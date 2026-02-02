@@ -1,5 +1,11 @@
 import { useCallback, useRef, useState } from "react";
 
+function getSSEBase(): string {
+  const path = window.location.pathname;
+  const match = path.match(/^(\/api\/hassio_ingress\/[^/]+)/);
+  return match ? `${match[1]}/api/v1` : "/api/v1";
+}
+
 export interface SSEProgress {
   phase: "idle" | "started" | "ping" | "download" | "upload" | "complete" | "error";
   bandwidth_mbps?: number;
@@ -28,7 +34,7 @@ export function useSSE() {
     setIsStreaming(true);
     receivedTerminalRef.current = false;
 
-    const es = new EventSource("/api/v1/speedtest/stream");
+    const es = new EventSource(`${getSSEBase()}/speedtest/stream`);
     esRef.current = es;
 
     es.addEventListener("started", () => {

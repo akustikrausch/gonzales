@@ -18,11 +18,12 @@ def setup_logging() -> logging.Logger:
     console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)
 
-    log_dir = Path("logs")
-    log_dir.mkdir(exist_ok=True)
-    file_handler = logging.FileHandler(log_dir / "gonzales.log")
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
+    if not settings.ha_addon:
+        log_dir = Path("logs")
+        log_dir.mkdir(exist_ok=True)
+        file_handler = logging.FileHandler(log_dir / "gonzales.log")
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
 
     return logger
 

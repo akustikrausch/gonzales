@@ -13,19 +13,33 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next) -> Response:
         response = await call_next(request)
         response.headers["X-Content-Type-Options"] = "nosniff"
-        response.headers["X-Frame-Options"] = "DENY"
         response.headers["X-XSS-Protection"] = "1; mode=block"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-        response.headers["Content-Security-Policy"] = (
-            "default-src 'self'; "
-            "script-src 'self'; "
-            "style-src 'self' 'unsafe-inline'; "
-            "img-src 'self' data:; "
-            "connect-src 'self'; "
-            "font-src 'self'; "
-            "object-src 'none'; "
-            "frame-ancestors 'none'"
-        )
+
+        if settings.ha_addon:
+            # HA Ingress embeds the UI in an iframe — allow framing
+            response.headers["X-Frame-Options"] = "SAMEORIGIN"
+            response.headers["Content-Security-Policy"] = (
+                "default-src 'self'; "
+                "script-src 'self'; "
+                "style-src 'self' 'unsafe-inline'; "
+                "img-src 'self' data:; "
+                "connect-src 'self'; "
+                "font-src 'self'; "
+                "object-src 'none'"
+            )
+        else:
+            response.headers["X-Frame-Options"] = "DENY"
+            response.headers["Content-Security-Policy"] = (
+                "default-src 'self'; "
+                "script-src 'self'; "
+                "style-src 'self' 'unsafe-inline'; "
+                "img-src 'self' data:; "
+                "connect-src 'self'; "
+                "font-src 'self'; "
+                "object-src 'none'; "
+                "frame-ancestors 'none'"
+            )
         return response
 
 
@@ -39,7 +53,8 @@ def configure_security(app: FastAPI) -> None:
         allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allow_headers=["Content-Type", "X-API-Key", "X-Requested-With"],
     )
-    allowed_hosts = ["localhost", "127.0.0.1"]
-    if settings.host not in ("127.0.0.1", "localhost"):
-        allowed_hosts.append(settings.host)
-    app.add_middleware(TrustedHostMiddleware, allowed_hosts=allowed_hosts)
+    if not settings.ha_addon:
+        allowed_hosts = ["localhost", "127.0.0.1"]
+        if settings.host not in ("127.0.0.1", "localhost"):
+            allowed_hosts.append(settings.host)
+        app.add_middleware(TrustedHostMiddleware, allowed_hosts=allowed_hosts)

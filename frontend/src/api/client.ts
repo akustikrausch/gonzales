@@ -11,7 +11,13 @@ import type {
   Status,
 } from "./types";
 
-const BASE = "/api/v1";
+function getApiBase(): string {
+  const path = window.location.pathname;
+  const match = path.match(/^(\/api\/hassio_ingress\/[^/]+)/);
+  return match ? `${match[1]}/api/v1` : "/api/v1";
+}
+
+const BASE = getApiBase();
 
 async function fetchJSON<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, init);

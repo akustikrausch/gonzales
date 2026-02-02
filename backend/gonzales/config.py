@@ -3,8 +3,6 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-CONFIG_FILE = Path("config.json")
-
 MUTABLE_KEYS = {
     "test_interval_minutes",
     "download_threshold_mbps",
@@ -27,6 +25,7 @@ class Settings(BaseSettings):
     debug: bool = False
 
     db_path: Path = Path("gonzales.db")
+    config_path: Path = Path("config.json")
     cors_origins: list[str] = ["http://localhost:5173", "http://localhost:8470"]
     speedtest_binary: str = "speedtest"
     manual_trigger_cooldown_seconds: int = 60
@@ -34,16 +33,17 @@ class Settings(BaseSettings):
     preferred_server_id: int = 0
     theme: str = "auto"
     api_key: str = ""
+    ha_addon: bool = False
 
     @property
     def database_url(self) -> str:
         return f"sqlite+aiosqlite:///{self.db_path}"
 
     def load_config_overrides(self) -> None:
-        if not CONFIG_FILE.exists():
+        if not self.config_path.exists():
             return
         try:
-            data = json.loads(CONFIG_FILE.read_text())
+            data = json.loads(self.config_path.read_text())
             for key in MUTABLE_KEYS:
                 if key in data:
                     setattr(self, key, data[key])
@@ -52,7 +52,8 @@ class Settings(BaseSettings):
 
     def save_config(self) -> None:
         data = {key: getattr(self, key) for key in MUTABLE_KEYS}
-        CONFIG_FILE.write_text(json.dumps(data, indent=2) + "\n")
+        self.config_path.parent.mkdir(parents=True, exist_ok=True)
+        self.config_path.write_text(json.dumps(data, indent=2) + "\n")
 
 
 settings = Settings()
