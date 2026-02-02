@@ -18,8 +18,17 @@ RESET = "\033[0m"
 YELLOW = "\033[1;33m"
 
 
+GREEN = "\033[1;32m"
+DIM = "\033[2m"
+
+
 def main() -> None:
     print(f"{CYAN}{BANNER}{RESET}")
+
+    url = f"http://{settings.host}:{settings.port}"
+    print(f"  {GREEN}Web Interface:{RESET}  {url}")
+    print(f"  {DIM}Open this URL in your browser to access the dashboard.{RESET}")
+    print()
 
     if settings.host != "127.0.0.1" and not settings.api_key:
         print(

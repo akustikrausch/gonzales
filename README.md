@@ -9,7 +9,7 @@
  ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝
 ```
 
-Local network speed monitoring tool to monitor and document ISP bandwidth and stability issues.
+Local network speed monitoring tool with a **web dashboard** to monitor and document ISP bandwidth and stability issues. Runs automated speed tests, stores results in SQLite, and visualizes everything in the browser.
 
 ---
 
@@ -40,7 +40,7 @@ make build
 make run
 ```
 
-Open **http://localhost:8470** in your browser. Done.
+The web dashboard is now running at **http://localhost:8470** -- open it in your browser.
 
 ---
 
@@ -275,7 +275,7 @@ make build
 make run
 ```
 
-Oeffne **http://localhost:8470** im Browser. Fertig.
+Das Web-Dashboard laeuft jetzt unter **http://localhost:8470** -- einfach im Browser oeffnen.
 
 ---
 
