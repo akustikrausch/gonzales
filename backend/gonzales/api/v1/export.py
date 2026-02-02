@@ -1,0 +1,59 @@
+from datetime import datetime
+
+from fastapi import APIRouter, Depends, Query
+from fastapi.responses import Response
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from gonzales.api.dependencies import get_db
+from gonzales.db.repository import MeasurementRepository
+from gonzales.services.export_service import export_service
+from gonzales.services.statistics_service import statistics_service
+
+router = APIRouter(prefix="/export", tags=["export"])
+
+
+@router.get("/csv")
+async def export_csv(
+    start_date: datetime | None = Query(default=None),
+    end_date: datetime | None = Query(default=None),
+    session: AsyncSession = Depends(get_db),
+):
+    repo = MeasurementRepository(session)
+    measurements = await repo.get_all_in_range(start_date, end_date)
+    csv_content = export_service.generate_csv(measurements)
+    return Response(
+        content=csv_content,
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=gonzales_export.csv"},
+    )
+
+
+@router.get("/pdf")
+async def export_pdf(
+    start_date: datetime | None = Query(default=None),
+    end_date: datetime | None = Query(default=None),
+    session: AsyncSession = Depends(get_db),
+):
+    repo = MeasurementRepository(session)
+    measurements = await repo.get_all_in_range(start_date, end_date)
+    stats_out = await statistics_service.get_statistics(session, start_date, end_date)
+
+    stats_dict = None
+    if stats_out.total_tests > 0:
+        stats_dict = {}
+        for key in ("download", "upload", "ping"):
+            s = getattr(stats_out, key)
+            if s:
+                stats_dict[key] = {
+                    "min": s.min,
+                    "max": s.max,
+                    "avg": s.avg,
+                    "median": s.median,
+                }
+
+    pdf_content = export_service.generate_pdf(measurements, stats_dict, start_date, end_date)
+    return Response(
+        content=pdf_content,
+        media_type="application/pdf",
+        headers={"Content-Disposition": "attachment; filename=gonzales_report.pdf"},
+    )

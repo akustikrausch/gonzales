@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+:root {
+  --color-blue: #007AFF;
+  --color-green: #34C759;
+  --color-red: #FF3B30;
+  --color-bg: #FAFAFA;
+  --color-card: #FFFFFF;
+  --color-text: #1D1D1F;
+  --color-text-secondary: #86868B;
+  --color-border: #E5E5EA;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display',
+    'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+}

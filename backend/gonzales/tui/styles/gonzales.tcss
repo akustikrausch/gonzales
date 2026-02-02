@@ -1,0 +1,179 @@
+/* Gonzales Demoscene Theme - Dark with neon accents */
+
+Screen {
+    background: #0a0a0a;
+    color: #e0e0e0;
+}
+
+Header {
+    background: #1a1a2e;
+    color: #00ffff;
+}
+
+Footer {
+    background: #1a1a2e;
+    color: #00ffff;
+}
+
+#dashboard-container {
+    padding: 1 2;
+}
+
+#history-container {
+    padding: 1 2;
+}
+
+#settings-container {
+    padding: 1 2;
+}
+
+.banner-art {
+    color: #00ffff;
+    text-style: bold;
+}
+
+.banner-subtitle {
+    color: #ff00ff;
+    text-style: bold;
+}
+
+#banner {
+    color: #00ffff;
+    text-style: bold;
+    margin-bottom: 0;
+}
+
+#subtitle {
+    color: #ff00ff;
+    text-style: bold;
+    margin-bottom: 1;
+}
+
+#status-line {
+    color: #ffff00;
+    text-style: bold;
+    margin-bottom: 1;
+}
+
+#gauges {
+    height: auto;
+    margin-bottom: 1;
+}
+
+#dl-gauge {
+    width: 1fr;
+    color: #00ffff;
+    height: auto;
+}
+
+#ul-gauge {
+    width: 1fr;
+    color: #ff00ff;
+    height: auto;
+}
+
+#ping-row {
+    height: auto;
+    margin-bottom: 1;
+}
+
+#ping-display {
+    color: #ffff00;
+    width: 1fr;
+}
+
+#jitter-display {
+    color: #ffff00;
+    width: 1fr;
+}
+
+#loss-display {
+    color: #ff3333;
+    width: 1fr;
+}
+
+#sparklines {
+    height: auto;
+    margin-bottom: 1;
+}
+
+#dl-sparkline {
+    color: #00ffff;
+    height: 1;
+}
+
+#ul-sparkline {
+    color: #ff00ff;
+    height: 1;
+}
+
+#ping-sparkline {
+    color: #ffff00;
+    height: 1;
+}
+
+#countdown {
+    color: #00ff00;
+    text-style: bold;
+}
+
+#last-test-info {
+    color: #888888;
+}
+
+#history-title {
+    color: #00ffff;
+    text-style: bold;
+    margin-bottom: 1;
+}
+
+#history-table {
+    margin: 1 2;
+}
+
+DataTable {
+    background: #0a0a0a;
+    color: #e0e0e0;
+}
+
+DataTable > .datatable--header {
+    background: #1a1a2e;
+    color: #00ffff;
+    text-style: bold;
+}
+
+DataTable > .datatable--cursor {
+    background: #2a2a4e;
+    color: #ffffff;
+}
+
+#settings-title {
+    color: #00ffff;
+    text-style: bold;
+    margin-bottom: 1;
+}
+
+#settings-form {
+    padding: 1 2;
+    max-width: 60;
+}
+
+Label {
+    color: #ff00ff;
+    margin-top: 1;
+}
+
+Input {
+    background: #1a1a2e;
+    color: #00ffff;
+    border: solid #333366;
+}
+
+Input:focus {
+    border: solid #00ffff;
+}
+
+#settings-status {
+    color: #00ff00;
+    margin-top: 1;
+}
