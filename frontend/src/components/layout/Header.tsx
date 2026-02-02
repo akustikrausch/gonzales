@@ -1,6 +1,7 @@
 import { Play, Loader2, Sun, Moon, Monitor } from "lucide-react";
-import { useStatus, useTriggerSpeedtest } from "../../hooks/useApi";
+import { useStatus } from "../../hooks/useApi";
 import { useTheme } from "../../hooks/useTheme";
+import { useSpeedTest } from "../../context/SpeedTestContext";
 import { GlassBadge } from "../ui/GlassBadge";
 import { GlassButton } from "../ui/GlassButton";
 
@@ -14,10 +15,11 @@ const themeOrder: Array<"auto" | "light" | "dark"> = ["auto", "light", "dark"];
 
 export function Header() {
   const { data: status } = useStatus();
-  const trigger = useTriggerSpeedtest();
+  const { runTest, isStreaming, progress } = useSpeedTest();
   const { theme, setTheme } = useTheme();
 
-  const isRunning = trigger.isPending || status?.scheduler.test_in_progress;
+  const isRunning = isStreaming || status?.scheduler.test_in_progress ||
+    (progress.phase !== "idle" && progress.phase !== "complete" && progress.phase !== "error");
   const ThemeIcon = themeIcons[theme];
 
   const cycleTheme = () => {
@@ -62,7 +64,7 @@ export function Header() {
         </GlassButton>
         <GlassButton
           variant="primary"
-          onClick={() => trigger.mutate()}
+          onClick={runTest}
           disabled={!!isRunning}
         >
           {isRunning ? (
@@ -70,7 +72,7 @@ export function Header() {
           ) : (
             <Play className="w-4 h-4" />
           )}
-          {trigger.isPending ? "Testing..." : "Run Test"}
+          {isRunning ? "Testing..." : "Run Test"}
         </GlassButton>
       </div>
     </header>

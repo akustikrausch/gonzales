@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AppShell } from "./components/layout/AppShell";
+import { SpeedTestProvider } from "./context/SpeedTestContext";
 import { Spinner } from "./components/ui/Spinner";
 
 const DashboardPage = lazy(() =>
@@ -30,17 +31,19 @@ function PageLoader() {
 export default function App() {
   return (
     <BrowserRouter>
-      <Suspense fallback={<PageLoader />}>
-        <Routes>
-          <Route element={<AppShell />}>
-            <Route index element={<DashboardPage />} />
-            <Route path="history" element={<HistoryPage />} />
-            <Route path="statistics" element={<StatisticsPage />} />
-            <Route path="export" element={<ExportPage />} />
-            <Route path="settings" element={<SettingsPage />} />
-          </Route>
-        </Routes>
-      </Suspense>
+      <SpeedTestProvider>
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            <Route element={<AppShell />}>
+              <Route index element={<DashboardPage />} />
+              <Route path="history" element={<HistoryPage />} />
+              <Route path="statistics" element={<StatisticsPage />} />
+              <Route path="export" element={<ExportPage />} />
+              <Route path="settings" element={<SettingsPage />} />
+            </Route>
+          </Routes>
+        </Suspense>
+      </SpeedTestProvider>
     </BrowserRouter>
   );
 }

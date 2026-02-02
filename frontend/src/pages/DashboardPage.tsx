@@ -1,6 +1,6 @@
 import { Gauge } from "lucide-react";
 import { useLatestMeasurement, useMeasurements, useStatistics } from "../hooks/useApi";
-import { useSSE } from "../hooks/useSSE";
+import { useSpeedTest } from "../context/SpeedTestContext";
 
 import { SpeedGauge } from "../components/dashboard/SpeedGauge";
 import { LatestResult } from "../components/dashboard/LatestResult";
@@ -8,23 +8,12 @@ import { SpeedChart } from "../components/dashboard/SpeedChart";
 import { PingChart } from "../components/dashboard/PingChart";
 import { LiveTestView } from "../components/speedtest/LiveTestView";
 import { Spinner } from "../components/ui/Spinner";
-import { useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
 
 export function DashboardPage() {
   const { data: latest, isLoading: loadingLatest } = useLatestMeasurement();
   const { data: page } = useMeasurements({ page_size: 50 });
   const { data: stats } = useStatistics();
-  const { progress, isStreaming } = useSSE();
-  const queryClient = useQueryClient();
-
-  useEffect(() => {
-    if (progress.phase === "complete") {
-      queryClient.invalidateQueries({ queryKey: ["measurement"] });
-      queryClient.invalidateQueries({ queryKey: ["measurements"] });
-      queryClient.invalidateQueries({ queryKey: ["statistics"] });
-    }
-  }, [progress.phase, queryClient]);
+  const { progress, isStreaming } = useSpeedTest();
 
   if (loadingLatest) {
     return (
