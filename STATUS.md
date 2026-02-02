@@ -10,7 +10,7 @@ The functional foundation (v1) is complete. All core features work.
 The v2 effort focuses on elevating design, animations, statistics, and
 documentation to "best on market" quality.
 
-Current quality: **8.9/10** -- Target: **9.5/10**
+Current quality: **9.1/10** -- Target: **9.5/10**
 
 ---
 
@@ -26,7 +26,7 @@ Current quality: **8.9/10** -- Target: **9.5/10**
 | 6 | Innovative Statistics + Insights | DONE | Anomaly detection, ISP score, correlations, predictions, degradation alerts |
 | 7 | TUI Real-Time Test View | DONE | LiveGauge widget, event bus subscription, sparkline, phase colors |
 | 8 | Tech Styleguide | DONE | STYLEGUIDE.md with full design reference (503 lines) |
-| 9 | Home Assistant Integration | TODO | Separate repo gonzales-ha, HACS compatible |
+| 9 | Home Assistant Integration | DONE | gonzales-ha repo, 12 sensors, config flow, HACS compatible |
 | 10 | Git Hygiene + Privacy Protection | DONE | .gitignore, templates, config.json.example, README updated |
 | 11 | Final Polish + Verification | TODO | Build, lint, tests, docs, end-to-end |
 
@@ -105,8 +105,13 @@ Current quality: **8.9/10** -- Target: **9.5/10**
 - Covers: colors, typography, spacing, radius, shadows, glass system, components, animations, icons, responsive, theme, charts, TUI, do's/don'ts
 - No backend unit tests (deferred to Phase 11)
 
-### Home Assistant (Phase 9)
-- Not started (separate repo needed)
+### Home Assistant (Phase 9) -- RESOLVED
+- Separate repo: https://github.com/akustikrausch/gonzales-ha
+- HACS-compatible custom integration with config flow
+- 7 main sensors (download, upload, ping, jitter, packet loss, last test, ISP score)
+- 5 diagnostic sensors (scheduler, test in progress, uptime, measurements, DB size)
+- DataUpdateCoordinator polling measurements, status, and enhanced statistics
+- README with installation, automation examples, and troubleshooting
 
 ### Git Hygiene (Phase 10) -- RESOLVED
 - config.json added to .gitignore
@@ -160,5 +165,5 @@ gonzales/
 
 ## Next Action
 
-Start Phase 9: Home Assistant Integration.
-Read PLAN.md Phase 9 for exact deliverables and repo structure.
+Start Phase 11: Final Polish + Verification.
+Read PLAN.md Phase 11 for exact deliverables and checklist.

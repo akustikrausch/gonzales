@@ -218,29 +218,39 @@ Current quality: 7.8/10. Target: 9.5/10.
 
 ---
 
-### Phase 9: Home Assistant Integration [TODO]
+### Phase 9: Home Assistant Integration [DONE]
 **Goal**: Separate repo with HACS-compatible HA custom integration
 
-- [ ] Create `gonzales-ha` repo structure
-- [ ] `custom_components/gonzales/manifest.json` (HA Feb 2026 compatible)
-- [ ] Config flow (host, port, polling interval)
-- [ ] Coordinator with async polling from Gonzales API
-- [ ] Sensor entities:
-  - Download speed (Mbps)
+- [x] Create `gonzales-ha` repo structure
+- [x] `custom_components/gonzales/manifest.json` (HA 2024.12+ compatible)
+- [x] Config flow (host, port, polling interval with validation)
+- [x] Coordinator with async polling from Gonzales API (3 endpoints)
+- [x] Sensor entities (7 main sensors):
+  - Download speed (Mbps) with server/ISP attributes
   - Upload speed (Mbps)
   - Ping latency (ms)
   - Ping jitter (ms)
   - Packet loss (%)
   - Last test time
-  - ISP performance score
-- [ ] Diagnostic sensors (scheduler status, uptime, DB size)
-- [ ] Device info (Gonzales instance as device)
-- [ ] HACS `hacs.json` for custom repository install
-- [ ] README with installation and configuration guide
+  - ISP performance score with grade/breakdown attributes
+- [x] Diagnostic sensors (5): scheduler status, test in progress, uptime, total measurements, DB size
+- [x] Device info (Gonzales instance as service device)
+- [x] HACS `hacs.json` for custom repository install
+- [x] README with installation, configuration, automation examples, troubleshooting
+- [x] Translation strings (en.json)
 
-**Repo**: `gonzales-ha/` (separate from main gonzales repo)
+**Repo**: `https://github.com/akustikrausch/gonzales-ha`
 
-**Verify**: HACS validation, HA config flow loads, sensors populate
+**Files created**:
+- `hacs.json`, `.gitignore`, `README.md`
+- `custom_components/gonzales/__init__.py` -- Entry setup/unload with runtime_data
+- `custom_components/gonzales/manifest.json` -- HA manifest with local_polling
+- `custom_components/gonzales/const.py` -- Domain and default constants
+- `custom_components/gonzales/config_flow.py` -- Config flow with API validation
+- `custom_components/gonzales/coordinator.py` -- DataUpdateCoordinator polling 3 endpoints
+- `custom_components/gonzales/sensor.py` -- 12 sensors (7 main + 5 diagnostic)
+- `custom_components/gonzales/strings.json` -- UI strings
+- `custom_components/gonzales/translations/en.json` -- English translations
 
 ---
 
