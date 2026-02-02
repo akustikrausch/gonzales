@@ -9,7 +9,7 @@
  ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝
 ```
 
-Local network speed monitoring tool to prove ISP bandwidth and stability issues.
+Local network speed monitoring tool to monitor and document ISP bandwidth and stability issues.
 
 ---
 
@@ -155,6 +155,7 @@ cp .env.example .env
 | `GONZALES_LOG_LEVEL` | `INFO` | Logging level |
 | `GONZALES_DEBUG` | `false` | Enable API docs at /docs |
 | `GONZALES_PREFERRED_SERVER_ID` | `0` | Preferred speedtest server (0 = auto) |
+| `GONZALES_API_KEY` | *(empty)* | API key for mutating endpoints. **Required when host != 127.0.0.1** |
 | `GONZALES_THEME` | `auto` | UI theme: auto, light, or dark |
 
 Settings can also be changed at runtime via the web UI (Settings page) or the API (`PUT /api/v1/config`). Runtime changes are persisted to `config.json`, which is auto-created and gitignored.
@@ -348,6 +349,7 @@ cp .env.example .env
 | `GONZALES_LOG_LEVEL` | `INFO` | Log-Level |
 | `GONZALES_DEBUG` | `false` | API-Docs unter /docs aktivieren |
 | `GONZALES_PREFERRED_SERVER_ID` | `0` | Bevorzugter Speedtest-Server (0 = automatisch) |
+| `GONZALES_API_KEY` | *(leer)* | API-Key fuer schreibende Endpoints. **Pflicht wenn Host != 127.0.0.1** |
 | `GONZALES_THEME` | `auto` | UI-Thema: auto, light oder dark |
 
 Einstellungen koennen auch zur Laufzeit ueber die Web-Oberflaeche (Einstellungen) oder die API (`PUT /api/v1/config`) geaendert werden. Laufzeitaenderungen werden in `config.json` gespeichert (wird automatisch erstellt, nicht in Git).
@@ -424,11 +426,13 @@ cp config.json.example config.json  # Runtime settings (optional)
 
 By default, the API is open (no authentication required). This is safe when binding to `127.0.0.1` (localhost only).
 
-If you expose Gonzales on the network (e.g., for Home Assistant), set an API key:
+**If you expose Gonzales on the network** (e.g., by setting `GONZALES_HOST=0.0.0.0` for Home Assistant or remote access), **you must set an API key**:
 
 ```bash
 export GONZALES_API_KEY="your-secret-key-here"
 ```
+
+Without an API key, anyone on your network can trigger speed tests, change configuration, and delete measurements. Gonzales will print a warning at startup if it detects network binding without an API key.
 
 When set, all mutating endpoints (config update, speedtest trigger, measurement delete) require the `X-API-Key` header:
 
@@ -437,6 +441,8 @@ curl -X POST http://localhost:8470/api/v1/speedtest/trigger -H "X-API-Key: your-
 ```
 
 Read-only endpoints (measurements, statistics, status, export) remain open.
+
+For production deployments, consider placing Gonzales behind a reverse proxy (nginx, Caddy) for TLS and additional access control.
 
 ---
 

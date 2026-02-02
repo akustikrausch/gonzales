@@ -22,6 +22,14 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.warning("Speedtest binary not found: %s", e)
 
+    if settings.host != "127.0.0.1" and not settings.api_key:
+        logger.warning(
+            "Binding to %s without GONZALES_API_KEY. "
+            "Mutating endpoints (trigger, config, delete) are unprotected. "
+            "Set GONZALES_API_KEY to secure your instance.",
+            settings.host,
+        )
+
     await init_db()
     logger.info("Database initialized")
 
