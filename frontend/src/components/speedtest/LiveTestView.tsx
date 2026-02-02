@@ -133,7 +133,7 @@ export function LiveTestView({ progress }: LiveTestViewProps) {
         />
       )}
 
-      <div className="relative z-10 flex flex-col items-center gap-5 py-8 px-6">
+      <div className="relative z-10 flex flex-col items-center gap-4 py-6 px-6">
         {/* Phase header row: badge left, elapsed timer right */}
         <div className="flex items-center justify-between w-full max-w-md" key={phase}>
           <GlassBadge color={color}>
@@ -198,38 +198,42 @@ export function LiveTestView({ progress }: LiveTestViewProps) {
 
           {/* Download phase */}
           {phase === "download" && (
-            <>
+            <div className="w-full flex flex-col items-center gap-2">
               <SpeedNeedle
                 value={progress.bandwidth_mbps || 0}
                 label="Download"
                 color="var(--g-blue)"
                 glowColor="#007AFF"
               />
-              <LiveSpeedGraph
-                samples={speedHistory.samples}
-                peak={speedHistory.peak}
-                color="var(--g-blue)"
-                version={speedHistory.version}
-              />
-            </>
+              <div className="w-full max-w-xs border-t pt-2" style={{ borderColor: "var(--g-border)" }}>
+                <LiveSpeedGraph
+                  samples={speedHistory.samples}
+                  peak={speedHistory.peak}
+                  color="var(--g-blue)"
+                  version={speedHistory.version}
+                />
+              </div>
+            </div>
           )}
 
           {/* Upload phase */}
           {phase === "upload" && (
-            <>
+            <div className="w-full flex flex-col items-center gap-2">
               <SpeedNeedle
                 value={progress.bandwidth_mbps || 0}
                 label="Upload"
                 color="var(--g-green)"
                 glowColor="#34C759"
               />
-              <LiveSpeedGraph
-                samples={speedHistory.samples}
-                peak={speedHistory.peak}
-                color="var(--g-green)"
-                version={speedHistory.version}
-              />
-            </>
+              <div className="w-full max-w-xs border-t pt-2" style={{ borderColor: "var(--g-border)" }}>
+                <LiveSpeedGraph
+                  samples={speedHistory.samples}
+                  peak={speedHistory.peak}
+                  color="var(--g-green)"
+                  version={speedHistory.version}
+                />
+              </div>
+            </div>
           )}
 
           {/* Complete -- results reveal */}

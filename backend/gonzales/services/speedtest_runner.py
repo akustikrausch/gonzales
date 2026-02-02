@@ -113,9 +113,10 @@ class SpeedtestRunner:
             final_result = None
             buffer = ""
             prev_phase = ""
+            last_log_progress = 0.0
 
             async def read_stdout():
-                nonlocal final_result, buffer, prev_phase
+                nonlocal final_result, buffer, prev_phase, last_log_progress
                 while True:
                     chunk = await process.stdout.read(4096)
                     if not chunk:
@@ -155,34 +156,50 @@ class SpeedtestRunner:
                             bw = data.get("download", {}).get("bandwidth", 0)
                             bw_mbps = round(bw * 8 / 1_000_000, 2)
                             dl_progress = data.get("download", {}).get("progress", 0)
-                            dl_elapsed = data.get("download", {}).get("elapsed", 0)
+                            dl_elapsed_ms = data.get("download", {}).get("elapsed", 0)
                             if prev_phase != "download":
                                 logger.info("Phase: Download")
                                 prev_phase = "download"
+                                last_log_progress = 0.0
+                            if dl_progress - last_log_progress >= 0.25 or dl_progress >= 1:
+                                logger.info(
+                                    "  DL: %.1f Mbps (%d%%)",
+                                    bw_mbps,
+                                    int(dl_progress * 100),
+                                )
+                                last_log_progress = dl_progress
                             event_bus.publish({
                                 "event": "progress",
                                 "data": {
                                     "phase": "download",
                                     "bandwidth_mbps": bw_mbps,
                                     "progress": dl_progress,
-                                    "elapsed": dl_elapsed,
+                                    "elapsed": round(dl_elapsed_ms / 1000, 2),
                                 },
                             })
                         elif msg_type == "upload":
                             bw = data.get("upload", {}).get("bandwidth", 0)
                             bw_mbps = round(bw * 8 / 1_000_000, 2)
                             ul_progress = data.get("upload", {}).get("progress", 0)
-                            ul_elapsed = data.get("upload", {}).get("elapsed", 0)
+                            ul_elapsed_ms = data.get("upload", {}).get("elapsed", 0)
                             if prev_phase != "upload":
                                 logger.info("Phase: Upload")
                                 prev_phase = "upload"
+                                last_log_progress = 0.0
+                            if ul_progress - last_log_progress >= 0.25 or ul_progress >= 1:
+                                logger.info(
+                                    "  UL: %.1f Mbps (%d%%)",
+                                    bw_mbps,
+                                    int(ul_progress * 100),
+                                )
+                                last_log_progress = ul_progress
                             event_bus.publish({
                                 "event": "progress",
                                 "data": {
                                     "phase": "upload",
                                     "bandwidth_mbps": bw_mbps,
                                     "progress": ul_progress,
-                                    "elapsed": ul_elapsed,
+                                    "elapsed": round(ul_elapsed_ms / 1000, 2),
                                 },
                             })
                         elif msg_type == "result":

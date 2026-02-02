@@ -69,7 +69,7 @@ export function SpeedNeedle({
 
   return (
     <div className="flex flex-col items-center">
-      <svg viewBox="0 0 200 145" className="w-full max-w-[320px]">
+      <svg viewBox="0 0 200 145" className="w-full max-w-[260px]">
         <defs>
           {/* Glow filter for needle */}
           <filter id="needleGlow" x="-50%" y="-50%" width="200%" height="200%">
@@ -218,9 +218,9 @@ export function SpeedNeedle({
           </circle>
         )}
       </svg>
-      <div className="text-center -mt-3">
+      <div className="text-center -mt-2">
         <span
-          className="text-5xl font-bold tabular-nums g-number-glow-pulse"
+          className="text-4xl font-bold tabular-nums g-number-glow-pulse"
           style={{
             color,
             "--glow-color": `${glow}60`,
