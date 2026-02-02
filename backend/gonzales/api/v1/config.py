@@ -1,5 +1,6 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
+from gonzales.api.dependencies import require_api_key
 from gonzales.config import settings
 from gonzales.schemas.config import ConfigOut, ConfigUpdate
 from gonzales.services.scheduler_service import scheduler_service
@@ -23,7 +24,7 @@ async def get_config():
     )
 
 
-@router.put("", response_model=ConfigOut)
+@router.put("", response_model=ConfigOut, dependencies=[Depends(require_api_key)])
 async def update_config(update: ConfigUpdate):
     if update.test_interval_minutes is not None:
         settings.test_interval_minutes = update.test_interval_minutes

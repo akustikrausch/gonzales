@@ -33,6 +33,7 @@ class Settings(BaseSettings):
 
     preferred_server_id: int = 0
     theme: str = "auto"
+    api_key: str = ""
 
     @property
     def database_url(self) -> str:

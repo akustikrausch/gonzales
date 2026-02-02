@@ -418,6 +418,36 @@ cp config.json.example config.json  # Runtime settings (optional)
 | Export | CSV, PDF (ReportLab) |
 | Home Assistant | [gonzales-ha](https://github.com/akustikrausch/gonzales-ha) (HACS custom integration) |
 
+## Security
+
+### API Key Protection
+
+By default, the API is open (no authentication required). This is safe when binding to `127.0.0.1` (localhost only).
+
+If you expose Gonzales on the network (e.g., for Home Assistant), set an API key:
+
+```bash
+export GONZALES_API_KEY="your-secret-key-here"
+```
+
+When set, all mutating endpoints (config update, speedtest trigger, measurement delete) require the `X-API-Key` header:
+
+```bash
+curl -X POST http://localhost:8470/api/v1/speedtest/trigger -H "X-API-Key: your-secret-key-here"
+```
+
+Read-only endpoints (measurements, statistics, status, export) remain open.
+
+---
+
 ## License
 
-MIT
+MIT -- see [LICENSE](LICENSE) for details.
+
+**Important:** Gonzales requires the [Ookla Speedtest CLI](https://www.speedtest.net/apps/cli) as a runtime dependency. The Ookla Speedtest CLI is **proprietary software** licensed under a separate [EULA](https://www.speedtest.net/about/eula):
+
+- **Personal, non-commercial use**: Permitted (free of charge)
+- **Commercial use**: Requires a separate license from Ookla
+- **Redistribution**: Not permitted -- users must install it independently
+
+Gonzales itself (this repository) is MIT-licensed. All other dependencies are permissively licensed (MIT/BSD/Apache-2.0).

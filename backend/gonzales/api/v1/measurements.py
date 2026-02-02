@@ -3,7 +3,7 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from gonzales.api.dependencies import get_db
+from gonzales.api.dependencies import get_db, require_api_key
 from gonzales.core.exceptions import MeasurementNotFoundError
 from gonzales.schemas.measurement import MeasurementOut, MeasurementPage, SortField, SortOrder
 from gonzales.services.measurement_service import measurement_service
@@ -50,7 +50,7 @@ async def get_measurement(measurement_id: int, session: AsyncSession = Depends(g
     return MeasurementOut.model_validate(m)
 
 
-@router.delete("/{measurement_id}")
+@router.delete("/{measurement_id}", dependencies=[Depends(require_api_key)])
 async def delete_measurement(measurement_id: int, session: AsyncSession = Depends(get_db)):
     deleted = await measurement_service.delete_by_id(session, measurement_id)
     if not deleted:

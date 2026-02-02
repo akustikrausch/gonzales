@@ -34,26 +34,34 @@ export function useSSE() {
     });
 
     es.addEventListener("progress", (e) => {
-      const data = JSON.parse(e.data);
-      setProgress({
-        phase: data.phase || "started",
-        bandwidth_mbps: data.bandwidth_mbps,
-        progress: data.progress,
-        ping_ms: data.ping_ms,
-        elapsed: data.elapsed,
-      });
+      try {
+        const data = JSON.parse(e.data);
+        setProgress({
+          phase: data.phase || "started",
+          bandwidth_mbps: data.bandwidth_mbps,
+          progress: data.progress,
+          ping_ms: data.ping_ms,
+          elapsed: data.elapsed,
+        });
+      } catch {
+        /* ignore malformed event */
+      }
     });
 
     es.addEventListener("complete", (e) => {
-      const data = JSON.parse(e.data);
-      setProgress({
-        phase: "complete",
-        download_mbps: data.download_mbps,
-        upload_mbps: data.upload_mbps,
-        ping_ms: data.ping_ms,
-        jitter_ms: data.jitter_ms,
-        measurement_id: data.measurement_id,
-      });
+      try {
+        const data = JSON.parse(e.data);
+        setProgress({
+          phase: "complete",
+          download_mbps: data.download_mbps,
+          upload_mbps: data.upload_mbps,
+          ping_ms: data.ping_ms,
+          jitter_ms: data.jitter_ms,
+          measurement_id: data.measurement_id,
+        });
+      } catch {
+        setProgress({ phase: "complete" });
+      }
       setIsStreaming(false);
       es.close();
       esRef.current = null;
@@ -61,8 +69,12 @@ export function useSSE() {
 
     es.addEventListener("error", (e) => {
       if (e instanceof MessageEvent) {
-        const data = JSON.parse(e.data);
-        setProgress({ phase: "error", message: data.message });
+        try {
+          const data = JSON.parse(e.data);
+          setProgress({ phase: "error", message: data.message });
+        } catch {
+          setProgress({ phase: "error", message: "Unknown error" });
+        }
       } else {
         setProgress({ phase: "error", message: "Connection lost" });
       }
