@@ -24,7 +24,9 @@ Python FastAPI application with async SQLAlchemy and APScheduler.
 - **Security**: `core/security.py` -- CORS (configurable origins), TrustedHost, GZip, security headers
 - **TUI**: `tui/app.py` -- Textual app with demoscene styling, 4 screens (dashboard, history, settings, real-time test)
   - `tui/screens/test.py` -- Real-time test screen with event bus subscription
-  - `tui/widgets/live_gauge.py` -- ASCII gauge with sparkline, progress bar, box-drawing results
+  - `tui/widgets/live_gauge.py` -- ASCII gauge with big speed numbers, animated data flow, elapsed timer, sparkline, progress bar, box-drawing results
+  - `tui/widgets/big_speed.py` -- 3-line-tall ASCII art digit renderer using block characters
+  - `tui/widgets/data_flow.py` -- 5-row animated ASCII data flow visualization (scroll direction and density scale with phase/bandwidth)
 
 ### Frontend (`frontend/`)
 
@@ -39,8 +41,9 @@ React 19 + TypeScript + Vite 6 + Tailwind CSS 4 SPA with Liquid Glass design sys
   - `src/hooks/useTheme.ts` -- theme state management (auto/light/dark)
   - `src/hooks/useMediaQuery.ts` -- responsive breakpoint hooks (useIsMobile, useIsTablet, useIsDesktop)
   - `src/hooks/useAnimatedNumber.ts` -- requestAnimationFrame number animation with easeOutExpo
+  - `src/hooks/useSpeedHistory.ts` -- accumulates {time, value} bandwidth samples during download/upload with throttled re-renders (~250ms)
 - **Layout**: `src/components/layout/` -- AppShell (responsive flex), Sidebar (collapsible on tablet), Header (theme toggle + run test), MobileNav (fixed bottom nav)
-- **Speedtest**: `src/components/speedtest/` -- LiveTestView (SSE progress with DataStreamLines, phase colors), SpeedNeedle (SVG gauge with glow filters, gradient arc, pulsing tip), ProgressRing (SVG circular progress with optional glow)
+- **Speedtest**: `src/components/speedtest/` -- LiveTestView (SSE progress with canvas particle system, live speed graph, elapsed timer, phase transition animations), SpeedNeedle (SVG gauge with glow filters, gradient arc, pulsing tip, pulsing outer arc), ProgressRing (SVG circular progress with optional glow), DataFlowCanvas (HTML Canvas particle system with 60-120 glowing particles, direction/density scales with bandwidth, prefers-reduced-motion fallback), LiveSpeedGraph (pure SVG area chart with glow filter and pulsing dot), ElapsedTimer (M:SS elapsed display)
 - **Pages**: Dashboard (with live test overlay), History, Statistics (tabbed: Overview/Time Analysis/Trends/Servers/Insights), Export, Settings (with server picker + theme selector). All pages lazy-loaded via React.lazy()
 - **Statistics**: `src/components/statistics/` -- HourlyHeatmap, DayOfWeekChart (radar), TrendChart (area with prediction lines), SlaCard, ReliabilityCard, ServerComparison (bar), IspScoreCard, PeakAnalysis, QualityTimeline, CorrelationMatrix, DegradationAlert
 - **Common**: `src/components/common/` -- AnimatedNumber (easeOutExpo counting), PageTransition (route fade/slide)

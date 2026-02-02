@@ -101,12 +101,14 @@ class TestScreen(Screen):
                         gauge.set_bandwidth(
                             data.get("bandwidth_mbps", 0),
                             data.get("progress", 0),
+                            data.get("elapsed", 0),
                         )
                     elif phase == "upload":
                         gauge.set_phase("upload")
                         gauge.set_bandwidth(
                             data.get("bandwidth_mbps", 0),
                             data.get("progress", 0),
+                            data.get("elapsed", 0),
                         )
 
                 elif event_type == "complete":

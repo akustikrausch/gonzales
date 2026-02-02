@@ -143,6 +143,29 @@
   }
 }
 
+@keyframes g-phase-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes g-number-glow-pulse {
+  0%, 100% {
+    text-shadow: 0 0 8px var(--glow-color, rgba(0, 122, 255, 0.3));
+  }
+  50% {
+    text-shadow: 0 0 24px var(--glow-color, rgba(0, 122, 255, 0.6)),
+                 0 0 48px var(--glow-color, rgba(0, 122, 255, 0.2));
+  }
+}
+
 
 /* ==========================================================================
    UTILITY CLASSES
@@ -170,6 +193,14 @@
 
 .g-animate-breathe {
   animation: g-breathe 2s ease-in-out infinite;
+}
+
+.g-phase-enter {
+  animation: g-phase-enter 400ms var(--g-ease-out) both;
+}
+
+.g-number-glow-pulse {
+  animation: g-number-glow-pulse 2s ease-in-out infinite;
 }
 
 
@@ -217,7 +248,9 @@
   .g-animate-slide-right,
   .g-animate-slide-left,
   .g-animate-float,
-  .g-animate-breathe {
+  .g-animate-breathe,
+  .g-phase-enter,
+  .g-number-glow-pulse {
     animation: none;
     opacity: 1;
     transform: none;

@@ -23,9 +23,9 @@ Current quality: **9.5/10** -- Target: **9.5/10**
 | 2 | Frontend Foundation | DONE | Glass design, 5 pages, live test, responsive |
 | 3 | Design System Polish | DONE | Multi-layer glass, hover effects, shimmer, skeleton, tooltips |
 | 4 | Page Transitions + Number Animations | DONE | Route transitions, animated numbers, chart draw-in |
-| 5 | Futuristic Live Test View (Web) | DONE | SVG glow filters, data stream lines, phase colors, staggered results |
+| 5 | Futuristic Live Test View (Web) | DONE | SVG glow filters, canvas particle system, live speed graph, elapsed timer, phase animations |
 | 6 | Innovative Statistics + Insights | DONE | Anomaly detection, ISP score, correlations, predictions, degradation alerts |
-| 7 | TUI Real-Time Test View | DONE | LiveGauge widget, event bus subscription, sparkline, phase colors |
+| 7 | TUI Real-Time Test View | DONE | LiveGauge with big ASCII speed numbers, animated data flow, elapsed timer, sparkline, phase colors |
 | 8 | Tech Styleguide | DONE | STYLEGUIDE.md with full design reference (503 lines) |
 | 9 | Home Assistant Integration | DONE | gonzales-ha repo, 12 sensors, config flow, HACS compatible |
 | 10 | Git Hygiene + Privacy Protection | DONE | .gitignore, templates, config.json.example, README updated |
@@ -68,9 +68,13 @@ Current quality: **9.5/10** -- Target: **9.5/10**
 - Route transitions (fade + slide) + animated numbers (easeOutExpo)
 - Chart draw-in animations with staggered timing
 - Futuristic live test view:
-  - SpeedNeedle with SVG glow filters, gradient arc, pulsing tip
+  - SpeedNeedle with SVG glow filters, gradient arc, pulsing tip, pulsing outer arc glow
   - ProgressRing with optional glow effect
-  - DataStreamLines background animation
+  - DataFlowCanvas: HTML Canvas particle system (60-120 glowing particles, direction/density scales with bandwidth, prefers-reduced-motion fallback)
+  - LiveSpeedGraph: pure SVG real-time area chart with glow filter and pulsing current-value dot
+  - ElapsedTimer: live M:SS elapsed display during active phases
+  - useSpeedHistory hook: accumulates bandwidth samples with throttled re-renders
+  - Phase transition animations (scale + blur entrance via g-phase-enter)
   - Phase-specific colors (teal/orange/blue/green)
   - Staggered result cards with spring animations
 - 14 statistics visualization components (9 original + 5 insights)
@@ -131,7 +135,7 @@ gonzales/
     design-system/       # 3 CSS files (tokens, glass, animations)
     components/ui/       # 8 glass primitives
     components/          # Feature components (9 subdirs)
-    hooks/               # 6 custom hooks
+    hooks/               # 7 custom hooks
     pages/               # 5 pages
     api/                 # Client + types
 ```

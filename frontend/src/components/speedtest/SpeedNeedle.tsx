@@ -102,7 +102,7 @@ export function SpeedNeedle({
           </linearGradient>
         </defs>
 
-        {/* Background track */}
+        {/* Background track with subtle pulse */}
         <path
           d={`M ${cx + r * Math.cos(arcStart)} ${cy + r * Math.sin(arcStart)} A ${r} ${r} 0 1 1 ${cx + r * Math.cos(135 * Math.PI / 180)} ${cy + r * Math.sin(135 * Math.PI / 180)}`}
           fill="none"
@@ -111,6 +111,24 @@ export function SpeedNeedle({
           strokeLinecap="round"
           opacity="0.5"
         />
+        {/* Pulsing glow on outer arc */}
+        {animated > 0 && (
+          <path
+            d={`M ${cx + r * Math.cos(arcStart)} ${cy + r * Math.sin(arcStart)} A ${r} ${r} 0 1 1 ${cx + r * Math.cos(135 * Math.PI / 180)} ${cy + r * Math.sin(135 * Math.PI / 180)}`}
+            fill="none"
+            stroke={color}
+            strokeWidth="8"
+            strokeLinecap="round"
+            filter="url(#arcGlow)"
+          >
+            <animate
+              attributeName="opacity"
+              values="0.05;0.15;0.05"
+              dur="3s"
+              repeatCount="indefinite"
+            />
+          </path>
+        )}
 
         {/* Minor ticks */}
         {minorTicks.map((t, i) => (
@@ -202,8 +220,12 @@ export function SpeedNeedle({
       </svg>
       <div className="text-center -mt-3">
         <span
-          className="text-4xl font-bold tabular-nums"
-          style={{ color, textShadow: `0 0 20px ${glow}40` }}
+          className="text-5xl font-bold tabular-nums g-number-glow-pulse"
+          style={{
+            color,
+            "--glow-color": `${glow}60`,
+            textShadow: `0 0 20px ${glow}40, 0 0 40px ${glow}20`,
+          } as React.CSSProperties}
         >
           {animated.toFixed(1)}
         </span>
