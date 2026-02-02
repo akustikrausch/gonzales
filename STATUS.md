@@ -10,7 +10,7 @@ The functional foundation (v1) is complete. All core features work.
 The v2 effort focuses on elevating design, animations, statistics, and
 documentation to "best on market" quality.
 
-Current quality: **8.8/10** -- Target: **9.5/10**
+Current quality: **8.9/10** -- Target: **9.5/10**
 
 ---
 
@@ -25,7 +25,7 @@ Current quality: **8.8/10** -- Target: **9.5/10**
 | 5 | Futuristic Live Test View (Web) | DONE | SVG glow filters, data stream lines, phase colors, staggered results |
 | 6 | Innovative Statistics + Insights | DONE | Anomaly detection, ISP score, correlations, predictions, degradation alerts |
 | 7 | TUI Real-Time Test View | DONE | LiveGauge widget, event bus subscription, sparkline, phase colors |
-| 8 | Tech Styleguide | TODO | STYLEGUIDE.md with full design reference |
+| 8 | Tech Styleguide | DONE | STYLEGUIDE.md with full design reference (503 lines) |
 | 9 | Home Assistant Integration | TODO | Separate repo gonzales-ha, HACS compatible |
 | 10 | Git Hygiene + Privacy Protection | DONE | .gitignore, templates, config.json.example, README updated |
 | 11 | Final Polish + Verification | TODO | Build, lint, tests, docs, end-to-end |
@@ -79,6 +79,7 @@ Current quality: **8.8/10** -- Target: **9.5/10**
 - claude.md (architecture reference)
 - REQUIREMENTS.md (full requirements spec)
 - PLAN.md (phased development plan)
+- STYLEGUIDE.md (comprehensive design system reference)
 
 ---
 
@@ -99,9 +100,10 @@ Current quality: **8.8/10** -- Target: **9.5/10**
 - Event bus subscription for per-event updates during tests
 - ASCII speed gauge, sparkline, progress bar, box-drawing results
 
-### Documentation (Phase 8)
-- No STYLEGUIDE.md (tech styleguide)
-- No backend unit tests
+### Documentation (Phase 8) -- RESOLVED
+- STYLEGUIDE.md created with full design reference (503 lines)
+- Covers: colors, typography, spacing, radius, shadows, glass system, components, animations, icons, responsive, theme, charts, TUI, do's/don'ts
+- No backend unit tests (deferred to Phase 11)
 
 ### Home Assistant (Phase 9)
 - Not started (separate repo needed)
@@ -123,6 +125,7 @@ gonzales/
   REQUIREMENTS.md        # What we want
   PLAN.md                # How we get there
   STATUS.md              # Where we are (this file)
+  STYLEGUIDE.md          # Design system reference
   README.md              # User documentation
   claude.md              # AI architecture reference
   backend/gonzales/
@@ -157,5 +160,5 @@ gonzales/
 
 ## Next Action
 
-Start Phase 8: Tech Styleguide Document.
-Read PLAN.md Phase 8 for exact deliverables and file list.
+Start Phase 9: Home Assistant Integration.
+Read PLAN.md Phase 9 for exact deliverables and repo structure.
