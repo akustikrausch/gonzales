@@ -1,0 +1,8 @@
+{
+  "test_interval_minutes": 30,
+  "download_threshold_mbps": 1000.0,
+  "upload_threshold_mbps": 500.0,
+  "preferred_server_id": 0,
+  "manual_trigger_cooldown_seconds": 60,
+  "theme": "auto"
+}

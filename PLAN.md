@@ -243,7 +243,7 @@ Current quality: 7.8/10. Target: 9.5/10.
 
 ---
 
-### Phase 10: Git Hygiene + Privacy Protection [TODO]
+### Phase 10: Git Hygiene + Privacy Protection [DONE]
 **Goal**: Ensure no private/runtime files are ever pushed to git
 
 #### Strategy:
@@ -252,30 +252,32 @@ Current quality: 7.8/10. Target: 9.5/10.
 - Backend startup ensures required directories exist
 
 #### Deliverables:
-- [ ] Enhanced `.gitignore`:
-  - Add `config.json` (runtime user settings)
-  - Add `*.sqlite` (alternative DB extension)
-  - Add `backend/logs/` and `frontend/logs/` explicitly
-  - Add `*.bak`, `*.tmp` (temp files)
-  - Verify all sensitive patterns covered
-- [ ] Remove any tracked private files from git index (`git rm --cached`)
-- [ ] Create template files:
+- [x] Enhanced `.gitignore`:
+  - Added `config.json` (runtime user settings)
+  - Added `*.sqlite` (alternative DB extension)
+  - Added `backend/logs/` and `frontend/logs/` explicitly
+  - Added `*.bak`, `*.tmp`, `*.orig` (temp files)
+  - Added `*.tsbuildinfo` (TypeScript build cache)
+  - Verified all sensitive patterns covered
+- [x] Removed tracked build artifact from git index (`git rm --cached tsconfig.tsbuildinfo`)
+- [x] Create template files:
   - `config.json.example` -- Default config with all MUTABLE_KEYS documented
-  - `.env.example` -- Already exists, verify it's complete
-- [ ] Backend auto-creation on startup:
-  - Ensure `logs/` directory is created if missing
-  - Ensure `config.json` is created with defaults if missing (already handled by `save_config()`)
-- [ ] Add `PRIVATE_FILES.md` or section in README explaining:
-  - Which files are gitignored and why
+  - `.env.example` -- Updated with all Settings fields (added DB_PATH, CORS_ORIGINS, SPEEDTEST_BINARY, MANUAL_TRIGGER_COOLDOWN_SECONDS)
+- [x] Backend auto-creation on startup:
+  - `logs/` directory created by logging setup (logging.py)
+  - `config.json` created on first settings save (save_config())
+  - `gonzales.db` created by init_db() with WAL mode
+- [x] Added "Runtime Files" section in README explaining:
+  - Which files are gitignored and why (table format)
   - How to configure via config.json or .env
   - What gets auto-created on first run
+  - Updated config tables in both EN and DE sections with all variables
 
-**Files to modify**:
-- `.gitignore` -- Add missing patterns
-- `config.json.example` -- New template file
-- `.env.example` -- Verify completeness
-- `backend/gonzales/main.py` or `config.py` -- Auto-create logs dir
-- `README.md` -- Add configuration section
+**Files modified**:
+- `.gitignore` -- Added config.json, *.sqlite, *.tsbuildinfo, *.bak, *.tmp, *.orig
+- `config.json.example` -- New template file with all MUTABLE_KEYS
+- `.env.example` -- Added missing variables, organized into sections
+- `README.md` -- Added Runtime Files section, updated config tables (EN + DE)
 
 **Verify**: `git status` shows no private files, templates exist, fresh clone works
 

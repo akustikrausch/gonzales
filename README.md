@@ -146,12 +146,18 @@ cp .env.example .env
 | `GONZALES_HOST` | `127.0.0.1` | Bind address |
 | `GONZALES_PORT` | `8470` | Server port |
 | `GONZALES_TEST_INTERVAL_MINUTES` | `30` | Minutes between tests |
+| `GONZALES_MANUAL_TRIGGER_COOLDOWN_SECONDS` | `60` | Cooldown between manual tests |
+| `GONZALES_SPEEDTEST_BINARY` | `speedtest` | Path to speedtest CLI binary |
 | `GONZALES_DOWNLOAD_THRESHOLD_MBPS` | `1000.0` | Expected download speed |
 | `GONZALES_UPLOAD_THRESHOLD_MBPS` | `500.0` | Expected upload speed |
+| `GONZALES_DB_PATH` | `gonzales.db` | SQLite database file path |
+| `GONZALES_CORS_ORIGINS` | `localhost:5173,8470` | Allowed CORS origins (JSON array) |
 | `GONZALES_LOG_LEVEL` | `INFO` | Logging level |
 | `GONZALES_DEBUG` | `false` | Enable API docs at /docs |
 | `GONZALES_PREFERRED_SERVER_ID` | `0` | Preferred speedtest server (0 = auto) |
 | `GONZALES_THEME` | `auto` | UI theme: auto, light, or dark |
+
+Settings can also be changed at runtime via the web UI (Settings page) or the API (`PUT /api/v1/config`). Runtime changes are persisted to `config.json`, which is auto-created and gitignored.
 
 #### Theme Support
 
@@ -329,12 +335,18 @@ cp .env.example .env
 | `GONZALES_HOST` | `127.0.0.1` | Bind-Adresse |
 | `GONZALES_PORT` | `8470` | Server-Port |
 | `GONZALES_TEST_INTERVAL_MINUTES` | `30` | Minuten zwischen Tests |
+| `GONZALES_MANUAL_TRIGGER_COOLDOWN_SECONDS` | `60` | Abklingzeit zwischen manuellen Tests |
+| `GONZALES_SPEEDTEST_BINARY` | `speedtest` | Pfad zur Speedtest-CLI |
 | `GONZALES_DOWNLOAD_THRESHOLD_MBPS` | `1000.0` | Erwartete Download-Geschwindigkeit |
 | `GONZALES_UPLOAD_THRESHOLD_MBPS` | `500.0` | Erwartete Upload-Geschwindigkeit |
+| `GONZALES_DB_PATH` | `gonzales.db` | SQLite-Datenbankdatei |
+| `GONZALES_CORS_ORIGINS` | `localhost:5173,8470` | Erlaubte CORS-Origins (JSON-Array) |
 | `GONZALES_LOG_LEVEL` | `INFO` | Log-Level |
 | `GONZALES_DEBUG` | `false` | API-Docs unter /docs aktivieren |
 | `GONZALES_PREFERRED_SERVER_ID` | `0` | Bevorzugter Speedtest-Server (0 = automatisch) |
 | `GONZALES_THEME` | `auto` | UI-Thema: auto, light oder dark |
+
+Einstellungen koennen auch zur Laufzeit ueber die Web-Oberflaeche (Einstellungen) oder die API (`PUT /api/v1/config`) geaendert werden. Laufzeitaenderungen werden in `config.json` gespeichert (wird automatisch erstellt, nicht in Git).
 
 #### Ueberpruefen
 
@@ -356,6 +368,27 @@ curl http://localhost:8470/api/v1/export/csv > ergebnisse.csv
 
 # Systemstatus
 curl http://localhost:8470/api/v1/status
+```
+
+---
+
+## Runtime Files (not in Git)
+
+The following files are created automatically at runtime and are excluded from version control via `.gitignore`:
+
+| File / Directory | Created by | Purpose |
+|-----------------|------------|---------|
+| `config.json` | Settings API | Persisted runtime config (test interval, thresholds, theme) |
+| `gonzales.db` | Backend startup | SQLite database with all measurements |
+| `gonzales.db-wal` | SQLite WAL mode | Write-ahead log for concurrent access |
+| `backend/logs/gonzales.log` | Logging setup | Application log file |
+| `.env` | User (from `.env.example`) | Environment variable overrides |
+
+After a fresh clone, simply run `make install && make build && make run`. All runtime files are created automatically on first startup. To customize settings before first run, copy the template files:
+
+```bash
+cp .env.example .env          # Environment variables
+cp config.json.example config.json  # Runtime settings (optional)
 ```
 
 ---

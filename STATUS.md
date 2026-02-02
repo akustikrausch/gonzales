@@ -27,7 +27,7 @@ Current quality: **8.2/10** -- Target: **9.5/10**
 | 7 | TUI Real-Time Test View | TODO | Live gauge, progress bar, event-driven updates |
 | 8 | Tech Styleguide | TODO | STYLEGUIDE.md with full design reference |
 | 9 | Home Assistant Integration | TODO | Separate repo gonzales-ha, HACS compatible |
-| 10 | Git Hygiene + Privacy Protection | TODO | .gitignore, templates, auto-creation of runtime files |
+| 10 | Git Hygiene + Privacy Protection | DONE | .gitignore, templates, config.json.example, README updated |
 | 11 | Final Polish + Verification | TODO | Build, lint, tests, docs, end-to-end |
 
 ---
@@ -106,11 +106,12 @@ Current quality: **8.2/10** -- Target: **9.5/10**
 ### Home Assistant (Phase 9)
 - Not started (separate repo needed)
 
-### Git Hygiene (Phase 10)
-- config.json not in .gitignore (runtime file with user settings)
-- No config.json.example template
-- No auto-creation of runtime directories (logs/)
-- No documentation of what files are gitignored and why
+### Git Hygiene (Phase 10) -- RESOLVED
+- config.json added to .gitignore
+- config.json.example template created
+- .env.example updated with all variables
+- README documents all runtime files and auto-creation behavior
+- tsconfig.tsbuildinfo removed from git tracking
 
 ---
 

@@ -15,8 +15,12 @@ venv/
 *.db-journal
 *.db-wal
 *.db-shm
+*.sqlite
 
-# Environment
+# Runtime config (user-specific, created at runtime)
+config.json
+
+# Environment (use .env.example as template)
 .env
 
 # IDE
@@ -37,6 +41,8 @@ frontend/dist/
 # Logs
 *.log
 logs/
+backend/logs/
+frontend/logs/
 
 # Testing
 .coverage
@@ -46,3 +52,9 @@ htmlcov/
 # Build artifacts
 *.so
 *.dylib
+*.tsbuildinfo
+
+# Temporary files
+*.bak
+*.tmp
+*.orig
