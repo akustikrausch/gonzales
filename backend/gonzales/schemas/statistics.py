@@ -85,6 +85,97 @@ class ServerStats(BaseModel):
     avg_ping_ms: float
 
 
+# --- Phase 6: Innovative Statistics ---
+
+
+class AnomalyPoint(BaseModel):
+    timestamp: str
+    metric: str
+    value: float
+    mean: float
+    stddev: float
+    z_score: float
+
+
+class PeriodStats(BaseModel):
+    label: str
+    hours: str
+    avg_download_mbps: float
+    avg_upload_mbps: float
+    avg_ping_ms: float
+    count: int
+
+
+class PeakOffPeakAnalysis(BaseModel):
+    peak: PeriodStats
+    offpeak: PeriodStats
+    night: PeriodStats
+    best_period: str
+    worst_period: str
+
+
+class IspScoreBreakdown(BaseModel):
+    speed_score: float
+    reliability_score: float
+    latency_score: float
+    consistency_score: float
+
+
+class IspScore(BaseModel):
+    composite: float
+    grade: str
+    breakdown: IspScoreBreakdown
+
+
+class TimeWindowResult(BaseModel):
+    hour: int
+    label: str
+    avg_download_mbps: float
+    avg_upload_mbps: float
+    avg_ping_ms: float
+
+
+class BestWorstTimes(BaseModel):
+    best_download: TimeWindowResult | None = None
+    worst_download: TimeWindowResult | None = None
+    best_upload: TimeWindowResult | None = None
+    worst_upload: TimeWindowResult | None = None
+    best_ping: TimeWindowResult | None = None
+    worst_ping: TimeWindowResult | None = None
+
+
+class CorrelationPair(BaseModel):
+    metric_a: str
+    metric_b: str
+    coefficient: float
+
+
+class CorrelationMatrix(BaseModel):
+    pairs: list[CorrelationPair]
+    metrics: list[str]
+
+
+class DegradationAlert(BaseModel):
+    metric: str
+    severity: str
+    description: str
+    current_avg: float
+    historical_avg: float
+    drop_pct: float
+
+
+class PredictionPoint(BaseModel):
+    timestamp: str
+    download_mbps: float
+    upload_mbps: float
+    ping_ms: float
+
+
+class PredictiveTrend(BaseModel):
+    points: list[PredictionPoint]
+    confidence: str
+
+
 class EnhancedStatisticsOut(BaseModel):
     basic: StatisticsOut
     hourly: list[HourlyAverage]
@@ -93,3 +184,10 @@ class EnhancedStatisticsOut(BaseModel):
     sla: SlaCompliance
     reliability: ReliabilityScore
     by_server: list[ServerStats]
+    anomalies: list[AnomalyPoint] = []
+    peak_offpeak: PeakOffPeakAnalysis | None = None
+    isp_score: IspScore | None = None
+    best_worst_times: BestWorstTimes | None = None
+    correlations: CorrelationMatrix | None = None
+    degradation_alerts: list[DegradationAlert] = []
+    predictions: PredictiveTrend | None = None

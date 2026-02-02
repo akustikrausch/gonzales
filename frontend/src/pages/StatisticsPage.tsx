@@ -13,13 +13,19 @@ import { TrendChart } from "../components/statistics/TrendChart";
 import { SlaCard } from "../components/statistics/SlaCard";
 import { ReliabilityCard } from "../components/statistics/ReliabilityCard";
 import { ServerComparison } from "../components/statistics/ServerComparison";
+import { IspScoreCard } from "../components/statistics/IspScoreCard";
+import { PeakAnalysis } from "../components/statistics/PeakAnalysis";
+import { QualityTimeline } from "../components/statistics/QualityTimeline";
+import { CorrelationMatrixView } from "../components/statistics/CorrelationMatrix";
+import { DegradationAlertBanner } from "../components/statistics/DegradationAlert";
 
-type Tab = "overview" | "time" | "trends" | "servers";
+type Tab = "overview" | "time" | "trends" | "insights" | "servers";
 
 const tabs: { key: Tab; label: string }[] = [
   { key: "overview", label: "Overview" },
   { key: "time", label: "Time Analysis" },
   { key: "trends", label: "Trends" },
+  { key: "insights", label: "Insights" },
   { key: "servers", label: "Servers" },
 ];
 
@@ -65,6 +71,11 @@ export function StatisticsPage() {
         />
       </div>
 
+      {/* Degradation alerts at top */}
+      {enhanced.degradation_alerts.length > 0 && (
+        <DegradationAlertBanner alerts={enhanced.degradation_alerts} />
+      )}
+
       <div className="flex gap-2 g-animate-in g-stagger-1">
         {tabs.map((tab) => (
           <GlassButton
@@ -81,6 +92,7 @@ export function StatisticsPage() {
       <div className="g-animate-in g-stagger-2">
         {activeTab === "overview" && (
           <div className="space-y-4">
+            {enhanced.isp_score && <IspScoreCard score={enhanced.isp_score} />}
             <StatsOverview stats={stats} />
             {stats.download && (
               <Percentiles label="Download" stat={stats.download} unit="Mbps" color="var(--g-blue)" />
@@ -121,6 +133,16 @@ export function StatisticsPage() {
 
         {activeTab === "time" && (
           <div className="space-y-4">
+            <QualityTimeline
+              data={enhanced.hourly}
+              downloadThreshold={stats.download_threshold_mbps}
+            />
+            {enhanced.peak_offpeak && (
+              <PeakAnalysis
+                peakOffPeak={enhanced.peak_offpeak}
+                bestWorstTimes={enhanced.best_worst_times}
+              />
+            )}
             <HourlyHeatmap data={enhanced.hourly} />
             <DayOfWeekChart data={enhanced.daily} />
           </div>
@@ -128,11 +150,58 @@ export function StatisticsPage() {
 
         {activeTab === "trends" && (
           <div className="space-y-4">
-            <TrendChart trend={enhanced.trend} />
+            <TrendChart trend={enhanced.trend} predictions={enhanced.predictions} />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <SlaCard sla={enhanced.sla} />
               <ReliabilityCard reliability={enhanced.reliability} />
             </div>
+          </div>
+        )}
+
+        {activeTab === "insights" && (
+          <div className="space-y-4">
+            {enhanced.isp_score && <IspScoreCard score={enhanced.isp_score} />}
+            {enhanced.correlations && (
+              <CorrelationMatrixView data={enhanced.correlations} />
+            )}
+            {enhanced.peak_offpeak && (
+              <PeakAnalysis
+                peakOffPeak={enhanced.peak_offpeak}
+                bestWorstTimes={enhanced.best_worst_times}
+              />
+            )}
+            {enhanced.anomalies.length > 0 && (
+              <div className="space-y-2">
+                <h3
+                  className="text-sm font-semibold"
+                  style={{ color: "var(--g-text)" }}
+                >
+                  Anomalies Detected ({enhanced.anomalies.length})
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                  {enhanced.anomalies.slice(0, 12).map((a, i) => (
+                    <div
+                      key={`${a.timestamp}-${a.metric}-${i}`}
+                      className="flex items-center gap-2 p-2 rounded-lg"
+                      style={{ background: "var(--g-red)08" }}
+                    >
+                      <div
+                        className="w-2 h-2 rounded-full shrink-0"
+                        style={{ background: "var(--g-red)" }}
+                      />
+                      <div className="min-w-0">
+                        <span className="text-xs font-medium block truncate" style={{ color: "var(--g-text)" }}>
+                          {a.metric}: {a.value} (z={a.z_score})
+                        </span>
+                        <span className="text-[10px]" style={{ color: "var(--g-text-tertiary)" }}>
+                          Mean: {a.mean} / {new Date(a.timestamp).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 

@@ -172,6 +172,96 @@ export interface ServerStats {
   avg_ping_ms: number;
 }
 
+// Phase 6: Innovative Statistics
+
+export interface AnomalyPoint {
+  timestamp: string;
+  metric: string;
+  value: number;
+  mean: number;
+  stddev: number;
+  z_score: number;
+}
+
+export interface PeriodStats {
+  label: string;
+  hours: string;
+  avg_download_mbps: number;
+  avg_upload_mbps: number;
+  avg_ping_ms: number;
+  count: number;
+}
+
+export interface PeakOffPeakAnalysis {
+  peak: PeriodStats;
+  offpeak: PeriodStats;
+  night: PeriodStats;
+  best_period: string;
+  worst_period: string;
+}
+
+export interface IspScoreBreakdown {
+  speed_score: number;
+  reliability_score: number;
+  latency_score: number;
+  consistency_score: number;
+}
+
+export interface IspScore {
+  composite: number;
+  grade: string;
+  breakdown: IspScoreBreakdown;
+}
+
+export interface TimeWindowResult {
+  hour: number;
+  label: string;
+  avg_download_mbps: number;
+  avg_upload_mbps: number;
+  avg_ping_ms: number;
+}
+
+export interface BestWorstTimes {
+  best_download: TimeWindowResult | null;
+  worst_download: TimeWindowResult | null;
+  best_upload: TimeWindowResult | null;
+  worst_upload: TimeWindowResult | null;
+  best_ping: TimeWindowResult | null;
+  worst_ping: TimeWindowResult | null;
+}
+
+export interface CorrelationPair {
+  metric_a: string;
+  metric_b: string;
+  coefficient: number;
+}
+
+export interface CorrelationMatrix {
+  pairs: CorrelationPair[];
+  metrics: string[];
+}
+
+export interface DegradationAlert {
+  metric: string;
+  severity: string;
+  description: string;
+  current_avg: number;
+  historical_avg: number;
+  drop_pct: number;
+}
+
+export interface PredictionPoint {
+  timestamp: string;
+  download_mbps: number;
+  upload_mbps: number;
+  ping_ms: number;
+}
+
+export interface PredictiveTrend {
+  points: PredictionPoint[];
+  confidence: string;
+}
+
 export interface EnhancedStatistics {
   basic: Statistics;
   hourly: HourlyAverage[];
@@ -180,4 +270,11 @@ export interface EnhancedStatistics {
   sla: SlaCompliance;
   reliability: ReliabilityScore;
   by_server: ServerStats[];
+  anomalies: AnomalyPoint[];
+  peak_offpeak: PeakOffPeakAnalysis | null;
+  isp_score: IspScore | null;
+  best_worst_times: BestWorstTimes | null;
+  correlations: CorrelationMatrix | null;
+  degradation_alerts: DegradationAlert[];
+  predictions: PredictiveTrend | null;
 }

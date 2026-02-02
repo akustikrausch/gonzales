@@ -123,47 +123,45 @@ Current quality: 7.8/10. Target: 9.5/10.
 
 ---
 
-### Phase 6: Innovative Statistics + Insights [TODO]
+### Phase 6: Innovative Statistics + Insights [DONE]
 **Goal**: Statistics that no competitor offers
 
 #### Backend additions:
-- [ ] Anomaly detection (flag >2 stddev outliers per metric)
-- [ ] Peak/off-peak analysis (business hours vs evening vs night)
-- [ ] ISP performance composite score (0-100)
-- [ ] Best/worst time window identification
-- [ ] Correlation computation (download vs upload vs ping vs jitter)
-- [ ] Degradation detection (sustained drops vs one-off anomalies)
-- [ ] Predictive trend projection (7-day forecast)
+- [x] Anomaly detection (flag >2 stddev outliers per metric)
+- [x] Peak/off-peak analysis (business hours 8-18, evening 18-23, night 23-8)
+- [x] ISP performance composite score (0-100 with A+/A/B/C/D/F grade)
+- [x] Best/worst time window identification (per metric)
+- [x] Correlation computation (Pearson: download vs upload vs ping vs jitter)
+- [x] Degradation detection (recent 10 tests vs historical, 15/25/40% thresholds)
+- [x] Predictive trend projection (7-day linear forecast with confidence level)
 
 #### Frontend additions:
-- [ ] Anomaly highlighting in charts (red dots/markers)
-- [ ] ISP Score card with animated circular gauge
-- [ ] Peak/Off-Peak comparison visualization
-- [ ] Network quality timeline (color-coded time blocks)
-- [ ] Correlation matrix heatmap
-- [ ] Best/Worst time badges with Lucide icons
-- [ ] Predictive trend line (dashed) on trend chart
-- [ ] Degradation alert banner
+- [x] Anomaly highlighting (red dot cards with z-score and mean)
+- [x] ISP Score card with animated circular gauge (ProgressRing + score bars)
+- [x] Peak/Off-Peak comparison visualization (3 period cards + best/worst badges)
+- [x] Network quality timeline (24-hour color-coded blocks with tooltips)
+- [x] Correlation matrix heatmap (4x4 with color intensity)
+- [x] Best/Worst time badges with Lucide icons
+- [x] Predictive trend line (dashed) on trend chart
+- [x] Degradation alert banner (severity-colored, auto-shows at page top)
 
-**Backend files to modify**:
-- `backend/gonzales/services/statistics_service.py` -- New analysis functions
-- `backend/gonzales/schemas/statistics.py` -- New response models
-- `backend/gonzales/api/v1/statistics.py` -- Extend enhanced endpoint
+**Backend files modified**:
+- `backend/gonzales/services/statistics_service.py` -- 7 new analysis functions
+- `backend/gonzales/schemas/statistics.py` -- 12 new Pydantic models
 
-**Frontend files to create**:
+**Frontend files created**:
 - `frontend/src/components/statistics/IspScoreCard.tsx`
 - `frontend/src/components/statistics/PeakAnalysis.tsx`
 - `frontend/src/components/statistics/QualityTimeline.tsx`
 - `frontend/src/components/statistics/CorrelationMatrix.tsx`
-- `frontend/src/components/statistics/AnomalyMarkers.tsx`
 - `frontend/src/components/statistics/DegradationAlert.tsx`
 
-**Frontend files to modify**:
-- `frontend/src/api/types.ts` -- New TypeScript interfaces
-- `frontend/src/hooks/useApi.ts` -- New query hooks if needed
-- `frontend/src/pages/StatisticsPage.tsx` -- Add new tabs/sections
+**Frontend files modified**:
+- `frontend/src/api/types.ts` -- 12 new TypeScript interfaces
+- `frontend/src/components/statistics/TrendChart.tsx` -- Prediction line support
+- `frontend/src/pages/StatisticsPage.tsx` -- New "Insights" tab, degradation alerts
 
-**Verify**: `npm run build` passes, enhanced stats endpoint returns new fields
+**Verify**: `npm run build` passes (794 KB JS, 36 KB CSS)
 
 ---
 

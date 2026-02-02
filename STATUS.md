@@ -10,7 +10,7 @@ The functional foundation (v1) is complete. All core features work.
 The v2 effort focuses on elevating design, animations, statistics, and
 documentation to "best on market" quality.
 
-Current quality: **8.2/10** -- Target: **9.5/10**
+Current quality: **8.5/10** -- Target: **9.5/10**
 
 ---
 
@@ -23,7 +23,7 @@ Current quality: **8.2/10** -- Target: **9.5/10**
 | 3 | Design System Polish | DONE | Multi-layer glass, hover effects, shimmer, skeleton, tooltips |
 | 4 | Page Transitions + Number Animations | DONE | Route transitions, animated numbers, chart draw-in |
 | 5 | Futuristic Live Test View (Web) | DONE | SVG glow filters, data stream lines, phase colors, staggered results |
-| 6 | Innovative Statistics + Insights | TODO | Anomaly detection, ISP score, predictions, correlations |
+| 6 | Innovative Statistics + Insights | DONE | Anomaly detection, ISP score, correlations, predictions, degradation alerts |
 | 7 | TUI Real-Time Test View | TODO | Live gauge, progress bar, event-driven updates |
 | 8 | Tech Styleguide | TODO | STYLEGUIDE.md with full design reference |
 | 9 | Home Assistant Integration | TODO | Separate repo gonzales-ha, HACS compatible |
@@ -36,7 +36,7 @@ Current quality: **8.2/10** -- Target: **9.5/10**
 
 | Check | Status | Notes |
 |-------|--------|-------|
-| Frontend Build (`npm run build`) | PASS | 776 KB JS, 33 KB CSS |
+| Frontend Build (`npm run build`) | PASS | 794 KB JS, 36 KB CSS |
 | TypeScript (`tsc --noEmit`) | PASS | Zero errors |
 | Backend Lint (`ruff check`) | NOT TESTED | ruff not in system PATH |
 | Backend Tests (`pytest`) | PASS (vacuous) | No test files exist |
@@ -69,7 +69,7 @@ Current quality: **8.2/10** -- Target: **9.5/10**
   - DataStreamLines background animation
   - Phase-specific colors (teal/orange/blue/green)
   - Staggered result cards with spring animations
-- 9 statistics visualization components
+- 14 statistics visualization components (9 original + 5 Phase 6 insights)
 - Server picker + settings form
 - Responsive layout (sidebar/mobile nav)
 - Light/dark/auto theme
@@ -84,15 +84,15 @@ Current quality: **8.2/10** -- Target: **9.5/10**
 
 ## What's Missing (v2 Gaps)
 
-### Statistics (Phase 6)
-- No anomaly detection
-- No ISP performance composite score
-- No peak/off-peak analysis
-- No predictive trends
-- No correlation matrix
-- No degradation alerts
-- No best/worst time identification
-- No network quality timeline
+### Statistics (Phase 6) -- RESOLVED
+- Anomaly detection with z-score flagging
+- ISP composite score (0-100) with letter grade and 4-metric breakdown
+- Peak/off-peak/night analysis with best/worst period identification
+- 7-day predictive trend via linear regression with confidence level
+- 4x4 Pearson correlation matrix (download/upload/ping/jitter)
+- Degradation detection (recent vs historical with severity levels)
+- Best/worst time identification per metric
+- Network quality timeline (24-hour color-coded blocks)
 
 ### TUI (Phase 7)
 - NO real-time test visualization (shows static "Running..." message)
@@ -157,5 +157,5 @@ gonzales/
 
 ## Next Action
 
-Start Phase 6: Innovative Statistics + Insights.
-Read PLAN.md Phase 6 for exact deliverables and file list.
+Start Phase 7: TUI Real-Time Test View.
+Read PLAN.md Phase 7 for exact deliverables and file list.
