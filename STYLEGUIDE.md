@@ -252,6 +252,8 @@ Shimmer loading placeholder.
 | `g-float` | translateY 0 to -4px | 3s |
 | `g-breathe` | Opacity 0.6 to 1 | 2s |
 | `g-pulse-glow` | Box-shadow pulse | 2s |
+| `g-phase-enter` | Scale(0.9) + blur(4px) to normal | 400ms |
+| `g-number-glow-pulse` | Pulsing text-shadow via `--glow-color` | 2s |
 
 ### Utility Classes
 
@@ -263,6 +265,8 @@ Shimmer loading placeholder.
 | `g-animate-slide-left` | Slide in from left |
 | `g-animate-float` | Gentle floating motion |
 | `g-animate-breathe` | Pulsing opacity |
+| `g-phase-enter` | Phase transition entrance (scale + blur) |
+| `g-number-glow-pulse` | Speed number glow pulse (uses `--glow-color` CSS var) |
 
 ### Stagger Delays
 
@@ -445,6 +449,8 @@ const { theme, setTheme, resolvedTheme } = useTheme();
 - Gradient blocks: ` ░▒▓█`
 - Sparkline: `▁▂▃▄▅▆▇█`
 - Box drawing: `╔═╗║╚╝╠╣`
+- Big speed digits: 3-line-tall, 5-char-wide block characters (big_speed.py)
+- Data flow: scrolling `. : | ! * # = █ ░ ▒ ▓` characters, density scales with bandwidth
 
 ### Screens
 

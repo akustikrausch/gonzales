@@ -4,12 +4,13 @@
 
 ---
 
-## Overall Status: v2 Complete
+## Overall Status: v2 Complete -- Ready for Public Release
 
-All 11 development phases are complete. The project has a fully functional
-backend, a polished Liquid Glass frontend with code splitting, innovative
-statistics, a real-time TUI, Home Assistant integration, and comprehensive
-documentation.
+All 13 development phases are complete. The project has a fully functional
+backend, a polished Liquid Glass frontend with code splitting, dramatic
+real-time visualizations, innovative statistics, a real-time TUI, Home
+Assistant integration, comprehensive documentation, and has passed a full
+security audit for public release.
 
 Current quality: **9.5/10** -- Target: **9.5/10**
 
@@ -30,6 +31,8 @@ Current quality: **9.5/10** -- Target: **9.5/10**
 | 9 | Home Assistant Integration | DONE | gonzales-ha repo, 12 sensors, config flow, HACS compatible |
 | 10 | Git Hygiene + Privacy Protection | DONE | .gitignore, templates, config.json.example, README updated |
 | 11 | Final Polish + Verification | DONE | Code splitting, docs updated, build verified, static copied |
+| 12 | Live Speed Test Visual Upgrade | DONE | Canvas particle system, live SVG speed graph, elapsed timer, big ASCII speed numbers, animated data flow |
+| 13 | Security Audit + Public Release Prep | DONE | Secrets audit, license audit, git history audit, startup security warning, README hardening |
 
 ---
 
@@ -58,6 +61,7 @@ Current quality: **9.5/10** -- Target: **9.5/10**
 - Enhanced statistics: percentiles, hourly, daily, trend, SLA, reliability, per-server
 - Innovative insights: anomaly detection, ISP score, peak/off-peak, correlations, degradation alerts, predictions
 - Security middleware (CORS, headers, GZip)
+- Startup security warning when binding to non-localhost without API key
 - TUI with Textual (dashboard, history, settings, real-time test screen with ASCII gauge)
 
 ### Frontend
@@ -96,12 +100,14 @@ Current quality: **9.5/10** -- Target: **9.5/10**
 ## Security
 
 - Optional API key authentication (`GONZALES_API_KEY`) protects mutating endpoints
+- Startup warning when binding to non-localhost without API key (console + logger)
 - Content-Security-Policy header on all responses
 - CORS restricted to specific methods and headers
 - SSE subscriber limit (20) and connection timeout (5 min)
 - All subprocess calls use list args (no `shell=True`)
 - SQL queries use parameterized ORM (no raw SQL)
 - No authentication required for read-only endpoints (by design, for HA integration)
+- Full security audit passed: no secrets in code/history, no XSS, no SQL injection, no shell injection
 
 ## Known Gaps
 
@@ -158,6 +164,7 @@ gonzales/
 
 ## Next Action
 
-All 11 phases complete. Backend tests and lint pass. Both repos pushed to GitHub.
+All 13 phases complete. Backend tests and lint pass. Security audit passed. Ready for public release.
 Remaining:
 - Manual end-to-end test: start server, run speed test, check all 5 pages + TUI
+- Make GitHub repository public

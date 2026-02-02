@@ -103,7 +103,7 @@ These phases built the functional foundation. All code exists and works.
   - Subtle pulse animation on the needle tip (SVG animate elements)
 - [x] Real-time bandwidth with counting animation (useAnimatedNumber hook)
 - [x] Phase transition animations (g-animate-scale on phase change)
-- [x] Background data stream visualization (DataStreamLines with g-shimmer CSS animation)
+- [x] Background data stream visualization (DataFlowCanvas particle system replacing DataStreamLines)
 - [x] Enhanced ProgressRing with glow filter (optional `glow` prop with SVG feGaussianBlur)
 - [x] Results reveal: staggered card appearance with spring animation (ResultCard with delay)
 - [x] Color theme per phase:
@@ -111,11 +111,17 @@ These phases built the functional foundation. All code exists and works.
   - Download: cool blue/cyan glow (var(--g-blue))
   - Upload: vibrant green/teal glow (var(--g-green))
 
-**Files to modify**:
-- `frontend/src/components/speedtest/LiveTestView.tsx`
-- `frontend/src/components/speedtest/SpeedNeedle.tsx`
+**Files created** (Phase 12 -- Visual Upgrade):
+- `frontend/src/hooks/useSpeedHistory.ts` -- Bandwidth sample accumulator
+- `frontend/src/components/speedtest/DataFlowCanvas.tsx` -- Canvas particle system
+- `frontend/src/components/speedtest/LiveSpeedGraph.tsx` -- SVG area chart
+- `frontend/src/components/speedtest/ElapsedTimer.tsx` -- M:SS elapsed display
+
+**Files modified**:
+- `frontend/src/components/speedtest/LiveTestView.tsx` -- Full rewrite with new layout
+- `frontend/src/components/speedtest/SpeedNeedle.tsx` -- Larger text, pulsing arc glow
 - `frontend/src/components/speedtest/ProgressRing.tsx`
-- `frontend/src/design-system/animations.css` -- Glow keyframes
+- `frontend/src/design-system/animations.css` -- Glow keyframes, g-phase-enter, g-number-glow-pulse
 
 **Verify**: `npm run build` passes, trigger test and observe live view
 
@@ -178,7 +184,9 @@ These phases built the functional foundation. All code exists and works.
 
 **Files created**:
 - `backend/gonzales/tui/screens/test.py` -- Real-time test screen with event bus subscription
-- `backend/gonzales/tui/widgets/live_gauge.py` -- Animated ASCII gauge with sparkline + progress bar
+- `backend/gonzales/tui/widgets/live_gauge.py` -- Animated ASCII gauge with big speed numbers, data flow, sparkline + progress bar
+- `backend/gonzales/tui/widgets/big_speed.py` -- 3-line-tall ASCII art digit renderer (Phase 12)
+- `backend/gonzales/tui/widgets/data_flow.py` -- 5-row animated ASCII data flow visualization (Phase 12)
 
 **Files modified**:
 - `backend/gonzales/tui/app.py` -- Added TestScreen mode, `run_test_screen()` method
@@ -300,13 +308,13 @@ These phases built the functional foundation. All code exists and works.
 - [x] No unused imports or dead code -- verified
 - [x] All Lucide icons consistent (no emoji anywhere) -- grep confirmed zero non-ASCII in TSX
 - [x] Backend syntax check passes -- all 53 Python files parse OK (ruff not in PATH, ast.parse used)
-- [ ] Backend tests exist and pass for critical services -- deferred (no test framework in current setup)
+- [x] Backend tests exist and pass for critical services -- 74 tests across 4 modules
 - [x] Code splitting for bundle size optimization -- React.lazy routes + Vite manualChunks (vendor/charts/query)
 - [x] README.md fully up to date -- HA integration section updated (EN + DE), tech stack updated
 - [x] claude.md reflects final architecture -- TUI test screen, insights, code splitting, hooks documented
 - [x] All API endpoints documented and verified -- claude.md endpoint table complete
 - [x] Copy built frontend to backend/gonzales/static/ -- 18 files copied
-- [ ] Manual end-to-end test -- requires running server (user to verify)
+- [ ] Manual end-to-end test -- requires running server with Speedtest CLI (user to verify)
 
 **Files modified**:
 - `frontend/src/App.tsx` -- React.lazy routes with Suspense + PageLoader
@@ -316,6 +324,71 @@ These phases built the functional foundation. All code exists and works.
 - `backend/gonzales/static/` -- Fresh build copied
 
 **Verify**: `npm run build` passes, `tsc --noEmit` passes, all 53 Python files parse
+
+---
+
+### Phase 12: Live Speed Test Visual Upgrade [DONE]
+**Goal**: Dramatic real-time visualizations for both Web and TUI during speed tests
+
+#### Web UI:
+- [x] Canvas particle system (DataFlowCanvas): 60-120 glowing particles, direction/density scales with bandwidth, prefers-reduced-motion fallback
+- [x] Live SVG speed graph (LiveSpeedGraph): pure SVG area chart with glow filter and pulsing current-value dot
+- [x] Elapsed timer (ElapsedTimer): M:SS display during active phases
+- [x] Bandwidth sample accumulator (useSpeedHistory): throttled re-renders at ~250ms
+- [x] SpeedNeedle enhancements: text-5xl central number, pulsing glow on outer arc, stronger text-shadow
+- [x] Phase transition animations: key={phase} triggers g-phase-enter (scale + blur entrance)
+- [x] New animation keyframes: g-phase-enter, g-number-glow-pulse (with prefers-reduced-motion)
+- [x] LiveTestView full rewrite with new layout (particle background, gauge, live graph, progress bar)
+
+#### TUI:
+- [x] Big ASCII speed numbers (big_speed.py): 3-line-tall block character font for speed display
+- [x] Animated data flow (data_flow.py): 5-row scrolling ASCII visualization, density scales with bandwidth
+- [x] LiveGauge rewrite: phase header with elapsed timer, big speed numbers, inline data flow, enhanced complete phase with box-drawing results
+
+**Web files created**:
+- `frontend/src/hooks/useSpeedHistory.ts`
+- `frontend/src/components/speedtest/DataFlowCanvas.tsx`
+- `frontend/src/components/speedtest/LiveSpeedGraph.tsx`
+- `frontend/src/components/speedtest/ElapsedTimer.tsx`
+
+**Web files modified**:
+- `frontend/src/components/speedtest/LiveTestView.tsx` -- Full rewrite
+- `frontend/src/components/speedtest/SpeedNeedle.tsx` -- Larger text, pulsing arc glow
+- `frontend/src/design-system/animations.css` -- g-phase-enter, g-number-glow-pulse
+
+**TUI files created**:
+- `backend/gonzales/tui/widgets/big_speed.py`
+- `backend/gonzales/tui/widgets/data_flow.py`
+
+**TUI files modified**:
+- `backend/gonzales/tui/widgets/live_gauge.py` -- Full rewrite with big speed, data flow, elapsed timer
+- `backend/gonzales/tui/screens/test.py` -- Pass elapsed to set_bandwidth
+
+**Verify**: `npm run build` passes, `tsc --noEmit` zero errors, `pytest` 74 tests pass, visual check of both UIs
+
+---
+
+### Phase 13: Security Audit + Public Release Prep [DONE]
+**Goal**: Ensure the repo is safe to make public
+
+- [x] Secrets audit: no API keys, passwords, tokens, or private data in code or git history
+- [x] Legal audit: README wording ("monitor and document" not "prove"), Ookla EULA notice in LICENSE
+- [x] Git history audit: no sensitive files ever committed
+- [x] Startup security warning: console + logger warning when host != 127.0.0.1 and no API key
+- [x] README security hardening: stronger API key documentation, reverse proxy recommendation
+- [x] .env.example: stronger security comments for API_KEY field
+- [x] All MD files updated to reflect final state
+
+**Files modified**:
+- `backend/gonzales/__main__.py` -- Yellow console warning for unsafe binding
+- `backend/gonzales/main.py` -- Logger warning for unsafe binding
+- `README.md` -- "prove" -> "monitor and document", expanded security section
+- `claude.md` -- Updated architecture reference with all v2 features
+- `.env.example` -- Stronger API_KEY security comment
+- `STATUS.md` -- All 13 phases documented, security audit results
+- `PLAN.md` -- All phases documented with full file lists
+
+**Verify**: `git log --all --diff-filter=A -- '*.env' '*.key' '*.pem'` returns nothing sensitive
 
 ---
 

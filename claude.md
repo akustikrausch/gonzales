@@ -10,7 +10,7 @@ Gonzales is a local network speed monitoring tool. It runs automated internet sp
 
 Python FastAPI application with async SQLAlchemy and APScheduler.
 
-- **Entry point**: `__main__.py` runs uvicorn, `main.py` contains the FastAPI app factory with lifespan (DB init, scheduler start/stop)
+- **Entry point**: `__main__.py` runs uvicorn with startup security warning, `main.py` contains the FastAPI app factory with lifespan (DB init, scheduler start/stop, security warning when host != 127.0.0.1 and no API key)
 - **Config**: `config.py` -- Pydantic Settings, all env vars prefixed `GONZALES_`. Mutable keys (interval, thresholds, preferred_server_id, cooldown, theme) persisted to `config.json`
 - **Database**: `db/engine.py` (async SQLite + WAL mode), `db/models.py` (Measurement, TestFailure), `db/repository.py` (query layer)
 - **Services**:
@@ -58,7 +58,7 @@ React 19 + TypeScript + Vite 6 + Tailwind CSS 4 SPA with Liquid Glass design sys
 - Frontend uses TanStack Query with 30s polling for auto-refresh
 - Subprocess calls use list args (no `shell=True`)
 - SSE streaming: backend publishes progress events to EventBus (max 20 subscribers, 5min timeout), `/api/v1/speedtest/stream` yields SSE events, frontend `useSSE` hook consumes via native EventSource API
-- Optional API key auth: `GONZALES_API_KEY` env var. When set, mutating endpoints (PUT config, POST trigger, DELETE measurements) require `X-API-Key` header. Read-only endpoints remain open.
+- Optional API key auth: `GONZALES_API_KEY` env var. When set, mutating endpoints (PUT config, POST trigger, DELETE measurements) require `X-API-Key` header. Read-only endpoints remain open. Startup warns if host != 127.0.0.1 and no API key is configured.
 - Security headers: CSP, X-Frame-Options DENY, X-Content-Type-Options nosniff, Referrer-Policy. CORS restricted to configured origins with specific methods/headers.
 - Design system uses CSS custom properties for theming; `data-theme` attribute on `<html>` for manual override
 - Responsive layout: mobile (<768px) shows bottom nav, tablet (768-1023px) shows collapsed sidebar, desktop (1024px+) shows full sidebar
@@ -113,7 +113,7 @@ SQLite at `gonzales.db` (created automatically in the working directory). WAL mo
 
 ## Environment Variables
 
-All prefixed with `GONZALES_`. See `.env.example`. Key settings: `HOST`, `PORT`, `TEST_INTERVAL_MINUTES`, `DOWNLOAD_THRESHOLD_MBPS`, `UPLOAD_THRESHOLD_MBPS`, `LOG_LEVEL`, `DEBUG`, `PREFERRED_SERVER_ID`, `THEME`.
+All prefixed with `GONZALES_`. See `.env.example`. Key settings: `HOST`, `PORT`, `TEST_INTERVAL_MINUTES`, `DOWNLOAD_THRESHOLD_MBPS`, `UPLOAD_THRESHOLD_MBPS`, `LOG_LEVEL`, `DEBUG`, `PREFERRED_SERVER_ID`, `THEME`, `API_KEY` (required when host != 127.0.0.1).
 
 ## External Dependencies
 
