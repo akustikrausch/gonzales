@@ -17,28 +17,31 @@ export function DateRangeFilter({
 
   return (
     <div className="flex items-center gap-3">
-      <Calendar className="w-4 h-4 text-[#86868B]" />
-      <label className="text-sm text-[#86868B]">From</label>
+      <Calendar className="w-4 h-4" style={{ color: "var(--g-text-secondary)" }} />
+      <label className="text-sm" style={{ color: "var(--g-text-secondary)" }}>From</label>
       <input
         type="datetime-local"
         value={startDate}
         onChange={(e) => onStartDateChange(e.target.value)}
-        className="px-3 py-1.5 text-sm border border-[#E5E5EA] rounded-lg bg-white
-                   focus:outline-none focus:ring-2 focus:ring-[#007AFF]/20 focus:border-[#007AFF]"
+        className="glass-input"
+        style={{ width: "auto" }}
       />
-      <label className="text-sm text-[#86868B]">To</label>
+      <label className="text-sm" style={{ color: "var(--g-text-secondary)" }}>To</label>
       <input
         type="datetime-local"
         value={endDate}
         onChange={(e) => onEndDateChange(e.target.value)}
-        className="px-3 py-1.5 text-sm border border-[#E5E5EA] rounded-lg bg-white
-                   focus:outline-none focus:ring-2 focus:ring-[#007AFF]/20 focus:border-[#007AFF]"
+        className="glass-input"
+        style={{ width: "auto" }}
       />
       {hasFilter && (
         <button
           onClick={() => { onStartDateChange(""); onEndDateChange(""); }}
-          className="text-[#86868B] hover:text-[#FF3B30] transition-colors"
+          className="transition-colors"
+          style={{ color: "var(--g-text-secondary)" }}
           title="Clear filter"
+          onMouseEnter={(e) => (e.currentTarget.style.color = "var(--g-red)")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "var(--g-text-secondary)")}
         >
           <X className="w-4 h-4" />
         </button>

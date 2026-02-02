@@ -10,6 +10,7 @@ from gonzales.core.exceptions import (
 )
 from gonzales.core.logging import logger
 from gonzales.schemas.speedtest_raw import SpeedtestRawResult
+from gonzales.services.event_bus import event_bus
 
 
 class SpeedtestRunner:
@@ -35,9 +36,11 @@ class SpeedtestRunner:
             return self.validate_binary()
         return self._binary_path
 
-    async def run(self) -> SpeedtestRawResult:
+    async def run(self, server_id: int = 0) -> SpeedtestRawResult:
         logger.info("Starting speed test...")
         cmd = [self.binary_path, "--format=json", "--accept-license", "--accept-gdpr"]
+        if server_id > 0:
+            cmd.extend(["--server-id", str(server_id)])
 
         try:
             process = await asyncio.create_subprocess_exec(
@@ -79,12 +82,177 @@ class SpeedtestRunner:
 
         result = SpeedtestRawResult.model_validate(data)
         logger.info(
-            "Speed test complete: ↓ %.1f Mbps, ↑ %.1f Mbps, ping %.1f ms",
+            "Speed test complete: down %.1f Mbps, up %.1f Mbps, ping %.1f ms",
             result.download_mbps,
             result.upload_mbps,
             result.ping.latency,
         )
         return result
+
+    async def run_with_progress(self, server_id: int = 0) -> SpeedtestRawResult:
+        logger.info("Starting speed test with progress...")
+        cmd = [
+            self.binary_path,
+            "--format=json",
+            "--progress=yes",
+            "--accept-license",
+            "--accept-gdpr",
+        ]
+        if server_id > 0:
+            cmd.extend(["--server-id", str(server_id)])
+
+        event_bus.publish({"event": "started", "data": {"phase": "started"}})
+
+        try:
+            process = await asyncio.create_subprocess_exec(
+                *cmd,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+
+            final_result = None
+            buffer = ""
+
+            async def read_stdout():
+                nonlocal final_result, buffer
+                while True:
+                    chunk = await process.stdout.read(4096)
+                    if not chunk:
+                        break
+                    buffer += chunk.decode("utf-8", errors="replace")
+                    while "\n" in buffer:
+                        line, buffer = buffer.split("\n", 1)
+                        line = line.strip()
+                        if not line:
+                            continue
+                        try:
+                            data = json.loads(line)
+                        except json.JSONDecodeError:
+                            continue
+
+                        msg_type = data.get("type", "")
+                        if msg_type == "testStart":
+                            event_bus.publish({
+                                "event": "progress",
+                                "data": {"phase": "ping", "progress": 0},
+                            })
+                        elif msg_type == "ping":
+                            event_bus.publish({
+                                "event": "progress",
+                                "data": {
+                                    "phase": "ping",
+                                    "ping_ms": data.get("ping", {}).get("latency", 0),
+                                    "progress": data.get("ping", {}).get("progress", 0),
+                                },
+                            })
+                        elif msg_type == "download":
+                            bw = data.get("download", {}).get("bandwidth", 0)
+                            event_bus.publish({
+                                "event": "progress",
+                                "data": {
+                                    "phase": "download",
+                                    "bandwidth_mbps": round(bw * 8 / 1_000_000, 2),
+                                    "progress": data.get("download", {}).get("progress", 0),
+                                    "elapsed": data.get("download", {}).get("elapsed", 0),
+                                },
+                            })
+                        elif msg_type == "upload":
+                            bw = data.get("upload", {}).get("bandwidth", 0)
+                            event_bus.publish({
+                                "event": "progress",
+                                "data": {
+                                    "phase": "upload",
+                                    "bandwidth_mbps": round(bw * 8 / 1_000_000, 2),
+                                    "progress": data.get("upload", {}).get("progress", 0),
+                                    "elapsed": data.get("upload", {}).get("elapsed", 0),
+                                },
+                            })
+                        elif msg_type == "result":
+                            final_result = SpeedtestRawResult.model_validate(data)
+
+            try:
+                await asyncio.wait_for(read_stdout(), timeout=self.TIMEOUT_SECONDS)
+            except asyncio.TimeoutError:
+                process.kill()
+                await process.wait()
+                event_bus.publish({"event": "error", "data": {"message": "Speedtest timed out"}})
+                raise SpeedtestTimeoutError(
+                    f"Speedtest timed out after {self.TIMEOUT_SECONDS}s"
+                )
+
+            await process.wait()
+
+            if process.returncode != 0:
+                stderr_text = ""
+                if process.stderr:
+                    stderr_bytes = await process.stderr.read()
+                    stderr_text = stderr_bytes.decode("utf-8", errors="replace").strip()
+                event_bus.publish({"event": "error", "data": {"message": f"Exit code {process.returncode}"}})
+                raise SpeedtestError(
+                    f"Speedtest exited with code {process.returncode}: {stderr_text}",
+                    raw_output=stderr_text,
+                )
+
+            if final_result is None:
+                event_bus.publish({"event": "error", "data": {"message": "No result received"}})
+                raise SpeedtestError("No result received from speedtest", raw_output=buffer)
+
+            logger.info(
+                "Speed test complete: down %.1f Mbps, up %.1f Mbps, ping %.1f ms",
+                final_result.download_mbps,
+                final_result.upload_mbps,
+                final_result.ping.latency,
+            )
+            return final_result
+
+        except FileNotFoundError:
+            event_bus.publish({"event": "error", "data": {"message": "Binary not found"}})
+            raise SpeedtestBinaryNotFoundError(
+                f"Speedtest binary not found at: {self.binary_path}"
+            )
+
+    async def list_servers(self) -> list[dict]:
+        cmd = [self.binary_path, "--servers", "--format=json", "--accept-license", "--accept-gdpr"]
+        try:
+            process = await asyncio.create_subprocess_exec(
+                *cmd,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+            stdout, stderr = await asyncio.wait_for(
+                process.communicate(),
+                timeout=30,
+            )
+        except asyncio.TimeoutError:
+            process.kill()
+            await process.wait()
+            raise SpeedtestTimeoutError("Server list request timed out")
+        except FileNotFoundError:
+            raise SpeedtestBinaryNotFoundError(
+                f"Speedtest binary not found at: {self.binary_path}"
+            )
+
+        stdout_text = stdout.decode("utf-8", errors="replace").strip()
+        if process.returncode != 0:
+            stderr_text = stderr.decode("utf-8", errors="replace").strip()
+            raise SpeedtestError(
+                f"Speedtest exited with code {process.returncode}: {stderr_text}",
+                raw_output=stdout_text or stderr_text,
+            )
+
+        try:
+            data = json.loads(stdout_text)
+        except json.JSONDecodeError as e:
+            raise SpeedtestError(
+                f"Failed to parse server list JSON: {e}",
+                raw_output=stdout_text,
+            )
+
+        if isinstance(data, dict) and "servers" in data:
+            return data["servers"]
+        if isinstance(data, list):
+            return data
+        return []
 
 
 speedtest_runner = SpeedtestRunner()

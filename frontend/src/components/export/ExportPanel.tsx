@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { FileSpreadsheet, FileText } from "lucide-react";
 import { api } from "../../api/client";
-import { Card } from "../common/Card";
+import { GlassCard } from "../ui/GlassCard";
+import { GlassButton } from "../ui/GlassButton";
 import { DateRangeFilter } from "../history/DateRangeFilter";
 
 export function ExportPanel() {
@@ -15,57 +16,53 @@ export function ExportPanel() {
 
   return (
     <div className="space-y-6">
-      <Card>
-        <h3 className="text-sm font-semibold text-[#1D1D1F] mb-4">Date Range</h3>
+      <GlassCard>
+        <h3 className="text-sm font-semibold mb-4" style={{ color: "var(--g-text)" }}>
+          Date Range
+        </h3>
         <DateRangeFilter
           startDate={startDate}
           endDate={endDate}
           onStartDateChange={setStartDate}
           onEndDateChange={setEndDate}
         />
-        <p className="text-xs text-[#86868B] mt-2">
+        <p className="text-xs mt-2" style={{ color: "var(--g-text-secondary)" }}>
           Leave empty to export all data.
         </p>
-      </Card>
+      </GlassCard>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Card>
-          <h3 className="text-sm font-semibold text-[#1D1D1F] mb-2 flex items-center gap-2">
-            <FileSpreadsheet className="w-4 h-4 text-[#86868B]" />
+        <GlassCard hover>
+          <h3 className="text-sm font-semibold mb-2 flex items-center gap-2" style={{ color: "var(--g-text)" }}>
+            <FileSpreadsheet className="w-4 h-4" style={{ color: "var(--g-text-secondary)" }} />
             CSV Export
           </h3>
-          <p className="text-xs text-[#86868B] mb-4">
+          <p className="text-xs mb-4" style={{ color: "var(--g-text-secondary)" }}>
             Download raw measurement data as a CSV spreadsheet.
           </p>
-          <a
-            href={api.getExportCsvUrl(params)}
-            download
-            className="inline-flex items-center gap-2 px-4 py-2 bg-[#007AFF] text-white text-sm font-medium
-                       rounded-lg hover:bg-[#0066D6] transition-colors"
-          >
-            <FileSpreadsheet className="w-4 h-4" />
-            Download CSV
+          <a href={api.getExportCsvUrl(params)} download>
+            <GlassButton variant="primary">
+              <FileSpreadsheet className="w-4 h-4" />
+              Download CSV
+            </GlassButton>
           </a>
-        </Card>
+        </GlassCard>
 
-        <Card>
-          <h3 className="text-sm font-semibold text-[#1D1D1F] mb-2 flex items-center gap-2">
-            <FileText className="w-4 h-4 text-[#86868B]" />
+        <GlassCard hover>
+          <h3 className="text-sm font-semibold mb-2 flex items-center gap-2" style={{ color: "var(--g-text)" }}>
+            <FileText className="w-4 h-4" style={{ color: "var(--g-text-secondary)" }} />
             PDF Report
           </h3>
-          <p className="text-xs text-[#86868B] mb-4">
+          <p className="text-xs mb-4" style={{ color: "var(--g-text-secondary)" }}>
             Generate a formatted report with statistics and measurement table.
           </p>
-          <a
-            href={api.getExportPdfUrl(params)}
-            download
-            className="inline-flex items-center gap-2 px-4 py-2 bg-[#34C759] text-white text-sm font-medium
-                       rounded-lg hover:bg-[#2DB84D] transition-colors"
-          >
-            <FileText className="w-4 h-4" />
-            Download PDF
+          <a href={api.getExportPdfUrl(params)} download>
+            <GlassButton variant="primary" className="!bg-[var(--g-green)] hover:!bg-[#2DB84D]">
+              <FileText className="w-4 h-4" />
+              Download PDF
+            </GlassButton>
           </a>
-        </Card>
+        </GlassCard>
       </div>
     </div>
   );

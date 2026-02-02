@@ -1,5 +1,5 @@
 import type { SpeedStatistics } from "../../api/types";
-import { Card } from "../common/Card";
+import { GlassCard } from "../ui/GlassCard";
 
 interface PercentilesProps {
   label: string;
@@ -20,17 +20,17 @@ export function Percentiles({ label, stat, unit, color }: PercentilesProps) {
   const max = Math.max(...bars.map((b) => b.value), 1);
 
   return (
-    <Card>
+    <GlassCard>
       <h4 className="text-sm font-semibold mb-4" style={{ color }}>
         {label} Percentiles
       </h4>
       <div className="space-y-2">
         {bars.map((bar) => (
           <div key={bar.label} className="flex items-center gap-3">
-            <span className="w-8 text-xs text-[#86868B] font-medium text-right">
+            <span className="w-8 text-xs font-medium text-right" style={{ color: "var(--g-text-secondary)" }}>
               {bar.label}
             </span>
-            <div className="flex-1 bg-[#F5F5F7] rounded-full h-5 overflow-hidden">
+            <div className="flex-1 h-5 rounded-full overflow-hidden" style={{ background: "var(--g-glass-bg)" }}>
               <div
                 className="h-full rounded-full transition-all"
                 style={{
@@ -39,12 +39,12 @@ export function Percentiles({ label, stat, unit, color }: PercentilesProps) {
                 }}
               />
             </div>
-            <span className="w-20 text-xs font-medium tabular-nums text-right">
+            <span className="w-20 text-xs font-medium tabular-nums text-right" style={{ color: "var(--g-text)" }}>
               {bar.value.toFixed(1)} {unit}
             </span>
           </div>
         ))}
       </div>
-    </Card>
+    </GlassCard>
   );
 }

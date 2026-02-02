@@ -79,6 +79,9 @@ export interface Config {
   test_interval_minutes: number;
   download_threshold_mbps: number;
   upload_threshold_mbps: number;
+  preferred_server_id: number;
+  manual_trigger_cooldown_seconds: number;
+  theme: string;
   host: string;
   port: number;
   log_level: string;
@@ -89,8 +92,92 @@ export interface ConfigUpdate {
   test_interval_minutes?: number;
   download_threshold_mbps?: number;
   upload_threshold_mbps?: number;
+  preferred_server_id?: number;
+  manual_trigger_cooldown_seconds?: number;
+  theme?: string;
 }
 
 export type SortField = "timestamp" | "download_mbps" | "upload_mbps" | "ping_latency_ms" | "ping_jitter_ms";
 
 export type SortOrder = "asc" | "desc";
+
+// Server types
+export interface SpeedtestServer {
+  id: number;
+  host: string;
+  port: number;
+  name: string;
+  location: string;
+  country: string;
+}
+
+export interface ServerListResponse {
+  servers: SpeedtestServer[];
+}
+
+// Enhanced statistics types
+export interface HourlyAverage {
+  hour: number;
+  avg_download_mbps: number;
+  avg_upload_mbps: number;
+  avg_ping_ms: number;
+  count: number;
+}
+
+export interface DayOfWeekAverage {
+  day: number;
+  day_name: string;
+  avg_download_mbps: number;
+  avg_upload_mbps: number;
+  avg_ping_ms: number;
+  count: number;
+}
+
+export interface TrendPoint {
+  timestamp: string;
+  download_mbps: number;
+  upload_mbps: number;
+  ping_ms: number;
+}
+
+export interface TrendAnalysis {
+  points: TrendPoint[];
+  download_slope: number;
+  upload_slope: number;
+  ping_slope: number;
+}
+
+export interface SlaCompliance {
+  total_tests: number;
+  download_compliant: number;
+  upload_compliant: number;
+  download_compliance_pct: number;
+  upload_compliance_pct: number;
+}
+
+export interface ReliabilityScore {
+  download_cv: number;
+  upload_cv: number;
+  ping_cv: number;
+  composite_score: number;
+}
+
+export interface ServerStats {
+  server_id: number;
+  server_name: string;
+  server_location: string;
+  test_count: number;
+  avg_download_mbps: number;
+  avg_upload_mbps: number;
+  avg_ping_ms: number;
+}
+
+export interface EnhancedStatistics {
+  basic: Statistics;
+  hourly: HourlyAverage[];
+  daily: DayOfWeekAverage[];
+  trend: TrendAnalysis;
+  sla: SlaCompliance;
+  reliability: ReliabilityScore;
+  by_server: ServerStats[];
+}

@@ -8,7 +8,7 @@ import {
   YAxis,
 } from "recharts";
 import type { Measurement } from "../../api/types";
-import { Card } from "../common/Card";
+import { GlassCard } from "../ui/GlassCard";
 
 interface DistributionProps {
   measurements: Measurement[];
@@ -46,19 +46,19 @@ export function Distribution({
   }
 
   return (
-    <Card>
-      <h4 className="text-sm font-semibold text-[#1D1D1F] mb-4">
+    <GlassCard>
+      <h4 className="text-sm font-semibold mb-4" style={{ color: "var(--g-text)" }}>
         {label} Distribution ({unit})
       </h4>
       <ResponsiveContainer width="100%" height={200}>
         <BarChart data={histogram}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" />
-          <XAxis dataKey="range" tick={{ fontSize: 10 }} stroke="#86868B" />
-          <YAxis tick={{ fontSize: 11 }} stroke="#86868B" />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--g-border)" />
+          <XAxis dataKey="range" tick={{ fontSize: 10 }} stroke="var(--g-text-tertiary)" />
+          <YAxis tick={{ fontSize: 11 }} stroke="var(--g-text-tertiary)" />
           <Tooltip />
           <Bar dataKey="count" fill={color} radius={[4, 4, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
-    </Card>
+    </GlassCard>
   );
 }

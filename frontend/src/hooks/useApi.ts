@@ -33,6 +33,16 @@ export function useStatistics(params?: {
   });
 }
 
+export function useEnhancedStatistics(params?: {
+  start_date?: string;
+  end_date?: string;
+}) {
+  return useQuery({
+    queryKey: ["statistics", "enhanced", params],
+    queryFn: () => api.getEnhancedStatistics(params),
+  });
+}
+
 export function useStatus() {
   return useQuery({
     queryKey: ["status"],
@@ -45,6 +55,14 @@ export function useConfig() {
   return useQuery({
     queryKey: ["config"],
     queryFn: () => api.getConfig(),
+  });
+}
+
+export function useServers() {
+  return useQuery({
+    queryKey: ["servers"],
+    queryFn: () => api.getServers(),
+    staleTime: 300000,
   });
 }
 

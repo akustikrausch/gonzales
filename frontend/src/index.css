@@ -1,21 +1,12 @@
 @import "tailwindcss";
-
-:root {
-  --color-blue: #007AFF;
-  --color-green: #34C759;
-  --color-red: #FF3B30;
-  --color-bg: #FAFAFA;
-  --color-card: #FFFFFF;
-  --color-text: #1D1D1F;
-  --color-text-secondary: #86868B;
-  --color-border: #E5E5EA;
-}
+@import "./design-system/tokens.css";
+@import "./design-system/liquid-glass.css";
+@import "./design-system/animations.css";
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display',
-    'Helvetica Neue', Helvetica, Arial, sans-serif;
-  background-color: var(--color-bg);
-  color: var(--color-text);
+  font-family: var(--g-font);
+  background-color: var(--g-bg);
+  color: var(--g-text);
   margin: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

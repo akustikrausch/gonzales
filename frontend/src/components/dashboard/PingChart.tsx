@@ -9,7 +9,7 @@ import {
 } from "recharts";
 import type { Measurement } from "../../api/types";
 import { formatShortDate } from "../../utils/format";
-import { Card } from "../common/Card";
+import { GlassCard } from "../ui/GlassCard";
 
 interface PingChartProps {
   measurements: Measurement[];
@@ -23,34 +23,20 @@ export function PingChart({ measurements }: PingChartProps) {
   }));
 
   return (
-    <Card>
-      <h3 className="text-sm font-semibold text-[#1D1D1F] mb-4">
+    <GlassCard>
+      <h3 className="text-sm font-semibold mb-4" style={{ color: "var(--g-text)" }}>
         Latency Over Time
       </h3>
       <ResponsiveContainer width="100%" height={250}>
         <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" />
-          <XAxis dataKey="time" tick={{ fontSize: 11 }} stroke="#86868B" />
-          <YAxis tick={{ fontSize: 11 }} stroke="#86868B" unit=" ms" />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--g-border)" />
+          <XAxis dataKey="time" tick={{ fontSize: 11 }} stroke="var(--g-text-tertiary)" />
+          <YAxis tick={{ fontSize: 11 }} stroke="var(--g-text-tertiary)" unit=" ms" />
           <Tooltip />
-          <Line
-            type="monotone"
-            dataKey="ping"
-            stroke="#FF9500"
-            strokeWidth={2}
-            dot={false}
-            name="Ping"
-          />
-          <Line
-            type="monotone"
-            dataKey="jitter"
-            stroke="#AF52DE"
-            strokeWidth={2}
-            dot={false}
-            name="Jitter"
-          />
+          <Line type="monotone" dataKey="ping" stroke="var(--g-orange)" strokeWidth={2} dot={false} name="Ping" />
+          <Line type="monotone" dataKey="jitter" stroke="var(--g-purple)" strokeWidth={2} dot={false} name="Jitter" />
         </LineChart>
       </ResponsiveContainer>
-    </Card>
+    </GlassCard>
   );
 }

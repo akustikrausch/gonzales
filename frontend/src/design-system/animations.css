@@ -1,0 +1,260 @@
+/* ==========================================================================
+   KEYFRAMES
+   ========================================================================== */
+
+@keyframes g-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes g-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes g-slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes g-slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes g-slide-in-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes g-pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 4px rgba(0, 122, 255, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(0, 122, 255, 0.6);
+  }
+}
+
+@keyframes g-pulse-glow-green {
+  0%, 100% {
+    box-shadow: 0 0 4px rgba(52, 199, 89, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(52, 199, 89, 0.6);
+  }
+}
+
+@keyframes g-pulse-glow-orange {
+  0%, 100% {
+    box-shadow: 0 0 4px rgba(255, 149, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(255, 149, 0, 0.6);
+  }
+}
+
+@keyframes g-shimmer {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes g-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes g-ripple {
+  from {
+    transform: scale(0);
+    opacity: 0.4;
+  }
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes g-expand-width {
+  from {
+    width: 0%;
+  }
+}
+
+@keyframes g-count-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes g-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes g-breathe {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+
+/* ==========================================================================
+   UTILITY CLASSES
+   ========================================================================== */
+
+.g-animate-in {
+  animation: g-fade-in var(--g-duration-normal) var(--g-ease-out) both;
+}
+
+.g-animate-scale {
+  animation: g-scale-in var(--g-duration-normal) var(--g-spring) both;
+}
+
+.g-animate-slide-right {
+  animation: g-slide-in-right var(--g-duration-normal) var(--g-ease-out) both;
+}
+
+.g-animate-slide-left {
+  animation: g-slide-in-left var(--g-duration-normal) var(--g-ease-out) both;
+}
+
+.g-animate-float {
+  animation: g-float 3s var(--g-ease-out) infinite;
+}
+
+.g-animate-breathe {
+  animation: g-breathe 2s ease-in-out infinite;
+}
+
+
+/* ==========================================================================
+   STAGGER DELAYS -- Up to 10 items
+   ========================================================================== */
+
+.g-stagger-1 { animation-delay: 50ms; }
+.g-stagger-2 { animation-delay: 100ms; }
+.g-stagger-3 { animation-delay: 150ms; }
+.g-stagger-4 { animation-delay: 200ms; }
+.g-stagger-5 { animation-delay: 250ms; }
+.g-stagger-6 { animation-delay: 300ms; }
+.g-stagger-7 { animation-delay: 350ms; }
+.g-stagger-8 { animation-delay: 400ms; }
+.g-stagger-9 { animation-delay: 450ms; }
+.g-stagger-10 { animation-delay: 500ms; }
+
+
+/* ==========================================================================
+   DURATION MODIFIERS
+   ========================================================================== */
+
+.g-duration-fast { animation-duration: var(--g-duration-fast); }
+.g-duration-normal { animation-duration: var(--g-duration-normal); }
+.g-duration-slow { animation-duration: var(--g-duration-slow); }
+
+
+/* ==========================================================================
+   GLOW UTILITIES -- Per-color pulsing glow
+   ========================================================================== */
+
+.g-glow-blue { animation: g-pulse-glow 2s ease-in-out infinite; }
+.g-glow-green { animation: g-pulse-glow-green 2s ease-in-out infinite; }
+.g-glow-orange { animation: g-pulse-glow-orange 2s ease-in-out infinite; }
+
+
+/* ==========================================================================
+   REDUCED MOTION -- Safety for accessibility
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .g-animate-in,
+  .g-animate-scale,
+  .g-animate-slide-right,
+  .g-animate-slide-left,
+  .g-animate-float,
+  .g-animate-breathe {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .g-stagger-1,
+  .g-stagger-2,
+  .g-stagger-3,
+  .g-stagger-4,
+  .g-stagger-5,
+  .g-stagger-6,
+  .g-stagger-7,
+  .g-stagger-8,
+  .g-stagger-9,
+  .g-stagger-10 {
+    animation-delay: 0ms;
+  }
+
+  .g-glow-blue,
+  .g-glow-green,
+  .g-glow-orange {
+    animation: none;
+  }
+
+  .glass-card-hover:hover {
+    transform: none;
+  }
+
+  .glass-card-hover:active {
+    transform: none;
+  }
+
+  .glass-btn:active {
+    transform: none;
+  }
+
+  .glass-skeleton {
+    animation: none;
+  }
+}

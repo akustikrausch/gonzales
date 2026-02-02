@@ -4,11 +4,16 @@ import { ExportPanel } from "../components/export/ExportPanel";
 export function ExportPage() {
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-bold text-[#1D1D1F] flex items-center gap-2">
+      <h2
+        className="text-xl font-bold flex items-center gap-2 g-animate-in"
+        style={{ color: "var(--g-text)" }}
+      >
         <Download className="w-5 h-5" />
         Export
       </h2>
-      <ExportPanel />
+      <div className="g-animate-in g-stagger-1">
+        <ExportPanel />
+      </div>
     </div>
   );
 }

@@ -1,8 +1,10 @@
 import type {
   Config,
   ConfigUpdate,
+  EnhancedStatistics,
   Measurement,
   MeasurementPage,
+  ServerListResponse,
   SortField,
   SortOrder,
   Statistics,
@@ -63,6 +65,17 @@ export const api = {
     return fetchJSON(`${BASE}/statistics${qs ? `?${qs}` : ""}`);
   },
 
+  getEnhancedStatistics(params?: {
+    start_date?: string;
+    end_date?: string;
+  }): Promise<EnhancedStatistics> {
+    const search = new URLSearchParams();
+    if (params?.start_date) search.set("start_date", params.start_date);
+    if (params?.end_date) search.set("end_date", params.end_date);
+    const qs = search.toString();
+    return fetchJSON(`${BASE}/statistics/enhanced${qs ? `?${qs}` : ""}`);
+  },
+
   getStatus(): Promise<Status> {
     return fetchJSON(`${BASE}/status`);
   },
@@ -81,6 +94,10 @@ export const api = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(update),
     });
+  },
+
+  getServers(): Promise<ServerListResponse> {
+    return fetchJSON(`${BASE}/servers`);
   },
 
   getExportCsvUrl(params?: { start_date?: string; end_date?: string }): string {

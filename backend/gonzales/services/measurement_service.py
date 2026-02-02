@@ -11,6 +11,7 @@ from gonzales.core.logging import logger
 from gonzales.db.models import Measurement, TestFailure
 from gonzales.db.repository import MeasurementRepository, TestFailureRepository
 from gonzales.schemas.speedtest_raw import SpeedtestRawResult
+from gonzales.services.event_bus import event_bus
 from gonzales.services.speedtest_runner import speedtest_runner
 
 
@@ -67,7 +68,9 @@ class MeasurementService:
         async with self._lock:
             self._test_in_progress = True
             try:
-                raw_result = await speedtest_runner.run()
+                raw_result = await speedtest_runner.run_with_progress(
+                    server_id=settings.preferred_server_id
+                )
                 raw_json = json.dumps(raw_result.model_dump(), default=str)
 
                 measurement = self._create_measurement_from_result(raw_result, raw_json)
@@ -83,6 +86,18 @@ class MeasurementService:
                         saved.upload_mbps,
                         settings.upload_threshold_mbps,
                     )
+
+                event_bus.publish({
+                    "event": "complete",
+                    "data": {
+                        "phase": "complete",
+                        "download_mbps": saved.download_mbps,
+                        "upload_mbps": saved.upload_mbps,
+                        "ping_ms": saved.ping_latency_ms,
+                        "jitter_ms": saved.ping_jitter_ms,
+                        "measurement_id": saved.id,
+                    },
+                })
 
                 if manual:
                     self._last_manual_trigger = time.time()

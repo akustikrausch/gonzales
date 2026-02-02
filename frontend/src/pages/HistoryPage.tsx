@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Clock } from "lucide-react";
 import { useDeleteMeasurement, useMeasurements } from "../hooks/useApi";
-import { Card } from "../components/common/Card";
-import { LoadingSpinner } from "../components/common/LoadingSpinner";
+import { GlassCard } from "../components/ui/GlassCard";
+import { GlassButton } from "../components/ui/GlassButton";
+import { Spinner } from "../components/ui/Spinner";
 import { DateRangeFilter } from "../components/history/DateRangeFilter";
 import { MeasurementTable } from "../components/history/MeasurementTable";
 import type { SortField, SortOrder } from "../api/types";
@@ -38,8 +39,11 @@ export function HistoryPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-[#1D1D1F] flex items-center gap-2">
+      <div className="flex items-center justify-between g-animate-in">
+        <h2
+          className="text-xl font-bold flex items-center gap-2"
+          style={{ color: "var(--g-text)" }}
+        >
           <Clock className="w-5 h-5" />
           History
         </h2>
@@ -51,49 +55,62 @@ export function HistoryPage() {
         />
       </div>
 
-      <Card>
-        {isLoading ? (
-          <LoadingSpinner />
-        ) : data && data.items.length > 0 ? (
-          <>
-            <MeasurementTable
-              measurements={data.items}
-              onDelete={(id) => deleteMutation.mutate(id)}
-              sortBy={sortBy}
-              sortOrder={sortOrder}
-              onSort={handleSort}
-            />
-            <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#F5F5F7]">
-              <p className="text-xs text-[#86868B]">
-                {data.total} measurements total
-              </p>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page <= 1}
-                  className="px-3 py-1 text-xs border border-[#E5E5EA] rounded-lg
-                             disabled:opacity-40 hover:bg-[#F5F5F7] transition-colors"
-                >
-                  Previous
-                </button>
-                <span className="text-xs text-[#86868B] px-2 py-1">
-                  Page {data.page} of {data.pages}
-                </span>
-                <button
-                  onClick={() => setPage((p) => Math.min(data.pages, p + 1))}
-                  disabled={page >= data.pages}
-                  className="px-3 py-1 text-xs border border-[#E5E5EA] rounded-lg
-                             disabled:opacity-40 hover:bg-[#F5F5F7] transition-colors"
-                >
-                  Next
-                </button>
-              </div>
+      <GlassCard padding="none" className="g-animate-in g-stagger-1">
+        <div className="p-5">
+          {isLoading ? (
+            <div className="flex items-center justify-center p-12">
+              <Spinner size={32} />
             </div>
-          </>
-        ) : (
-          <p className="text-center py-12 text-[#86868B]">No measurements found.</p>
-        )}
-      </Card>
+          ) : data && data.items.length > 0 ? (
+            <>
+              <MeasurementTable
+                measurements={data.items}
+                onDelete={(id) => deleteMutation.mutate(id)}
+                sortBy={sortBy}
+                sortOrder={sortOrder}
+                onSort={handleSort}
+              />
+              <div
+                className="flex items-center justify-between mt-4 pt-4 border-t"
+                style={{ borderColor: "var(--g-border)" }}
+              >
+                <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>
+                  {data.total} measurements total
+                </p>
+                <div className="flex gap-2">
+                  <GlassButton
+                    size="sm"
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page <= 1}
+                  >
+                    Previous
+                  </GlassButton>
+                  <span
+                    className="text-xs px-2 py-1"
+                    style={{ color: "var(--g-text-secondary)" }}
+                  >
+                    Page {data.page} of {data.pages}
+                  </span>
+                  <GlassButton
+                    size="sm"
+                    onClick={() => setPage((p) => Math.min(data.pages, p + 1))}
+                    disabled={page >= data.pages}
+                  >
+                    Next
+                  </GlassButton>
+                </div>
+              </div>
+            </>
+          ) : (
+            <p
+              className="text-center py-12"
+              style={{ color: "var(--g-text-secondary)" }}
+            >
+              No measurements found.
+            </p>
+          )}
+        </div>
+      </GlassCard>
     </div>
   );
 }

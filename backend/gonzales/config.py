@@ -5,7 +5,14 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 CONFIG_FILE = Path("config.json")
 
-MUTABLE_KEYS = {"test_interval_minutes", "download_threshold_mbps", "upload_threshold_mbps"}
+MUTABLE_KEYS = {
+    "test_interval_minutes",
+    "download_threshold_mbps",
+    "upload_threshold_mbps",
+    "preferred_server_id",
+    "manual_trigger_cooldown_seconds",
+    "theme",
+}
 
 
 class Settings(BaseSettings):
@@ -23,6 +30,9 @@ class Settings(BaseSettings):
     cors_origins: list[str] = ["http://localhost:5173", "http://localhost:8470"]
     speedtest_binary: str = "speedtest"
     manual_trigger_cooldown_seconds: int = 60
+
+    preferred_server_id: int = 0
+    theme: str = "auto"
 
     @property
     def database_url(self) -> str:

@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { Zap, ClipboardList, BarChart3, Download, Settings, type LucideIcon } from "lucide-react";
+import { Logo } from "../ui/Logo";
 
 const navItems: { to: string; label: string; icon: LucideIcon }[] = [
   { to: "/", label: "Dashboard", icon: Zap },
@@ -9,37 +10,72 @@ const navItems: { to: string; label: string; icon: LucideIcon }[] = [
   { to: "/settings", label: "Settings", icon: Settings },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  collapsed?: boolean;
+}
+
+export function Sidebar({ collapsed = false }: SidebarProps) {
   return (
-    <aside className="w-56 bg-white border-r border-[#E5E5EA] min-h-screen flex flex-col">
-      <div className="p-5 border-b border-[#E5E5EA]">
-        <h1 className="text-lg font-bold text-[#1D1D1F] tracking-tight">
-          Gonzales
-        </h1>
-        <p className="text-xs text-[#86868B] mt-0.5">Speed Monitor</p>
+    <aside
+      className="glass-sidebar min-h-screen flex flex-col transition-all"
+      style={{
+        width: collapsed ? "var(--g-sidebar-collapsed)" : "var(--g-sidebar-width)",
+      }}
+    >
+      <div
+        className="flex items-center gap-3 border-b"
+        style={{
+          padding: collapsed ? "var(--g-space-4)" : "var(--g-space-5)",
+          borderColor: "var(--g-border)",
+          justifyContent: collapsed ? "center" : "flex-start",
+        }}
+      >
+        <Logo size={28} />
+        {!collapsed && (
+          <div>
+            <h1
+              className="text-lg font-bold tracking-tight"
+              style={{ color: "var(--g-text)" }}
+            >
+              Gonzales
+            </h1>
+            <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>
+              Speed Monitor
+            </p>
+          </div>
+        )}
       </div>
-      <nav className="flex-1 p-3">
+      <nav className="flex-1" style={{ padding: "var(--g-space-3)" }}>
         {navItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
             end={item.to === "/"}
+            title={collapsed ? item.label : undefined}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors mb-0.5 ${
-                isActive
-                  ? "bg-[#007AFF]/10 text-[#007AFF]"
-                  : "text-[#1D1D1F] hover:bg-black/5"
-              }`
+              `glass-nav-item mb-0.5 ${
+                collapsed ? "justify-center !px-2.5 !gap-0" : ""
+              } ${isActive ? "glass-nav-item-active" : ""}`
             }
           >
-            <item.icon className="w-4 h-4" />
-            {item.label}
+            <item.icon className="glass-nav-icon w-4 h-4" />
+            {!collapsed && item.label}
           </NavLink>
         ))}
       </nav>
-      <div className="p-4 border-t border-[#E5E5EA]">
-        <p className="text-[10px] text-[#86868B]">akustikrausch@gmail.com</p>
-      </div>
+      {!collapsed && (
+        <div
+          className="border-t"
+          style={{
+            padding: "var(--g-space-4)",
+            borderColor: "var(--g-border)",
+          }}
+        >
+          <p className="text-[10px]" style={{ color: "var(--g-text-secondary)" }}>
+            Gonzales v2.0
+          </p>
+        </div>
+      )}
     </aside>
   );
 }
