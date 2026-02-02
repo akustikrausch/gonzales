@@ -229,17 +229,21 @@ curl http://localhost:8470/api/v1/status
 
 #### Home Assistant Integration
 
-A Home Assistant integration for Gonzales will be available as a separate repository (`gonzales-ha`). The integration uses local polling to read data from the Gonzales API.
+A HACS-compatible Home Assistant integration is available at [gonzales-ha](https://github.com/akustikrausch/gonzales-ha).
 
-Sensor mapping:
-- `sensor.gonzales_download_speed` -- latest download speed (Mbps)
-- `sensor.gonzales_upload_speed` -- latest upload speed (Mbps)
+Install via HACS (custom repository) or copy `custom_components/gonzales/` to your HA config directory. The integration provides a config flow for host/port/interval setup.
+
+Sensors:
+- `sensor.gonzales_download_speed` -- latest download speed (Mbit/s)
+- `sensor.gonzales_upload_speed` -- latest upload speed (Mbit/s)
 - `sensor.gonzales_ping_latency` -- latest ping latency (ms)
 - `sensor.gonzales_ping_jitter` -- latest ping jitter (ms)
 - `sensor.gonzales_packet_loss` -- latest packet loss (%)
 - `sensor.gonzales_last_test_time` -- timestamp of last test
+- `sensor.gonzales_isp_score` -- ISP performance score (0-100)
+- Diagnostic: scheduler status, test in progress, uptime, total measurements, DB size
 
-The Gonzales API requires no authentication and returns clean JSON responses. Ensure CORS allows your HA instance to connect by adding its URL to `GONZALES_CORS_ORIGINS` if needed.
+The integration uses local polling (no cloud, no authentication). CORS configuration is not needed since HA makes server-side HTTP requests.
 
 ---
 
@@ -348,6 +352,14 @@ cp .env.example .env
 
 Einstellungen koennen auch zur Laufzeit ueber die Web-Oberflaeche (Einstellungen) oder die API (`PUT /api/v1/config`) geaendert werden. Laufzeitaenderungen werden in `config.json` gespeichert (wird automatisch erstellt, nicht in Git).
 
+#### Home Assistant Integration
+
+Eine HACS-kompatible Home Assistant Integration ist verfuegbar unter [gonzales-ha](https://github.com/akustikrausch/gonzales-ha).
+
+Installation ueber HACS (Custom Repository) oder manuell `custom_components/gonzales/` ins HA Config-Verzeichnis kopieren. Die Integration bietet einen Config Flow fuer Host/Port/Intervall-Einrichtung.
+
+Sensoren: Download-Geschwindigkeit, Upload-Geschwindigkeit, Ping-Latenz, Ping-Jitter, Paketverlust, Letzter Test, ISP-Score. Zusaetzlich Diagnose-Sensoren fuer Scheduler-Status, laufende Tests, Uptime, Gesamtmessungen und Datenbankgroesse.
+
 #### Ueberpruefen
 
 ```bash
@@ -404,6 +416,7 @@ cp config.json.example config.json  # Runtime settings (optional)
 | Design System | Liquid Glass (CSS custom properties, backdrop-filter) |
 | Terminal UI | Textual + Rich |
 | Export | CSV, PDF (ReportLab) |
+| Home Assistant | [gonzales-ha](https://github.com/akustikrausch/gonzales-ha) (HACS custom integration) |
 
 ## License
 

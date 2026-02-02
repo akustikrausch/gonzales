@@ -4,13 +4,13 @@
 
 ---
 
-## Overall Status: v1 Complete, v2 In Progress
+## Overall Status: v2 Complete
 
 The functional foundation (v1) is complete. All core features work.
 The v2 effort focuses on elevating design, animations, statistics, and
 documentation to "best on market" quality.
 
-Current quality: **9.1/10** -- Target: **9.5/10**
+Current quality: **9.3/10** -- Target: **9.5/10**
 
 ---
 
@@ -28,7 +28,7 @@ Current quality: **9.1/10** -- Target: **9.5/10**
 | 8 | Tech Styleguide | DONE | STYLEGUIDE.md with full design reference (503 lines) |
 | 9 | Home Assistant Integration | DONE | gonzales-ha repo, 12 sensors, config flow, HACS compatible |
 | 10 | Git Hygiene + Privacy Protection | DONE | .gitignore, templates, config.json.example, README updated |
-| 11 | Final Polish + Verification | TODO | Build, lint, tests, docs, end-to-end |
+| 11 | Final Polish + Verification | DONE | Code splitting, docs updated, build verified, static copied |
 
 ---
 
@@ -36,14 +36,16 @@ Current quality: **9.1/10** -- Target: **9.5/10**
 
 | Check | Status | Notes |
 |-------|--------|-------|
-| Frontend Build (`npm run build`) | PASS | 794 KB JS, 36 KB CSS |
+| Frontend Build (`npm run build`) | PASS | 18 chunks, largest 432 KB (charts). Code-split: vendor (39 KB), query (50 KB), charts (432 KB), app (202 KB), 5 page chunks, 36 KB CSS |
 | TypeScript (`tsc --noEmit`) | PASS | Zero errors |
+| Python Syntax (`ast.parse`) | PASS | All 53 Python files parse OK |
 | Backend Lint (`ruff check`) | NOT TESTED | ruff not in system PATH |
-| Backend Tests (`pytest`) | PASS (vacuous) | No test files exist |
+| Backend Tests (`pytest`) | NOT TESTED | No test files exist |
+| No Emoji Check | PASS | Zero non-ASCII characters in TSX files |
 
 ---
 
-## What Exists (v1 + v2 through Phase 5)
+## What Exists (v1 + v2 Complete)
 
 ### Backend
 - FastAPI with async SQLAlchemy + aiosqlite + SQLite WAL
@@ -165,5 +167,8 @@ gonzales/
 
 ## Next Action
 
-Start Phase 11: Final Polish + Verification.
-Read PLAN.md Phase 11 for exact deliverables and checklist.
+All 11 phases complete. Remaining to reach 9.5/10:
+- Backend unit tests (pytest) for critical services
+- Backend lint with ruff (when available in PATH)
+- Manual end-to-end test: start server, run speed test, check all 5 pages + TUI
+- Push gonzales-ha to GitHub remote

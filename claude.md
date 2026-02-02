@@ -17,12 +17,14 @@ Python FastAPI application with async SQLAlchemy and APScheduler.
   - `services/speedtest_runner.py` -- Ookla CLI subprocess. `run()` for simple execution, `run_with_progress()` for SSE streaming with progress events, `list_servers()` for server enumeration
   - `services/measurement_service.py` -- orchestrates tests, threshold checks, asyncio lock, publishes events to event_bus
   - `services/scheduler_service.py` -- APScheduler recurring test execution
-  - `services/statistics_service.py` -- basic stats (percentiles, aggregates) + enhanced stats (hourly, daily, trend regression, SLA compliance, reliability score, per-server breakdown)
+  - `services/statistics_service.py` -- basic stats (percentiles, aggregates) + enhanced stats (hourly, daily, trend regression, SLA compliance, reliability score, per-server breakdown) + innovative insights (anomaly detection, ISP score, peak/off-peak, correlations, degradation alerts, predictions)
   - `services/event_bus.py` -- async pub/sub for real-time SSE streaming. `EventBus` class with per-subscriber `asyncio.Queue` fan-out
   - `services/export_service.py` -- CSV + PDF generation
-- **API**: `api/v1/` -- REST endpoints for measurements, statistics (basic + enhanced), status, export, speedtest trigger + SSE stream, config, servers
+- **API**: `api/v1/` -- REST endpoints for measurements, statistics (basic + enhanced with insights), status, export, speedtest trigger + SSE stream, config, servers
 - **Security**: `core/security.py` -- CORS (configurable origins), TrustedHost, GZip, security headers
-- **TUI**: `tui/app.py` -- Textual app with demoscene styling, 3 screens (dashboard, history, settings)
+- **TUI**: `tui/app.py` -- Textual app with demoscene styling, 4 screens (dashboard, history, settings, real-time test)
+  - `tui/screens/test.py` -- Real-time test screen with event bus subscription
+  - `tui/widgets/live_gauge.py` -- ASCII gauge with sparkline, progress bar, box-drawing results
 
 ### Frontend (`frontend/`)
 
@@ -36,11 +38,13 @@ React 19 + TypeScript + Vite 6 + Tailwind CSS 4 SPA with Liquid Glass design sys
   - `src/hooks/useSSE.ts` -- EventSource hook for real-time speed test streaming
   - `src/hooks/useTheme.ts` -- theme state management (auto/light/dark)
   - `src/hooks/useMediaQuery.ts` -- responsive breakpoint hooks (useIsMobile, useIsTablet, useIsDesktop)
+  - `src/hooks/useAnimatedNumber.ts` -- requestAnimationFrame number animation with easeOutExpo
 - **Layout**: `src/components/layout/` -- AppShell (responsive flex), Sidebar (collapsible on tablet), Header (theme toggle + run test), MobileNav (fixed bottom nav)
-- **Speedtest**: `src/components/speedtest/` -- LiveTestView (SSE progress display), SpeedNeedle (SVG gauge), ProgressRing (SVG circular progress)
-- **Pages**: Dashboard (with live test overlay), History, Statistics (tabbed: Overview/Time Analysis/Trends/Servers), Export, Settings (with server picker + theme selector)
-- **Statistics**: `src/components/statistics/` -- HourlyHeatmap, DayOfWeekChart (radar), TrendChart (area), SlaCard, ReliabilityCard, ServerComparison (bar)
-- **Built output**: Copied to `backend/gonzales/static/` and served by FastAPI at `/`
+- **Speedtest**: `src/components/speedtest/` -- LiveTestView (SSE progress with DataStreamLines, phase colors), SpeedNeedle (SVG gauge with glow filters, gradient arc, pulsing tip), ProgressRing (SVG circular progress with optional glow)
+- **Pages**: Dashboard (with live test overlay), History, Statistics (tabbed: Overview/Time Analysis/Trends/Servers/Insights), Export, Settings (with server picker + theme selector). All pages lazy-loaded via React.lazy()
+- **Statistics**: `src/components/statistics/` -- HourlyHeatmap, DayOfWeekChart (radar), TrendChart (area with prediction lines), SlaCard, ReliabilityCard, ServerComparison (bar), IspScoreCard, PeakAnalysis, QualityTimeline, CorrelationMatrix, DegradationAlert
+- **Common**: `src/components/common/` -- AnimatedNumber (easeOutExpo counting), PageTransition (route fade/slide)
+- **Built output**: Copied to `backend/gonzales/static/` and served by FastAPI at `/`. Code-split: vendor, charts, query as separate chunks
 
 ## Key Patterns
 
@@ -78,7 +82,7 @@ All under `/api/v1`:
 | GET | `/measurements/{id}` | Single measurement |
 | DELETE | `/measurements/{id}` | Delete measurement |
 | GET | `/statistics` | Basic stats with percentiles |
-| GET | `/statistics/enhanced` | Enhanced stats (hourly, daily, trend, SLA, reliability, per-server) |
+| GET | `/statistics/enhanced` | Enhanced stats + insights (hourly, daily, trend, SLA, reliability, per-server, anomalies, ISP score, peak/off-peak, correlations, degradation, predictions) |
 | GET | `/status` | Scheduler state, uptime, DB size |
 | GET | `/export/csv` | Download CSV |
 | GET | `/export/pdf` | Download PDF report |
