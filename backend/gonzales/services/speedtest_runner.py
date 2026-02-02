@@ -12,6 +12,41 @@ from gonzales.core.logging import logger
 from gonzales.schemas.speedtest_raw import SpeedtestRawResult
 from gonzales.services.event_bus import event_bus
 
+# ANSI escape codes for terminal visualization
+_B = "\033[1m"       # Bold
+_DIM = "\033[2m"     # Dim
+_BLUE = "\033[38;5;39m"
+_GREEN = "\033[38;5;41m"
+_ORANGE = "\033[38;5;214m"
+_CYAN = "\033[38;5;45m"
+_WHITE = "\033[97m"
+_R = "\033[0m"       # Reset
+
+
+def _bar(progress: float, width: int = 25, color: str = "") -> str:
+    """Render a colored progress bar: [████████░░░░░░░░░░░░] 51%"""
+    filled = int(progress * width)
+    bar = "\u2588" * filled + "\u2591" * (width - filled)
+    pct = f"{int(progress * 100):3d}%"
+    return f"{color}{bar}{_R} {_B}{pct}{_R}"
+
+
+def _header(label: str, color: str) -> str:
+    """Render a phase header: ── Download ──────────────────"""
+    line = "\u2500" * (36 - len(label))
+    return f"{color}{_B}\u2500\u2500 {label} {line}{_R}"
+
+
+def _summary(dl: float, ul: float, ping: float) -> str:
+    """Render the final result summary box."""
+    top = f"{_DIM}\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550{_R}"
+    vals = (
+        f"  {_BLUE}{_B}\u2193 {dl:.1f} Mbps{_R}  "
+        f"{_GREEN}{_B}\u2191 {ul:.1f} Mbps{_R}  "
+        f"{_ORANGE}{_B}\u25cf {ping:.1f} ms{_R}"
+    )
+    return f"{top}\n{vals}\n{top}"
+
 
 class SpeedtestRunner:
     TIMEOUT_SECONDS = 120
@@ -82,15 +117,16 @@ class SpeedtestRunner:
 
         result = SpeedtestRawResult.model_validate(data)
         logger.info(
-            "Speed test complete: down %.1f Mbps, up %.1f Mbps, ping %.1f ms",
-            result.download_mbps,
-            result.upload_mbps,
-            result.ping.latency,
+            "\n%s",
+            _summary(result.download_mbps, result.upload_mbps, result.ping.latency),
         )
         return result
 
     async def run_with_progress(self, server_id: int = 0) -> SpeedtestRawResult:
-        logger.info("Starting speed test with progress...")
+        logger.info(
+            "\n%s%s\u2500\u2500 GONZALES SPEED TEST \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500%s",
+            _CYAN, _B, _R,
+        )
         cmd = [
             self.binary_path,
             "--format=json",
@@ -134,7 +170,15 @@ class SpeedtestRunner:
 
                         msg_type = data.get("type", "")
                         if msg_type == "testStart":
-                            logger.info("Phase: Ping")
+                            srv = data.get("server", {})
+                            srv_name = srv.get("name", "")
+                            srv_loc = srv.get("location", "")
+                            srv_label = f"{srv_name}, {srv_loc}" if srv_name else "unknown"
+                            logger.info(
+                                "  %s\u25b8 Server:%s %s",
+                                _DIM, _R, srv_label,
+                            )
+                            logger.info("%s", _header("Ping", _ORANGE))
                             event_bus.publish({
                                 "event": "progress",
                                 "data": {"phase": "ping", "progress": 0},
@@ -143,7 +187,10 @@ class SpeedtestRunner:
                             ping_ms = data.get("ping", {}).get("latency", 0)
                             ping_progress = data.get("ping", {}).get("progress", 0)
                             if ping_progress >= 1:
-                                logger.info("Ping: %.1f ms", ping_ms)
+                                logger.info(
+                                    "  %s%s\u25cf %.1f ms%s",
+                                    _ORANGE, _B, ping_ms, _R,
+                                )
                             event_bus.publish({
                                 "event": "progress",
                                 "data": {
@@ -158,14 +205,14 @@ class SpeedtestRunner:
                             dl_progress = data.get("download", {}).get("progress", 0)
                             dl_elapsed_ms = data.get("download", {}).get("elapsed", 0)
                             if prev_phase != "download":
-                                logger.info("Phase: Download")
+                                logger.info("%s", _header("Download", _BLUE))
                                 prev_phase = "download"
                                 last_log_progress = 0.0
-                            if dl_progress - last_log_progress >= 0.25 or dl_progress >= 1:
+                            if dl_progress - last_log_progress >= 0.10 or dl_progress >= 1:
                                 logger.info(
-                                    "  DL: %.1f Mbps (%d%%)",
-                                    bw_mbps,
-                                    int(dl_progress * 100),
+                                    "  %s  %s\u2193 %s%.1f Mbps%s",
+                                    _bar(dl_progress, 25, _BLUE),
+                                    _BLUE, _B, bw_mbps, _R,
                                 )
                                 last_log_progress = dl_progress
                             event_bus.publish({
@@ -183,14 +230,14 @@ class SpeedtestRunner:
                             ul_progress = data.get("upload", {}).get("progress", 0)
                             ul_elapsed_ms = data.get("upload", {}).get("elapsed", 0)
                             if prev_phase != "upload":
-                                logger.info("Phase: Upload")
+                                logger.info("%s", _header("Upload", _GREEN))
                                 prev_phase = "upload"
                                 last_log_progress = 0.0
-                            if ul_progress - last_log_progress >= 0.25 or ul_progress >= 1:
+                            if ul_progress - last_log_progress >= 0.10 or ul_progress >= 1:
                                 logger.info(
-                                    "  UL: %.1f Mbps (%d%%)",
-                                    bw_mbps,
-                                    int(ul_progress * 100),
+                                    "  %s  %s\u2191 %s%.1f Mbps%s",
+                                    _bar(ul_progress, 25, _GREEN),
+                                    _GREEN, _B, bw_mbps, _R,
                                 )
                                 last_log_progress = ul_progress
                             event_bus.publish({
@@ -233,10 +280,12 @@ class SpeedtestRunner:
                 raise SpeedtestError("No result received from speedtest", raw_output=buffer)
 
             logger.info(
-                "Speed test complete: down %.1f Mbps, up %.1f Mbps, ping %.1f ms",
-                final_result.download_mbps,
-                final_result.upload_mbps,
-                final_result.ping.latency,
+                "\n%s",
+                _summary(
+                    final_result.download_mbps,
+                    final_result.upload_mbps,
+                    final_result.ping.latency,
+                ),
             )
             return final_result
 
