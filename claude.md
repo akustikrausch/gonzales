@@ -73,6 +73,16 @@ make lint       # Run ruff + eslint
 make clean      # Remove build artifacts
 ```
 
+## Tests
+
+Backend tests in `backend/tests/` (74 tests, run with `cd backend && python3 -m pytest tests/ -v`):
+
+- **`conftest.py`** -- Shared fixtures: in-memory SQLite engine, session, measurement factory, FastAPI test app with overridden DB dependency, httpx AsyncClient
+- **`test_statistics_pure.py`** -- Pure function tests (no DB): `_percentile`, `_stddev`, `_linear_regression`, `_pearson`, `_compute_speed_stats`, `_compute_isp_score`, `_detect_anomalies`, `_compute_peak_offpeak`, `_detect_degradation`
+- **`test_event_bus.py`** -- EventBus pub/sub: publish/subscribe, fan-out, subscriber count/limit, complete/error termination, cleanup after disconnect
+- **`test_repository.py`** -- Repository CRUD with in-memory SQLite: create, get_by_id, get_latest, get_paginated (pagination, sorting, date filters), delete, count, get_statistics, TestFailureRepository
+- **`test_api.py`** -- REST API via httpx: measurements CRUD, statistics (basic + enhanced), status, API key authentication (protected/unprotected/wrong key)
+
 ## API Endpoints
 
 All under `/api/v1`:
