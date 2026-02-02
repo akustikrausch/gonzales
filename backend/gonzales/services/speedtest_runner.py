@@ -115,7 +115,7 @@ class SpeedtestRunner:
             prev_phase = ""
 
             async def read_stdout():
-                nonlocal final_result, buffer
+                nonlocal final_result, buffer, prev_phase
                 while True:
                     chunk = await process.stdout.read(4096)
                     if not chunk:
