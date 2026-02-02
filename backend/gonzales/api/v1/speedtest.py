@@ -32,6 +32,7 @@ async def stream_speedtest():
         headers={
             "Cache-Control": "no-cache",
             "Connection": "keep-alive",
+            "Content-Encoding": "identity",
             "X-Accel-Buffering": "no",
         },
     )
