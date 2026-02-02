@@ -1,6 +1,7 @@
 import type { ReliabilityScore } from "../../api/types";
 import { GlassCard } from "../ui/GlassCard";
 import { ProgressRing } from "../speedtest/ProgressRing";
+import { AnimatedNumber } from "../common/AnimatedNumber";
 
 interface ReliabilityCardProps {
   reliability: ReliabilityScore;
@@ -17,28 +18,43 @@ export function ReliabilityCard({ reliability }: ReliabilityCardProps) {
       </h4>
       <div className="flex flex-col items-center gap-3">
         <ProgressRing value={score} size={110} strokeWidth={8} color={color}>
-          <span className="text-2xl font-bold tabular-nums" style={{ color }}>
-            {score.toFixed(0)}
-          </span>
+          <AnimatedNumber
+            value={score}
+            decimals={0}
+            className="text-2xl font-bold"
+            style={{ color }}
+          />
         </ProgressRing>
         <div className="grid grid-cols-3 gap-4 text-center w-full mt-2">
           <div>
             <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>DL CV</p>
-            <p className="text-sm font-medium tabular-nums" style={{ color: "var(--g-text)" }}>
-              {(reliability.download_cv * 100).toFixed(1)}%
-            </p>
+            <AnimatedNumber
+              value={reliability.download_cv * 100}
+              decimals={1}
+              className="text-sm font-medium"
+              style={{ color: "var(--g-text)" }}
+            />
+            <span className="text-xs" style={{ color: "var(--g-text-secondary)" }}>%</span>
           </div>
           <div>
             <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>UL CV</p>
-            <p className="text-sm font-medium tabular-nums" style={{ color: "var(--g-text)" }}>
-              {(reliability.upload_cv * 100).toFixed(1)}%
-            </p>
+            <AnimatedNumber
+              value={reliability.upload_cv * 100}
+              decimals={1}
+              className="text-sm font-medium"
+              style={{ color: "var(--g-text)" }}
+            />
+            <span className="text-xs" style={{ color: "var(--g-text-secondary)" }}>%</span>
           </div>
           <div>
             <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>Ping CV</p>
-            <p className="text-sm font-medium tabular-nums" style={{ color: "var(--g-text)" }}>
-              {(reliability.ping_cv * 100).toFixed(1)}%
-            </p>
+            <AnimatedNumber
+              value={reliability.ping_cv * 100}
+              decimals={1}
+              className="text-sm font-medium"
+              style={{ color: "var(--g-text)" }}
+            />
+            <span className="text-xs" style={{ color: "var(--g-text-secondary)" }}>%</span>
           </div>
         </div>
       </div>

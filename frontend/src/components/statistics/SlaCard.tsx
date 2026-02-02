@@ -1,6 +1,7 @@
 import type { SlaCompliance } from "../../api/types";
 import { GlassCard } from "../ui/GlassCard";
 import { ProgressRing } from "../speedtest/ProgressRing";
+import { AnimatedNumber } from "../common/AnimatedNumber";
 
 interface SlaCardProps {
   sla: SlaCompliance;
@@ -20,9 +21,13 @@ export function SlaCard({ sla }: SlaCardProps) {
             strokeWidth={6}
             color="var(--g-blue)"
           >
-            <span className="text-sm font-bold tabular-nums" style={{ color: "var(--g-blue)" }}>
-              {sla.download_compliance_pct.toFixed(0)}%
-            </span>
+            <AnimatedNumber
+              value={sla.download_compliance_pct}
+              decimals={0}
+              className="text-sm font-bold"
+              style={{ color: "var(--g-blue)" }}
+            />
+            <span className="text-xs" style={{ color: "var(--g-blue)" }}>%</span>
           </ProgressRing>
           <span className="text-xs" style={{ color: "var(--g-text-secondary)" }}>Download</span>
           <span className="text-[10px] tabular-nums" style={{ color: "var(--g-text-tertiary)" }}>
@@ -36,9 +41,13 @@ export function SlaCard({ sla }: SlaCardProps) {
             strokeWidth={6}
             color="var(--g-green)"
           >
-            <span className="text-sm font-bold tabular-nums" style={{ color: "var(--g-green)" }}>
-              {sla.upload_compliance_pct.toFixed(0)}%
-            </span>
+            <AnimatedNumber
+              value={sla.upload_compliance_pct}
+              decimals={0}
+              className="text-sm font-bold"
+              style={{ color: "var(--g-green)" }}
+            />
+            <span className="text-xs" style={{ color: "var(--g-green)" }}>%</span>
           </ProgressRing>
           <span className="text-xs" style={{ color: "var(--g-text-secondary)" }}>Upload</span>
           <span className="text-[10px] tabular-nums" style={{ color: "var(--g-text-tertiary)" }}>

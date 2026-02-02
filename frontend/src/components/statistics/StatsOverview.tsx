@@ -1,5 +1,6 @@
 import type { Statistics } from "../../api/types";
 import { GlassCard } from "../ui/GlassCard";
+import { AnimatedNumber } from "../common/AnimatedNumber";
 
 interface StatsOverviewProps {
   stats: Statistics;
@@ -26,9 +27,12 @@ function StatRow({
         {(["min", "max", "avg", "median", "stddev"] as const).map((key) => (
           <div key={key}>
             <p className="text-xs uppercase" style={{ color: "var(--g-text-secondary)" }}>{key}</p>
-            <p className="text-lg font-bold tabular-nums" style={{ color: "var(--g-text)" }}>
-              {stat[key].toFixed(1)}
-            </p>
+            <AnimatedNumber
+              value={stat[key]}
+              decimals={1}
+              className="text-lg font-bold block"
+              style={{ color: "var(--g-text)" }}
+            />
             <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>{unit}</p>
           </div>
         ))}
@@ -44,16 +48,31 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm" style={{ color: "var(--g-text-secondary)" }}>Total Tests</p>
-            <p className="text-3xl font-bold" style={{ color: "var(--g-text)" }}>{stats.total_tests}</p>
+            <AnimatedNumber
+              value={stats.total_tests}
+              decimals={0}
+              className="text-3xl font-bold block"
+              style={{ color: "var(--g-text)" }}
+            />
           </div>
           <div className="text-right">
             <p className="text-sm" style={{ color: "var(--g-text-secondary)" }}>Threshold Violations</p>
             <div className="flex gap-4 mt-1">
               <span className="text-sm">
-                <span className="font-bold" style={{ color: "var(--g-red)" }}>{stats.download_violations}</span>{" "}DL
+                <AnimatedNumber
+                  value={stats.download_violations}
+                  decimals={0}
+                  className="font-bold"
+                  style={{ color: "var(--g-red)" }}
+                />{" "}DL
               </span>
               <span className="text-sm">
-                <span className="font-bold" style={{ color: "var(--g-red)" }}>{stats.upload_violations}</span>{" "}UL
+                <AnimatedNumber
+                  value={stats.upload_violations}
+                  decimals={0}
+                  className="font-bold"
+                  style={{ color: "var(--g-red)" }}
+                />{" "}UL
               </span>
             </div>
           </div>

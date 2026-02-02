@@ -59,7 +59,15 @@ export function TrendChart({ trend }: TrendChartProps) {
           <CartesianGrid strokeDasharray="3 3" stroke="var(--g-border)" />
           <XAxis dataKey="time" tick={{ fontSize: 11 }} stroke="var(--g-text-tertiary)" />
           <YAxis tick={{ fontSize: 11 }} stroke="var(--g-text-tertiary)" unit=" Mbps" />
-          <Tooltip />
+          <Tooltip
+            contentStyle={{
+              background: "var(--g-card-bg)",
+              border: "1px solid var(--g-card-border)",
+              borderRadius: "var(--g-radius-sm)",
+              backdropFilter: "blur(20px)",
+              fontSize: "var(--g-text-xs)",
+            }}
+          />
           <Area
             type="monotone"
             dataKey="download"
@@ -67,6 +75,9 @@ export function TrendChart({ trend }: TrendChartProps) {
             fill="url(#dlGrad)"
             strokeWidth={2}
             name="Download"
+            animationDuration={1000}
+            animationBegin={0}
+            animationEasing="ease-out"
           />
           <Area
             type="monotone"
@@ -75,6 +86,9 @@ export function TrendChart({ trend }: TrendChartProps) {
             fill="url(#ulGrad)"
             strokeWidth={2}
             name="Upload"
+            animationDuration={1000}
+            animationBegin={200}
+            animationEasing="ease-out"
           />
         </AreaChart>
       </ResponsiveContainer>

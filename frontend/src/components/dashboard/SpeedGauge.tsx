@@ -1,4 +1,5 @@
 import { GlassCard } from "../ui/GlassCard";
+import { AnimatedNumber } from "../common/AnimatedNumber";
 
 interface SpeedGaugeProps {
   label: string;
@@ -23,12 +24,12 @@ export function SpeedGauge({
         {label}
       </p>
       <div className="flex items-baseline gap-2">
-        <span
-          className="text-5xl font-bold tabular-nums tracking-tight"
+        <AnimatedNumber
+          value={value}
+          decimals={1}
+          className="text-5xl font-bold tracking-tight"
           style={{ color: isViolation ? "var(--g-red)" : color }}
-        >
-          {value.toFixed(1)}
-        </span>
+        />
         <span className="text-lg font-medium" style={{ color: "var(--g-text-secondary)" }}>
           {unit}
         </span>

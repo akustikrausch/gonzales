@@ -65,18 +65,19 @@ Current quality: 7.8/10. Target: 9.5/10.
 
 ---
 
-### Phase 4: Page Transitions + Number Animations [TODO]
+### Phase 4: Page Transitions + Number Animations [DONE]
 **Goal**: Add motion design that makes the app feel alive
 
-- [ ] Route transition animations (fade + subtle slide between pages)
-- [ ] Animated number counting (values animate from current to target)
-  - Hook: `useAnimatedNumber(value, duration)` with easing
-  - Apply to: SpeedGauge, StatsOverview, SlaCard, ReliabilityCard, Percentiles
-- [ ] Chart draw-in animations (lines/bars animate progressively on mount)
+- [x] Route transition animations (fade + subtle slide between pages)
+- [x] Animated number counting (values animate from current to target)
+  - Hook: `useAnimatedNumber(value, duration)` with easeOutExpo
+  - Applied to: SpeedGauge, StatsOverview, SlaCard, ReliabilityCard
+- [x] Chart draw-in animations (lines/bars animate progressively on mount)
   - Recharts `animationDuration` and `animationBegin` props
-  - Stagger for multi-series charts
-- [ ] Staggered list animations for history table rows
-- [ ] Improved page header entrance animations
+  - Stagger for multi-series charts (200ms offset)
+- [x] Staggered list animations for history table rows (30ms per row, max 300ms)
+- [x] Percentile bars animate width with staggered easeOutExpo transitions
+- [x] Glass-styled chart tooltips (backdrop-filter blur)
 
 **Files to create**:
 - `frontend/src/hooks/useAnimatedNumber.ts`

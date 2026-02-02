@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 import { Header } from "./Header";
 import { Sidebar } from "./Sidebar";
 import { MobileNav } from "./MobileNav";
+import { PageTransition } from "../common/PageTransition";
 import { useIsMobile, useIsTablet } from "../../hooks/useMediaQuery";
 
 export function AppShell() {
@@ -20,7 +21,9 @@ export function AppShell() {
             paddingBottom: isMobile ? "calc(var(--g-mobile-nav-height) + var(--g-space-4))" : "var(--g-space-6)",
           }}
         >
-          <Outlet />
+          <PageTransition>
+            <Outlet />
+          </PageTransition>
         </main>
       </div>
       {isMobile && <MobileNav />}

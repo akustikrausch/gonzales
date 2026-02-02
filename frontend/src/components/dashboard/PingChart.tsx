@@ -32,9 +32,37 @@ export function PingChart({ measurements }: PingChartProps) {
           <CartesianGrid strokeDasharray="3 3" stroke="var(--g-border)" />
           <XAxis dataKey="time" tick={{ fontSize: 11 }} stroke="var(--g-text-tertiary)" />
           <YAxis tick={{ fontSize: 11 }} stroke="var(--g-text-tertiary)" unit=" ms" />
-          <Tooltip />
-          <Line type="monotone" dataKey="ping" stroke="var(--g-orange)" strokeWidth={2} dot={false} name="Ping" />
-          <Line type="monotone" dataKey="jitter" stroke="var(--g-purple)" strokeWidth={2} dot={false} name="Jitter" />
+          <Tooltip
+            contentStyle={{
+              background: "var(--g-card-bg)",
+              border: "1px solid var(--g-card-border)",
+              borderRadius: "var(--g-radius-sm)",
+              backdropFilter: "blur(20px)",
+              fontSize: "var(--g-text-xs)",
+            }}
+          />
+          <Line
+            type="monotone"
+            dataKey="ping"
+            stroke="var(--g-orange)"
+            strokeWidth={2}
+            dot={false}
+            name="Ping"
+            animationDuration={800}
+            animationBegin={0}
+            animationEasing="ease-out"
+          />
+          <Line
+            type="monotone"
+            dataKey="jitter"
+            stroke="var(--g-purple)"
+            strokeWidth={2}
+            dot={false}
+            name="Jitter"
+            animationDuration={800}
+            animationBegin={200}
+            animationEasing="ease-out"
+          />
         </LineChart>
       </ResponsiveContainer>
     </GlassCard>

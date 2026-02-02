@@ -21,7 +21,7 @@ Current quality: **7.8/10** -- Target: **9.5/10**
 | 1 | Backend Core | DONE | All services, API, SSE, config, stats |
 | 2 | Frontend Foundation | DONE | Glass design, 5 pages, live test, responsive |
 | 3 | Design System Polish | DONE | Multi-layer glass, hover effects, shimmer, skeleton, tooltips |
-| 4 | Page Transitions + Number Animations | TODO | Route transitions, animated numbers, chart draw-in |
+| 4 | Page Transitions + Number Animations | DONE | Route transitions, animated numbers, chart draw-in |
 | 5 | Futuristic Live Test View (Web) | TODO | Glow effects, particles, dramatic entrance |
 | 6 | Innovative Statistics + Insights | TODO | Anomaly detection, ISP score, predictions, correlations |
 | 7 | TUI Real-Time Test View | TODO | Live gauge, progress bar, event-driven updates |
@@ -35,7 +35,7 @@ Current quality: **7.8/10** -- Target: **9.5/10**
 
 | Check | Status | Notes |
 |-------|--------|-------|
-| Frontend Build (`npm run build`) | PASS | 769 KB JS, 30 KB CSS |
+| Frontend Build (`npm run build`) | PASS | 771 KB JS, 31 KB CSS |
 | TypeScript (`tsc --noEmit`) | PASS | Zero errors |
 | Backend Lint (`ruff check`) | NOT TESTED | ruff not in system PATH |
 | Backend Tests (`pytest`) | PASS (vacuous) | No test files exist |
@@ -75,10 +75,8 @@ Current quality: **7.8/10** -- Target: **9.5/10**
 
 ## What's Missing (v2 Gaps)
 
-### Design (Phase 4-5)
-- Page transition animations (instant route switches)
-- Number counting animations (values appear instantly)
-- Chart draw-in animations (data appears instantly)
+### Design (Phase 5)
+- Live test view lacks glow effects, particles, dramatic entrance
 - Live test view lacks glow effects, particles, dramatic entrance
 - SpeedNeedle has no glow filter, no arc fill animation
 
@@ -148,5 +146,5 @@ gonzales/
 
 ## Next Action
 
-Start Phase 4: Page Transitions + Number Animations.
-Read PLAN.md Phase 4 for exact deliverables and file list.
+Start Phase 5: Futuristic Live Test View (Web).
+Read PLAN.md Phase 5 for exact deliverables and file list.

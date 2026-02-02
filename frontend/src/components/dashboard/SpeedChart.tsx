@@ -33,10 +33,38 @@ export function SpeedChart({ measurements }: SpeedChartProps) {
           <CartesianGrid strokeDasharray="3 3" stroke="var(--g-border)" />
           <XAxis dataKey="time" tick={{ fontSize: 11 }} stroke="var(--g-text-tertiary)" />
           <YAxis tick={{ fontSize: 11 }} stroke="var(--g-text-tertiary)" unit=" Mbps" />
-          <Tooltip />
+          <Tooltip
+            contentStyle={{
+              background: "var(--g-card-bg)",
+              border: "1px solid var(--g-card-border)",
+              borderRadius: "var(--g-radius-sm)",
+              backdropFilter: "blur(20px)",
+              fontSize: "var(--g-text-xs)",
+            }}
+          />
           <Legend />
-          <Line type="monotone" dataKey="download" stroke="var(--g-blue)" strokeWidth={2} dot={false} name="Download" />
-          <Line type="monotone" dataKey="upload" stroke="var(--g-green)" strokeWidth={2} dot={false} name="Upload" />
+          <Line
+            type="monotone"
+            dataKey="download"
+            stroke="var(--g-blue)"
+            strokeWidth={2}
+            dot={false}
+            name="Download"
+            animationDuration={800}
+            animationBegin={0}
+            animationEasing="ease-out"
+          />
+          <Line
+            type="monotone"
+            dataKey="upload"
+            stroke="var(--g-green)"
+            strokeWidth={2}
+            dot={false}
+            name="Upload"
+            animationDuration={800}
+            animationBegin={200}
+            animationEasing="ease-out"
+          />
         </LineChart>
       </ResponsiveContainer>
     </GlassCard>

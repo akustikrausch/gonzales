@@ -66,12 +66,14 @@ export function MeasurementTable({ measurements, onDelete, sortBy, sortOrder, on
           </tr>
         </thead>
         <tbody>
-          {measurements.map((m) => {
+          {measurements.map((m, i) => {
             const hasViolation = m.below_download_threshold || m.below_upload_threshold;
             return (
               <tr
                 key={m.id}
+                className="g-animate-in"
                 style={{
+                  animationDelay: `${Math.min(i * 30, 300)}ms`,
                   background: hasViolation ? "rgba(255, 59, 48, 0.05)" : undefined,
                 }}
               >
@@ -106,7 +108,7 @@ export function MeasurementTable({ measurements, onDelete, sortBy, sortOrder, on
                   {onDelete && (
                     <button
                       onClick={() => onDelete(m.id)}
-                      className="transition-colors"
+                      className="glass-focus-ring rounded transition-colors"
                       style={{ color: "var(--g-text-secondary)" }}
                       title="Delete"
                       onMouseEnter={(e) => (e.currentTarget.style.color = "var(--g-red)")}
