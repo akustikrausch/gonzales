@@ -94,24 +94,24 @@ Current quality: 7.8/10. Target: 9.5/10.
 
 ---
 
-### Phase 5: Futuristic Live Test View (Web) [TODO]
+### Phase 5: Futuristic Live Test View (Web) [DONE]
 **Goal**: Make the live speed test a showpiece -- dramatic, cinematic, futuristic
 
-- [ ] Full-width dramatic entrance (scale + fade from center)
-- [ ] Enhanced SpeedNeedle with:
+- [x] Full-width dramatic entrance (scale + fade from center)
+- [x] Enhanced SpeedNeedle with:
   - Glow effect around needle (SVG filter: drop-shadow with color)
-  - Tick marks with gradient opacity
-  - Animated arc fill showing current speed range
-  - Subtle pulse animation on the needle tip
-- [ ] Real-time bandwidth with counting animation (not instant jump)
-- [ ] Phase transition animations (smooth morph between ping/dl/ul)
-- [ ] Background data stream visualization (subtle animated lines or particles via CSS)
-- [ ] Enhanced ProgressRing with gradient stroke + glow
-- [ ] Results reveal: staggered card appearance with spring animation
-- [ ] Color theme per phase:
-  - Ping: warm orange/amber glow
-  - Download: cool blue/cyan glow
-  - Upload: vibrant green/teal glow
+  - Tick marks with gradient opacity (21 minor ticks, 5 major ticks)
+  - Animated arc fill showing current speed range (gradient arc with glow filter)
+  - Subtle pulse animation on the needle tip (SVG animate elements)
+- [x] Real-time bandwidth with counting animation (useAnimatedNumber hook)
+- [x] Phase transition animations (g-animate-scale on phase change)
+- [x] Background data stream visualization (DataStreamLines with g-shimmer CSS animation)
+- [x] Enhanced ProgressRing with glow filter (optional `glow` prop with SVG feGaussianBlur)
+- [x] Results reveal: staggered card appearance with spring animation (ResultCard with delay)
+- [x] Color theme per phase:
+  - Ping: warm orange/amber glow (var(--g-orange))
+  - Download: cool blue/cyan glow (var(--g-blue))
+  - Upload: vibrant green/teal glow (var(--g-green))
 
 **Files to modify**:
 - `frontend/src/components/speedtest/LiveTestView.tsx`
@@ -243,7 +243,45 @@ Current quality: 7.8/10. Target: 9.5/10.
 
 ---
 
-### Phase 10: Final Polish + Verification [TODO]
+### Phase 10: Git Hygiene + Privacy Protection [TODO]
+**Goal**: Ensure no private/runtime files are ever pushed to git
+
+#### Strategy:
+- Runtime files (config, DB, logs) are gitignored and auto-created on first run
+- Template files (`*.example`) are committed as reference for users
+- Backend startup ensures required directories exist
+
+#### Deliverables:
+- [ ] Enhanced `.gitignore`:
+  - Add `config.json` (runtime user settings)
+  - Add `*.sqlite` (alternative DB extension)
+  - Add `backend/logs/` and `frontend/logs/` explicitly
+  - Add `*.bak`, `*.tmp` (temp files)
+  - Verify all sensitive patterns covered
+- [ ] Remove any tracked private files from git index (`git rm --cached`)
+- [ ] Create template files:
+  - `config.json.example` -- Default config with all MUTABLE_KEYS documented
+  - `.env.example` -- Already exists, verify it's complete
+- [ ] Backend auto-creation on startup:
+  - Ensure `logs/` directory is created if missing
+  - Ensure `config.json` is created with defaults if missing (already handled by `save_config()`)
+- [ ] Add `PRIVATE_FILES.md` or section in README explaining:
+  - Which files are gitignored and why
+  - How to configure via config.json or .env
+  - What gets auto-created on first run
+
+**Files to modify**:
+- `.gitignore` -- Add missing patterns
+- `config.json.example` -- New template file
+- `.env.example` -- Verify completeness
+- `backend/gonzales/main.py` or `config.py` -- Auto-create logs dir
+- `README.md` -- Add configuration section
+
+**Verify**: `git status` shows no private files, templates exist, fresh clone works
+
+---
+
+### Phase 11: Final Polish + Verification [TODO]
 **Goal**: Everything builds, looks perfect, zero errors
 
 - [ ] Frontend build passes (`npm run build`)
