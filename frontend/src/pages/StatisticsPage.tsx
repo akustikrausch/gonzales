@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { TrendingUp } from "lucide-react";
 import { useMeasurements, useStatistics } from "../hooks/useApi";
 import { LoadingSpinner } from "../components/common/LoadingSpinner";
 import { DateRangeFilter } from "../components/history/DateRangeFilter";
@@ -24,7 +25,10 @@ export function StatisticsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-[#1D1D1F]">Statistics</h2>
+        <h2 className="text-xl font-bold text-[#1D1D1F] flex items-center gap-2">
+          <TrendingUp className="w-5 h-5" />
+          Statistics
+        </h2>
         <DateRangeFilter
           startDate={startDate}
           endDate={endDate}

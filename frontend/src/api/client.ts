@@ -3,6 +3,8 @@ import type {
   ConfigUpdate,
   Measurement,
   MeasurementPage,
+  SortField,
+  SortOrder,
   Statistics,
   Status,
 } from "./types";
@@ -24,12 +26,16 @@ export const api = {
     page_size?: number;
     start_date?: string;
     end_date?: string;
+    sort_by?: SortField;
+    sort_order?: SortOrder;
   }): Promise<MeasurementPage> {
     const search = new URLSearchParams();
     if (params?.page) search.set("page", String(params.page));
     if (params?.page_size) search.set("page_size", String(params.page_size));
     if (params?.start_date) search.set("start_date", params.start_date);
     if (params?.end_date) search.set("end_date", params.end_date);
+    if (params?.sort_by) search.set("sort_by", params.sort_by);
+    if (params?.sort_order) search.set("sort_order", params.sort_order);
     const qs = search.toString();
     return fetchJSON(`${BASE}/measurements${qs ? `?${qs}` : ""}`);
   },

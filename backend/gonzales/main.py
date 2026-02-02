@@ -37,7 +37,7 @@ async def lifespan(app: FastAPI):
 def create_app() -> FastAPI:
     app = FastAPI(
         title="Gonzales",
-        description="Internet Speed Monitor by Warp9",
+        description="Internet Speed Monitor",
         version="1.0.0",
         docs_url="/docs" if settings.debug else None,
         redoc_url="/redoc" if settings.debug else None,

@@ -9,10 +9,6 @@ BANNER = r"""
  ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝
 """
 
-SUBTITLE = "                        b y   W A R P 9"
-
-
 class AsciiBanner(Static):
     def compose(self):
         yield Static(BANNER, classes="banner-art")
-        yield Static(SUBTITLE, classes="banner-subtitle")

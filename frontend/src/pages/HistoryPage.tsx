@@ -1,20 +1,36 @@
 import { useState } from "react";
+import { Clock } from "lucide-react";
 import { useDeleteMeasurement, useMeasurements } from "../hooks/useApi";
 import { Card } from "../components/common/Card";
 import { LoadingSpinner } from "../components/common/LoadingSpinner";
 import { DateRangeFilter } from "../components/history/DateRangeFilter";
 import { MeasurementTable } from "../components/history/MeasurementTable";
+import type { SortField, SortOrder } from "../api/types";
 
 export function HistoryPage() {
   const [page, setPage] = useState(1);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [sortBy, setSortBy] = useState<SortField>("timestamp");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
+
+  const handleSort = (field: SortField) => {
+    if (field === sortBy) {
+      setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+    } else {
+      setSortBy(field);
+      setSortOrder("desc");
+    }
+    setPage(1);
+  };
 
   const params = {
     page,
     page_size: 25,
     start_date: startDate ? new Date(startDate).toISOString() : undefined,
     end_date: endDate ? new Date(endDate).toISOString() : undefined,
+    sort_by: sortBy,
+    sort_order: sortOrder,
   };
 
   const { data, isLoading } = useMeasurements(params);
@@ -23,7 +39,10 @@ export function HistoryPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-[#1D1D1F]">History</h2>
+        <h2 className="text-xl font-bold text-[#1D1D1F] flex items-center gap-2">
+          <Clock className="w-5 h-5" />
+          History
+        </h2>
         <DateRangeFilter
           startDate={startDate}
           endDate={endDate}
@@ -40,6 +59,9 @@ export function HistoryPage() {
             <MeasurementTable
               measurements={data.items}
               onDelete={(id) => deleteMutation.mutate(id)}
+              sortBy={sortBy}
+              sortOrder={sortOrder}
+              onSort={handleSort}
             />
             <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#F5F5F7]">
               <p className="text-xs text-[#86868B]">

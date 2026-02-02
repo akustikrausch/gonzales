@@ -1,11 +1,12 @@
 import { NavLink } from "react-router-dom";
+import { Zap, ClipboardList, BarChart3, Download, Settings, type LucideIcon } from "lucide-react";
 
-const navItems = [
-  { to: "/", label: "Dashboard", icon: "⚡" },
-  { to: "/history", label: "History", icon: "📋" },
-  { to: "/statistics", label: "Statistics", icon: "📊" },
-  { to: "/export", label: "Export", icon: "📥" },
-  { to: "/settings", label: "Settings", icon: "⚙️" },
+const navItems: { to: string; label: string; icon: LucideIcon }[] = [
+  { to: "/", label: "Dashboard", icon: Zap },
+  { to: "/history", label: "History", icon: ClipboardList },
+  { to: "/statistics", label: "Statistics", icon: BarChart3 },
+  { to: "/export", label: "Export", icon: Download },
+  { to: "/settings", label: "Settings", icon: Settings },
 ];
 
 export function Sidebar() {
@@ -31,13 +32,13 @@ export function Sidebar() {
               }`
             }
           >
-            <span className="text-base">{item.icon}</span>
+            <item.icon className="w-4 h-4" />
             {item.label}
           </NavLink>
         ))}
       </nav>
       <div className="p-4 border-t border-[#E5E5EA]">
-        <p className="text-[10px] text-[#86868B]">by Warp9</p>
+        <p className="text-[10px] text-[#86868B]">akustikrausch@gmail.com</p>
       </div>
     </aside>
   );

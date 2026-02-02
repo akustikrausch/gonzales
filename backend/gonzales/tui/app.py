@@ -22,7 +22,7 @@ CSS_PATH = Path(__file__).parent / "styles" / "gonzales.tcss"
 
 class GonzalesApp(App):
     TITLE = "GONZALES Speed Monitor"
-    SUB_TITLE = "by Warp9"
+    SUB_TITLE = ""
     CSS_PATH = CSS_PATH
 
     MODES = {

@@ -1,7 +1,5 @@
 # Gonzales - Internet Speed Monitor
 
-### by Warp9
-
 ```
  ██████╗  ██████╗ ███╗   ██╗███████╗ █████╗ ██╗     ███████╗███████╗
 ██╔════╝ ██╔═══██╗████╗  ██║╚══███╔╝██╔══██╗██║     ██╔════╝██╔════╝
@@ -106,7 +104,7 @@ cp .env.example .env
 |----------|---------|-------------|
 | `GONZALES_HOST` | `127.0.0.1` | Bind address |
 | `GONZALES_PORT` | `8470` | Server port |
-| `GONZALES_TEST_INTERVAL_MINUTES` | `5` | Minutes between tests |
+| `GONZALES_TEST_INTERVAL_MINUTES` | `30` | Minutes between tests |
 | `GONZALES_DOWNLOAD_THRESHOLD_MBPS` | `1000.0` | Expected download speed |
 | `GONZALES_UPLOAD_THRESHOLD_MBPS` | `500.0` | Expected upload speed |
 | `GONZALES_LOG_LEVEL` | `INFO` | Logging level |
@@ -239,7 +237,7 @@ cp .env.example .env
 |----------|----------|--------------|
 | `GONZALES_HOST` | `127.0.0.1` | Bind-Adresse |
 | `GONZALES_PORT` | `8470` | Server-Port |
-| `GONZALES_TEST_INTERVAL_MINUTES` | `5` | Minuten zwischen Tests |
+| `GONZALES_TEST_INTERVAL_MINUTES` | `30` | Minuten zwischen Tests |
 | `GONZALES_DOWNLOAD_THRESHOLD_MBPS` | `1000.0` | Erwartete Download-Geschwindigkeit |
 | `GONZALES_UPLOAD_THRESHOLD_MBPS` | `500.0` | Erwartete Upload-Geschwindigkeit |
 | `GONZALES_LOG_LEVEL` | `INFO` | Log-Level |

@@ -90,3 +90,7 @@ export interface ConfigUpdate {
   download_threshold_mbps?: number;
   upload_threshold_mbps?: number;
 }
+
+export type SortField = "timestamp" | "download_mbps" | "upload_mbps" | "ping_latency_ms" | "ping_jitter_ms";
+
+export type SortOrder = "asc" | "desc";

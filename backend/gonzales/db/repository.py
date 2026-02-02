@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import delete, desc, func, select
+from sqlalchemy import asc, delete, desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from gonzales.db.models import Measurement, TestFailure
@@ -34,6 +34,8 @@ class MeasurementRepository:
         page_size: int = 20,
         start_date: datetime | None = None,
         end_date: datetime | None = None,
+        sort_by: str = "timestamp",
+        sort_order: str = "desc",
     ) -> tuple[list[Measurement], int]:
         query = select(Measurement)
         count_query = select(func.count(Measurement.id))
@@ -48,8 +50,10 @@ class MeasurementRepository:
         total_result = await self.session.execute(count_query)
         total = total_result.scalar_one()
 
+        column = getattr(Measurement, sort_by, Measurement.timestamp)
+        order_fn = asc if sort_order == "asc" else desc
         query = (
-            query.order_by(desc(Measurement.timestamp))
+            query.order_by(order_fn(column))
             .offset((page - 1) * page_size)
             .limit(page_size)
         )

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Timer, Activity, Server, Save } from "lucide-react";
 import { useConfig, useStatus, useUpdateConfig } from "../hooks/useApi";
 import { Card } from "../components/common/Card";
 import { LoadingSpinner } from "../components/common/LoadingSpinner";
@@ -33,10 +34,16 @@ export function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-bold text-[#1D1D1F]">Settings</h2>
+      <h2 className="text-xl font-bold text-[#1D1D1F] flex items-center gap-2">
+        <Timer className="w-5 h-5" />
+        Settings
+      </h2>
 
       <Card>
-        <h3 className="text-sm font-semibold text-[#1D1D1F] mb-4">Test Configuration</h3>
+        <h3 className="text-sm font-semibold text-[#1D1D1F] mb-4 flex items-center gap-2">
+          <Timer className="w-4 h-4 text-[#86868B]" />
+          Test Configuration
+        </h3>
         <div className="space-y-4 max-w-md">
           <div>
             <label className="block text-sm text-[#86868B] mb-1">
@@ -83,9 +90,10 @@ export function SettingsPage() {
           <button
             onClick={handleSave}
             disabled={updateConfig.isPending}
-            className="px-4 py-2 bg-[#007AFF] text-white text-sm font-medium rounded-lg
+            className="flex items-center gap-2 px-4 py-2 bg-[#007AFF] text-white text-sm font-medium rounded-lg
                        hover:bg-[#0066D6] disabled:opacity-50 transition-colors"
           >
+            <Save className="w-4 h-4" />
             {updateConfig.isPending ? "Saving..." : "Save Settings"}
           </button>
           {updateConfig.isSuccess && (
@@ -96,7 +104,10 @@ export function SettingsPage() {
 
       {status && (
         <Card>
-          <h3 className="text-sm font-semibold text-[#1D1D1F] mb-4">System Status</h3>
+          <h3 className="text-sm font-semibold text-[#1D1D1F] mb-4 flex items-center gap-2">
+            <Activity className="w-4 h-4 text-[#86868B]" />
+            System Status
+          </h3>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
             <div>
               <p className="text-[#86868B]">Uptime</p>
@@ -120,7 +131,10 @@ export function SettingsPage() {
 
       {config && (
         <Card>
-          <h3 className="text-sm font-semibold text-[#1D1D1F] mb-4">Server Info</h3>
+          <h3 className="text-sm font-semibold text-[#1D1D1F] mb-4 flex items-center gap-2">
+            <Server className="w-4 h-4 text-[#86868B]" />
+            Server Info
+          </h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
             <div>
               <p className="text-[#86868B]">Host</p>

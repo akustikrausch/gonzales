@@ -1,3 +1,4 @@
+import { Gauge } from "lucide-react";
 import { useLatestMeasurement, useMeasurements, useStatistics } from "../hooks/useApi";
 import { SpeedGauge } from "../components/dashboard/SpeedGauge";
 import { LatestResult } from "../components/dashboard/LatestResult";
@@ -14,7 +15,10 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-bold text-[#1D1D1F]">Dashboard</h2>
+      <h2 className="text-xl font-bold text-[#1D1D1F] flex items-center gap-2">
+        <Gauge className="w-5 h-5" />
+        Dashboard
+      </h2>
 
       {latest ? (
         <>

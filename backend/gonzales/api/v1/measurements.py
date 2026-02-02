@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from gonzales.api.dependencies import get_db
 from gonzales.core.exceptions import MeasurementNotFoundError
-from gonzales.schemas.measurement import MeasurementOut, MeasurementPage
+from gonzales.schemas.measurement import MeasurementOut, MeasurementPage, SortField, SortOrder
 from gonzales.services.measurement_service import measurement_service
 
 router = APIRouter(prefix="/measurements", tags=["measurements"])
@@ -17,10 +17,12 @@ async def list_measurements(
     page_size: int = Query(default=20, ge=1, le=100),
     start_date: datetime | None = Query(default=None),
     end_date: datetime | None = Query(default=None),
+    sort_by: SortField = Query(default=SortField.timestamp),
+    sort_order: SortOrder = Query(default=SortOrder.desc),
     session: AsyncSession = Depends(get_db),
 ):
     items, total = await measurement_service.get_paginated(
-        session, page, page_size, start_date, end_date
+        session, page, page_size, start_date, end_date, sort_by.value, sort_order.value
     )
     pages = (total + page_size - 1) // page_size if total > 0 else 0
     return MeasurementPage(

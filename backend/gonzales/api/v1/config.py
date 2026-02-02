@@ -30,6 +30,8 @@ async def update_config(update: ConfigUpdate):
     if update.upload_threshold_mbps is not None:
         settings.upload_threshold_mbps = update.upload_threshold_mbps
 
+    settings.save_config()
+
     return ConfigOut(
         test_interval_minutes=settings.test_interval_minutes,
         download_threshold_mbps=settings.download_threshold_mbps,

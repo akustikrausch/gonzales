@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../api/client";
-import type { ConfigUpdate } from "../api/types";
+import type { ConfigUpdate, SortField, SortOrder } from "../api/types";
 
 export function useLatestMeasurement() {
   return useQuery({
@@ -14,6 +14,8 @@ export function useMeasurements(params?: {
   page_size?: number;
   start_date?: string;
   end_date?: string;
+  sort_by?: SortField;
+  sort_order?: SortOrder;
 }) {
   return useQuery({
     queryKey: ["measurements", params],

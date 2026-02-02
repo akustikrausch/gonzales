@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Gonzales is a local network speed monitoring tool by Warp9. It runs automated internet speed tests at configurable intervals using the Ookla Speedtest CLI, stores results in SQLite, and provides both a web dashboard and a terminal UI for visualization.
+Gonzales is a local network speed monitoring tool. It runs automated internet speed tests at configurable intervals using the Ookla Speedtest CLI, stores results in SQLite, and provides both a web dashboard and a terminal UI for visualization.
 
 ## Architecture
 

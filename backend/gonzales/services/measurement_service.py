@@ -108,9 +108,11 @@ class MeasurementService:
         page_size: int = 20,
         start_date: datetime | None = None,
         end_date: datetime | None = None,
+        sort_by: str = "timestamp",
+        sort_order: str = "desc",
     ) -> tuple[list[Measurement], int]:
         repo = MeasurementRepository(session)
-        return await repo.get_paginated(page, page_size, start_date, end_date)
+        return await repo.get_paginated(page, page_size, start_date, end_date, sort_by, sort_order)
 
     async def get_latest(self, session: AsyncSession) -> Measurement | None:
         repo = MeasurementRepository(session)

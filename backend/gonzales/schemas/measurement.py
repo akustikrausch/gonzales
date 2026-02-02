@@ -1,6 +1,20 @@
 from datetime import datetime
+from enum import Enum
 
 from pydantic import BaseModel, Field
+
+
+class SortField(str, Enum):
+    timestamp = "timestamp"
+    download_mbps = "download_mbps"
+    upload_mbps = "upload_mbps"
+    ping_latency_ms = "ping_latency_ms"
+    ping_jitter_ms = "ping_jitter_ms"
+
+
+class SortOrder(str, Enum):
+    asc = "asc"
+    desc = "desc"
 
 
 class MeasurementOut(BaseModel):

@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "gonzales"
 version = "1.0.0"
-description = "Internet Speed Monitor by Warp9"
+description = "Internet Speed Monitor"
 requires-python = ">=3.10"
 dependencies = [
     "fastapi>=0.115.0",
