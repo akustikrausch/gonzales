@@ -15,7 +15,7 @@ class DashboardScreen(Screen):
         ("d", "app.switch_mode('dashboard')", "Dashboard"),
         ("h", "app.switch_mode('history')", "History"),
         ("s", "app.switch_mode('settings')", "Settings"),
-        ("t", "test_now", "Test Now"),
+        ("t", "test_now", "Test"),
         ("q", "app.quit", "Quit"),
     ]
 
@@ -86,4 +86,4 @@ class DashboardScreen(Screen):
         self.query_one("#status-line", Static).update(f"  {msg}")
 
     def action_test_now(self) -> None:
-        self.app.run_manual_test()
+        self.app.run_test_screen()

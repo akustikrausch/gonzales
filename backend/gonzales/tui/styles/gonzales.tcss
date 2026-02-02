@@ -177,3 +177,25 @@ Input:focus {
     color: #00ff00;
     margin-top: 1;
 }
+
+/* Test Screen */
+
+#test-container {
+    padding: 1 2;
+}
+
+#test-title {
+    color: #00ffff;
+    text-style: bold;
+    margin-bottom: 1;
+}
+
+#live-gauge {
+    margin: 1 0;
+    height: auto;
+}
+
+#test-hint {
+    color: #888888;
+    margin-top: 1;
+}

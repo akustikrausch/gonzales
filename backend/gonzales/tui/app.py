@@ -1,7 +1,6 @@
 """Gonzales Terminal UI - Demoscene-style speed monitor."""
 
 import asyncio
-import json
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -10,12 +9,12 @@ from textual.app import App
 from gonzales.config import settings
 from gonzales.db.engine import async_session, init_db
 from gonzales.db.repository import MeasurementRepository
-from gonzales.services.measurement_service import measurement_service
 from gonzales.services.scheduler_service import scheduler_service
 from gonzales.services.speedtest_runner import speedtest_runner
 from gonzales.tui.screens.dashboard import DashboardScreen
 from gonzales.tui.screens.history import HistoryScreen
 from gonzales.tui.screens.settings import SettingsScreen
+from gonzales.tui.screens.test import TestScreen
 
 CSS_PATH = Path(__file__).parent / "styles" / "gonzales.tcss"
 
@@ -29,6 +28,7 @@ class GonzalesApp(App):
         "dashboard": DashboardScreen,
         "history": HistoryScreen,
         "settings": SettingsScreen,
+        "test": TestScreen,
     }
 
     def __init__(self):
@@ -125,25 +125,37 @@ class GonzalesApp(App):
                 pass
             await asyncio.sleep(1)
 
+    def run_test_screen(self) -> None:
+        """Switch to test screen and auto-start a speed test."""
+        self.switch_mode("test")
+        # Auto-start is handled by TestScreen when auto_start=True
+        # Since MODES creates instances without args, we trigger manually
+        screen = self.screen
+        if isinstance(screen, TestScreen):
+            screen.action_run_test()
+
     def run_manual_test(self) -> None:
+        """Run a test from the dashboard (legacy behavior)."""
         asyncio.create_task(self._do_manual_test())
 
     async def _do_manual_test(self) -> None:
+        from gonzales.services.measurement_service import measurement_service
+
         screen = self.screen
         if isinstance(screen, DashboardScreen):
-            screen.update_status("⚡ Running speed test...")
+            screen.update_status("Running speed test...")
 
         try:
             async with async_session() as session:
                 result = await measurement_service.run_test(session, manual=True)
             if isinstance(screen, DashboardScreen):
                 screen.update_status(
-                    f"✓ Test complete: ↓{result.download_mbps:.1f} ↑{result.upload_mbps:.1f} Mbps"
+                    f"Test complete: {result.download_mbps:.1f} / {result.upload_mbps:.1f} Mbps"
                 )
             await self._refresh_data()
         except Exception as e:
             if isinstance(screen, DashboardScreen):
-                screen.update_status(f"✗ Test failed: {e}")
+                screen.update_status(f"Test failed: {e}")
 
     async def action_quit(self) -> None:
         if self._countdown_task:

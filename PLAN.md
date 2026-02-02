@@ -165,25 +165,28 @@ Current quality: 7.8/10. Target: 9.5/10.
 
 ---
 
-### Phase 7: TUI Real-Time Test View [TODO]
+### Phase 7: TUI Real-Time Test View [DONE]
 **Goal**: Terminal speed test visualization that matches the web version in drama
 
-- [ ] New TUI screen: `TestScreen` with real-time gauge
-- [ ] Subscribe to event bus during test (not 10s polling)
-- [ ] ASCII speed gauge with gradient block characters
-- [ ] Live progress bar with phase label and percentage
-- [ ] Real-time bandwidth display updating per-event
-- [ ] Mini sparkline showing bandwidth over test duration
-- [ ] Phase color transitions (neon palette)
-- [ ] Completion summary with formatted results
-- [ ] Keybinding: `T` triggers test AND switches to TestScreen
+- [x] New TUI screen: `TestScreen` with real-time gauge
+- [x] Subscribe to event bus during test (async generator, not polling)
+- [x] ASCII speed gauge with gradient block characters (░▒▓█)
+- [x] Live progress bar with phase label and percentage
+- [x] Real-time bandwidth display updating per-event
+- [x] Mini sparkline showing bandwidth over test duration (▁▂▃▄▅▆▇█)
+- [x] Phase color transitions (neon palette: cyan/magenta/yellow/green/red)
+- [x] Completion summary with formatted box-drawing results
+- [x] Keybinding: `T` triggers test AND switches to TestScreen from any screen
 
-**Files to create**:
-- `backend/gonzales/tui/screens/test.py` -- Real-time test screen
-- `backend/gonzales/tui/widgets/live_gauge.py` -- Animated ASCII gauge
+**Files created**:
+- `backend/gonzales/tui/screens/test.py` -- Real-time test screen with event bus subscription
+- `backend/gonzales/tui/widgets/live_gauge.py` -- Animated ASCII gauge with sparkline + progress bar
 
-**Files to modify**:
-- `backend/gonzales/tui/app.py` -- Add TestScreen, wire keybinding
+**Files modified**:
+- `backend/gonzales/tui/app.py` -- Added TestScreen mode, `run_test_screen()` method
+- `backend/gonzales/tui/screens/dashboard.py` -- T binding switches to test screen
+- `backend/gonzales/tui/screens/history.py` -- T binding switches to test screen
+- `backend/gonzales/tui/widgets/ascii_banner.py` -- Added missing SUBTITLE constant
 - `backend/gonzales/tui/styles/gonzales.tcss` -- Test screen styling
 
 **Verify**: `make tui`, press T, observe real-time updates during test

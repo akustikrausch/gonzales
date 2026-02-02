@@ -9,6 +9,9 @@ BANNER = r"""
  ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝
 """
 
+SUBTITLE = "  ▸ Internet Speed Monitor ◂  "
+
+
 class AsciiBanner(Static):
     def compose(self):
         yield Static(BANNER, classes="banner-art")
