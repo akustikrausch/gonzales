@@ -28,7 +28,7 @@ Current quality: **9.5/10** -- Target: **9.5/10**
 | 6 | Innovative Statistics + Insights | DONE | Anomaly detection, ISP score, correlations, predictions, degradation alerts |
 | 7 | TUI Real-Time Test View | DONE | LiveGauge with big ASCII speed numbers, animated data flow, elapsed timer, sparkline, phase colors |
 | 8 | Tech Styleguide | DONE | STYLEGUIDE.md with full design reference (503 lines) |
-| 9 | Home Assistant Integration | DONE | gonzales-ha repo, 12 sensors, config flow, HACS compatible |
+| 9 | Home Assistant Integration | DONE | gonzales-ha repo, 12 sensors, config flow, HACS compatible, Add-on with Ingress |
 | 10 | Git Hygiene + Privacy Protection | DONE | .gitignore, templates, config.json.example, README updated |
 | 11 | Final Polish + Verification | DONE | Code splitting, docs updated, build verified, static copied |
 | 12 | Live Speed Test Visual Upgrade | DONE | Canvas particle system, live SVG speed graph, elapsed timer, big ASCII speed numbers, animated data flow |
@@ -158,7 +158,7 @@ gonzales/
 | Design | Liquid Glass (custom CSS) |
 | TUI | Textual + Rich |
 | Export | CSV + PDF (ReportLab) |
-| Home Assistant | [gonzales-ha](https://github.com/akustikrausch/gonzales-ha) (HACS) |
+| Home Assistant | [gonzales-ha](https://github.com/akustikrausch/gonzales-ha) (Add-on + HACS Integration) |
 
 ---
 

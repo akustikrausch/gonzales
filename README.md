@@ -157,6 +157,8 @@ cp .env.example .env
 | `GONZALES_PREFERRED_SERVER_ID` | `0` | Preferred speedtest server (0 = auto) |
 | `GONZALES_API_KEY` | *(empty)* | API key for mutating endpoints. **Required when host != 127.0.0.1** |
 | `GONZALES_THEME` | `auto` | UI theme: auto, light, or dark |
+| `GONZALES_CONFIG_PATH` | `config.json` | Path to runtime config file |
+| `GONZALES_HA_ADDON` | `false` | Enable Home Assistant Add-on mode (Ingress headers, stdout-only logging) |
 
 Settings can also be changed at runtime via the web UI (Settings page) or the API (`PUT /api/v1/config`). Runtime changes are persisted to `config.json`, which is auto-created and gitignored.
 
@@ -228,13 +230,27 @@ curl http://localhost:8470/api/v1/export/csv > results.csv
 curl http://localhost:8470/api/v1/status
 ```
 
-#### Home Assistant Integration
+#### Home Assistant
 
-A HACS-compatible Home Assistant integration is available at [gonzales-ha](https://github.com/akustikrausch/gonzales-ha).
+Gonzales integrates with Home Assistant in two ways. Both live in the [gonzales-ha](https://github.com/akustikrausch/gonzales-ha) repository.
 
-Install via HACS (custom repository) or copy `custom_components/gonzales/` to your HA config directory. The integration provides a config flow for host/port/interval setup.
+**Option A: Home Assistant Add-on (recommended)**
 
-Sensors:
+One-click installation that runs Gonzales entirely inside Home Assistant as a Docker container. The web dashboard is accessible via the HA sidebar (Ingress). Database and config are persisted across updates.
+
+1. In HA go to **Settings > Add-ons > Add-on Store** (three-dot menu) > **Repositories**
+2. Add `https://github.com/akustikrausch/gonzales-ha`
+3. Install **Gonzales Speed Monitor** and start it
+4. The sensor integration is auto-discovered -- confirm setup when prompted
+
+**Option B: Standalone + HACS Integration**
+
+Run Gonzales on a separate machine (e.g. Raspberry Pi) and install the HACS integration to pull sensor data into HA.
+
+1. Install via HACS (custom repository) or copy `custom_components/gonzales/` to your HA config directory
+2. Add the integration and enter the host/port of your Gonzales instance
+
+**Sensors** (both options):
 - `sensor.gonzales_download_speed` -- latest download speed (Mbit/s)
 - `sensor.gonzales_upload_speed` -- latest upload speed (Mbit/s)
 - `sensor.gonzales_ping_latency` -- latest ping latency (ms)
@@ -243,8 +259,6 @@ Sensors:
 - `sensor.gonzales_last_test_time` -- timestamp of last test
 - `sensor.gonzales_isp_score` -- ISP performance score (0-100)
 - Diagnostic: scheduler status, test in progress, uptime, total measurements, DB size
-
-The integration uses local polling (no cloud, no authentication). CORS configuration is not needed since HA makes server-side HTTP requests.
 
 ---
 
@@ -351,16 +365,32 @@ cp .env.example .env
 | `GONZALES_PREFERRED_SERVER_ID` | `0` | Bevorzugter Speedtest-Server (0 = automatisch) |
 | `GONZALES_API_KEY` | *(leer)* | API-Key fuer schreibende Endpoints. **Pflicht wenn Host != 127.0.0.1** |
 | `GONZALES_THEME` | `auto` | UI-Thema: auto, light oder dark |
+| `GONZALES_CONFIG_PATH` | `config.json` | Pfad zur Laufzeit-Konfigurationsdatei |
+| `GONZALES_HA_ADDON` | `false` | Home Assistant Add-on Modus (Ingress-Header, nur stdout-Logging) |
 
 Einstellungen koennen auch zur Laufzeit ueber die Web-Oberflaeche (Einstellungen) oder die API (`PUT /api/v1/config`) geaendert werden. Laufzeitaenderungen werden in `config.json` gespeichert (wird automatisch erstellt, nicht in Git).
 
-#### Home Assistant Integration
+#### Home Assistant
 
-Eine HACS-kompatible Home Assistant Integration ist verfuegbar unter [gonzales-ha](https://github.com/akustikrausch/gonzales-ha).
+Gonzales laesst sich auf zwei Arten mit Home Assistant verbinden. Beides lebt im [gonzales-ha](https://github.com/akustikrausch/gonzales-ha) Repository.
 
-Installation ueber HACS (Custom Repository) oder manuell `custom_components/gonzales/` ins HA Config-Verzeichnis kopieren. Die Integration bietet einen Config Flow fuer Host/Port/Intervall-Einrichtung.
+**Option A: Home Assistant Add-on (empfohlen)**
 
-Sensoren: Download-Geschwindigkeit, Upload-Geschwindigkeit, Ping-Latenz, Ping-Jitter, Paketverlust, Letzter Test, ISP-Score. Zusaetzlich Diagnose-Sensoren fuer Scheduler-Status, laufende Tests, Uptime, Gesamtmessungen und Datenbankgroesse.
+Ein-Klick-Installation, die Gonzales komplett in Home Assistant als Docker-Container ausfuehrt. Das Web-Dashboard ist ueber die HA-Sidebar (Ingress) erreichbar. Datenbank und Config bleiben bei Updates erhalten.
+
+1. In HA zu **Einstellungen > Add-ons > Add-on Store** (Drei-Punkte-Menue) > **Repositories**
+2. `https://github.com/akustikrausch/gonzales-ha` hinzufuegen
+3. **Gonzales Speed Monitor** installieren und starten
+4. Die Sensor-Integration wird automatisch erkannt -- Einrichtung bestaetigen
+
+**Option B: Standalone + HACS Integration**
+
+Gonzales auf einem separaten Geraet laufen lassen (z.B. Raspberry Pi) und die HACS-Integration installieren, um Sensordaten in HA zu holen.
+
+1. Installation ueber HACS (Custom Repository) oder manuell `custom_components/gonzales/` ins HA Config-Verzeichnis kopieren
+2. Integration hinzufuegen und Host/Port der Gonzales-Instanz eingeben
+
+Sensoren (beide Optionen): Download-Geschwindigkeit, Upload-Geschwindigkeit, Ping-Latenz, Ping-Jitter, Paketverlust, Letzter Test, ISP-Score. Zusaetzlich Diagnose-Sensoren fuer Scheduler-Status, laufende Tests, Uptime, Gesamtmessungen und Datenbankgroesse.
 
 #### Ueberpruefen
 

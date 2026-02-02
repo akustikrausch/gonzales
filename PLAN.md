@@ -224,9 +224,10 @@ These phases built the functional foundation. All code exists and works.
 
 ---
 
-### Phase 9: Home Assistant Integration [DONE]
-**Goal**: Separate repo with HACS-compatible HA custom integration
+### Phase 9: Home Assistant Integration + Add-on [DONE]
+**Goal**: HACS integration + self-contained HA Add-on with Ingress web dashboard
 
+#### Integration (HACS):
 - [x] Create `gonzales-ha` repo structure
 - [x] `custom_components/gonzales/manifest.json` (HA 2024.12+ compatible)
 - [x] Config flow (host, port, polling interval with validation)
@@ -245,18 +246,39 @@ These phases built the functional foundation. All code exists and works.
 - [x] README with installation, configuration, automation examples, troubleshooting
 - [x] Translation strings (en.json)
 
+#### Add-on (Docker):
+- [x] `gonzales-addon/config.yaml` -- Add-on manifest with Ingress, discovery, options
+- [x] `gonzales-addon/build.yaml` -- Multi-arch base images (aarch64 + amd64)
+- [x] `gonzales-addon/Dockerfile` -- Python 3.12 + Ookla CLI + gonzales pip install
+- [x] `gonzales-addon/run.sh` -- Bashio entrypoint with config, discovery registration
+- [x] `gonzales-addon/DOCS.md` + `CHANGELOG.md`
+- [x] `repository.yaml` -- HA Add-on Store metadata
+
+#### Auto-discovery:
+- [x] `async_step_hassio` in config_flow.py for Supervisor add-on discovery
+- [x] `hassio` binding in manifest.json
+- [x] `hassio_confirm` strings for discovery confirmation dialog
+
+#### Backend Add-on compatibility (gonzales repo):
+- [x] `config.py`: `ha_addon` and `config_path` settings
+- [x] `security.py`: Conditional Ingress headers (SAMEORIGIN, no frame-ancestors, skip TrustedHostMiddleware)
+- [x] `logging.py`: Skip file handler in add-on mode (stdout only)
+- [x] `vite.config.ts`: `base: "./"` for relative asset paths under Ingress
+- [x] `client.ts` + `useSSE.ts`: Dynamic API base URL detection for Ingress proxy
+
 **Repo**: `https://github.com/akustikrausch/gonzales-ha`
 
-**Files created**:
-- `hacs.json`, `.gitignore`, `README.md`
+**Files created (gonzales-ha)**:
+- `hacs.json`, `.gitignore`, `README.md`, `repository.yaml`
 - `custom_components/gonzales/__init__.py` -- Entry setup/unload with runtime_data
-- `custom_components/gonzales/manifest.json` -- HA manifest with local_polling
+- `custom_components/gonzales/manifest.json` -- HA manifest with local_polling + hassio discovery
 - `custom_components/gonzales/const.py` -- Domain and default constants
-- `custom_components/gonzales/config_flow.py` -- Config flow with API validation
+- `custom_components/gonzales/config_flow.py` -- Config flow with API validation + hassio discovery
 - `custom_components/gonzales/coordinator.py` -- DataUpdateCoordinator polling 3 endpoints
 - `custom_components/gonzales/sensor.py` -- 12 sensors (7 main + 5 diagnostic)
-- `custom_components/gonzales/strings.json` -- UI strings
+- `custom_components/gonzales/strings.json` -- UI strings (incl. hassio_confirm)
 - `custom_components/gonzales/translations/en.json` -- English translations
+- `gonzales-addon/config.yaml`, `build.yaml`, `Dockerfile`, `run.sh`, `DOCS.md`, `CHANGELOG.md`
 
 ---
 
