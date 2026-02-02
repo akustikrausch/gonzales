@@ -11,7 +11,7 @@ backend, a polished Liquid Glass frontend with code splitting, innovative
 statistics, a real-time TUI, Home Assistant integration, and comprehensive
 documentation.
 
-Current quality: **9.3/10** -- Target: **9.5/10**
+Current quality: **9.4/10** -- Target: **9.5/10**
 
 ---
 
@@ -85,8 +85,19 @@ Current quality: **9.3/10** -- Target: **9.5/10**
 - REQUIREMENTS.md (full requirements spec)
 - PLAN.md (phased development plan)
 - STYLEGUIDE.md (comprehensive design system reference)
+- LICENSE (MIT + Ookla notice)
 
 ---
+
+## Security
+
+- Optional API key authentication (`GONZALES_API_KEY`) protects mutating endpoints
+- Content-Security-Policy header on all responses
+- CORS restricted to specific methods and headers
+- SSE subscriber limit (20) and connection timeout (5 min)
+- All subprocess calls use list args (no `shell=True`)
+- SQL queries use parameterized ORM (no raw SQL)
+- No authentication required for read-only endpoints (by design, for HA integration)
 
 ## Known Gaps
 
@@ -95,6 +106,7 @@ Current quality: **9.3/10** -- Target: **9.5/10**
 | Backend unit tests | Low | No pytest test files exist. Services work but lack automated coverage. |
 | Backend lint | Low | ruff not in system PATH. Python syntax verified via ast.parse. |
 | Manual E2E test | Medium | Requires running server + Speedtest CLI. User should verify visually. |
+| Ookla CLI license | Info | Proprietary, personal use only. See LICENSE file. |
 
 ---
 

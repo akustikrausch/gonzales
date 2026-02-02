@@ -54,7 +54,9 @@ React 19 + TypeScript + Vite 6 + Tailwind CSS 4 SPA with Liquid Glass design sys
 - Scheduler uses APScheduler `AsyncIOScheduler` with `max_instances=1`
 - Frontend uses TanStack Query with 30s polling for auto-refresh
 - Subprocess calls use list args (no `shell=True`)
-- SSE streaming: backend publishes progress events to EventBus, `/api/v1/speedtest/stream` yields SSE events, frontend `useSSE` hook consumes via native EventSource API
+- SSE streaming: backend publishes progress events to EventBus (max 20 subscribers, 5min timeout), `/api/v1/speedtest/stream` yields SSE events, frontend `useSSE` hook consumes via native EventSource API
+- Optional API key auth: `GONZALES_API_KEY` env var. When set, mutating endpoints (PUT config, POST trigger, DELETE measurements) require `X-API-Key` header. Read-only endpoints remain open.
+- Security headers: CSP, X-Frame-Options DENY, X-Content-Type-Options nosniff, Referrer-Policy. CORS restricted to configured origins with specific methods/headers.
 - Design system uses CSS custom properties for theming; `data-theme` attribute on `<html>` for manual override
 - Responsive layout: mobile (<768px) shows bottom nav, tablet (768-1023px) shows collapsed sidebar, desktop (1024px+) shows full sidebar
 
