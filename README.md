@@ -448,7 +448,7 @@ cp config.json.example config.json  # Runtime settings (optional)
 | Design System | Liquid Glass (CSS custom properties, backdrop-filter) |
 | Terminal UI | Textual + Rich |
 | Export | CSV, PDF (ReportLab) |
-| Home Assistant | [gonzales-ha](https://github.com/akustikrausch/gonzales-ha) (HACS custom integration) |
+| Home Assistant | [gonzales-ha](https://github.com/akustikrausch/gonzales-ha) (Add-on + HACS Integration) |
 
 ## Security
 
