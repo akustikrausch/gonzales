@@ -6,9 +6,10 @@
 
 ## Overall Status: v2 Complete
 
-The functional foundation (v1) is complete. All core features work.
-The v2 effort focuses on elevating design, animations, statistics, and
-documentation to "best on market" quality.
+All 11 development phases are complete. The project has a fully functional
+backend, a polished Liquid Glass frontend with code splitting, innovative
+statistics, a real-time TUI, Home Assistant integration, and comprehensive
+documentation.
 
 Current quality: **9.3/10** -- Target: **9.5/10**
 
@@ -52,16 +53,17 @@ Current quality: **9.3/10** -- Target: **9.5/10**
 - Ookla Speedtest CLI runner with progress streaming
 - APScheduler (configurable interval, default 30 min)
 - Event bus for SSE real-time streaming
-- REST API: measurements, statistics (basic + enhanced), config, servers, export, status
+- REST API: measurements, statistics (basic + enhanced + insights), config, servers, export, status
 - Persistent config (config.json + env vars)
 - Enhanced statistics: percentiles, hourly, daily, trend, SLA, reliability, per-server
+- Innovative insights: anomaly detection, ISP score, peak/off-peak, correlations, degradation alerts, predictions
 - Security middleware (CORS, headers, GZip)
-- TUI with Textual (dashboard, history, settings, real-time test screen)
+- TUI with Textual (dashboard, history, settings, real-time test screen with ASCII gauge)
 
 ### Frontend
 - React 19 + TypeScript + Vite 6 + Tailwind CSS 4
 - Liquid Glass design system (tokens, glass CSS, animations)
-- 8 glass UI components + 5 pages
+- 8 glass UI components + 5 lazy-loaded pages (code-split)
 - Multi-layer glass depth system with hover micro-interactions
 - Route transitions (fade + slide) + animated numbers (easeOutExpo)
 - Chart draw-in animations with staggered timing
@@ -71,10 +73,11 @@ Current quality: **9.3/10** -- Target: **9.5/10**
   - DataStreamLines background animation
   - Phase-specific colors (teal/orange/blue/green)
   - Staggered result cards with spring animations
-- 14 statistics visualization components (9 original + 5 Phase 6 insights)
+- 14 statistics visualization components (9 original + 5 insights)
 - Server picker + settings form
 - Responsive layout (sidebar/mobile nav)
 - Light/dark/auto theme
+- Code splitting: vendor, charts, query as separate chunks (18 total files)
 
 ### Documentation
 - README.md (English + German)
@@ -85,42 +88,13 @@ Current quality: **9.3/10** -- Target: **9.5/10**
 
 ---
 
-## What's Missing (v2 Gaps)
+## Known Gaps
 
-### Statistics (Phase 6) -- RESOLVED
-- Anomaly detection with z-score flagging
-- ISP composite score (0-100) with letter grade and 4-metric breakdown
-- Peak/off-peak/night analysis with best/worst period identification
-- 7-day predictive trend via linear regression with confidence level
-- 4x4 Pearson correlation matrix (download/upload/ping/jitter)
-- Degradation detection (recent vs historical with severity levels)
-- Best/worst time identification per metric
-- Network quality timeline (24-hour color-coded blocks)
-
-### TUI (Phase 7) -- RESOLVED
-- Real-time test visualization with LiveGauge widget
-- Event bus subscription for per-event updates during tests
-- ASCII speed gauge, sparkline, progress bar, box-drawing results
-
-### Documentation (Phase 8) -- RESOLVED
-- STYLEGUIDE.md created with full design reference (503 lines)
-- Covers: colors, typography, spacing, radius, shadows, glass system, components, animations, icons, responsive, theme, charts, TUI, do's/don'ts
-- No backend unit tests (deferred to Phase 11)
-
-### Home Assistant (Phase 9) -- RESOLVED
-- Separate repo: https://github.com/akustikrausch/gonzales-ha
-- HACS-compatible custom integration with config flow
-- 7 main sensors (download, upload, ping, jitter, packet loss, last test, ISP score)
-- 5 diagnostic sensors (scheduler, test in progress, uptime, measurements, DB size)
-- DataUpdateCoordinator polling measurements, status, and enhanced statistics
-- README with installation, automation examples, and troubleshooting
-
-### Git Hygiene (Phase 10) -- RESOLVED
-- config.json added to .gitignore
-- config.json.example template created
-- .env.example updated with all variables
-- README documents all runtime files and auto-creation behavior
-- tsconfig.tsbuildinfo removed from git tracking
+| Gap | Severity | Notes |
+|-----|----------|-------|
+| Backend unit tests | Low | No pytest test files exist. Services work but lack automated coverage. |
+| Backend lint | Low | ruff not in system PATH. Python syntax verified via ast.parse. |
+| Manual E2E test | Medium | Requires running server + Speedtest CLI. User should verify visually. |
 
 ---
 
@@ -145,7 +119,7 @@ gonzales/
     design-system/       # 3 CSS files (tokens, glass, animations)
     components/ui/       # 8 glass primitives
     components/          # Feature components (9 subdirs)
-    hooks/               # 5 custom hooks
+    hooks/               # 6 custom hooks
     pages/               # 5 pages
     api/                 # Client + types
 ```
@@ -162,13 +136,13 @@ gonzales/
 | Design | Liquid Glass (custom CSS) |
 | TUI | Textual + Rich |
 | Export | CSV + PDF (ReportLab) |
+| Home Assistant | [gonzales-ha](https://github.com/akustikrausch/gonzales-ha) (HACS) |
 
 ---
 
 ## Next Action
 
-All 11 phases complete. Remaining to reach 9.5/10:
+All 11 phases complete. Both repos pushed to GitHub. Remaining to reach 9.5/10:
 - Backend unit tests (pytest) for critical services
 - Backend lint with ruff (when available in PATH)
 - Manual end-to-end test: start server, run speed test, check all 5 pages + TUI
-- Push gonzales-ha to GitHub remote
