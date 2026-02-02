@@ -8,12 +8,19 @@ SUBSCRIBE_TIMEOUT = 300  # 5 minutes max per SSE connection
 class EventBus:
     def __init__(self) -> None:
         self._subscribers: list[asyncio.Queue[dict[str, Any]]] = []
+        self._last_event: dict[str, Any] | None = None
 
     @property
     def subscriber_count(self) -> int:
         return len(self._subscribers)
 
     def publish(self, event: dict[str, Any]) -> None:
+        # Buffer the latest event so late subscribers can catch up
+        if event.get("event") in ("complete", "error"):
+            self._last_event = None
+        else:
+            self._last_event = event
+
         for queue in self._subscribers:
             queue.put_nowait(event)
 
@@ -23,6 +30,11 @@ class EventBus:
             return
 
         queue: asyncio.Queue[dict[str, Any]] = asyncio.Queue()
+
+        # Replay last event so late subscribers immediately know the current state
+        if self._last_event is not None:
+            queue.put_nowait(self._last_event)
+
         self._subscribers.append(queue)
         try:
             while True:

@@ -112,6 +112,7 @@ class SpeedtestRunner:
 
             final_result = None
             buffer = ""
+            prev_phase = ""
 
             async def read_stdout():
                 nonlocal final_result, buffer
@@ -132,39 +133,56 @@ class SpeedtestRunner:
 
                         msg_type = data.get("type", "")
                         if msg_type == "testStart":
+                            logger.info("Phase: Ping")
                             event_bus.publish({
                                 "event": "progress",
                                 "data": {"phase": "ping", "progress": 0},
                             })
                         elif msg_type == "ping":
+                            ping_ms = data.get("ping", {}).get("latency", 0)
+                            ping_progress = data.get("ping", {}).get("progress", 0)
+                            if ping_progress >= 1:
+                                logger.info("Ping: %.1f ms", ping_ms)
                             event_bus.publish({
                                 "event": "progress",
                                 "data": {
                                     "phase": "ping",
-                                    "ping_ms": data.get("ping", {}).get("latency", 0),
-                                    "progress": data.get("ping", {}).get("progress", 0),
+                                    "ping_ms": ping_ms,
+                                    "progress": ping_progress,
                                 },
                             })
                         elif msg_type == "download":
                             bw = data.get("download", {}).get("bandwidth", 0)
+                            bw_mbps = round(bw * 8 / 1_000_000, 2)
+                            dl_progress = data.get("download", {}).get("progress", 0)
+                            dl_elapsed = data.get("download", {}).get("elapsed", 0)
+                            if prev_phase != "download":
+                                logger.info("Phase: Download")
+                                prev_phase = "download"
                             event_bus.publish({
                                 "event": "progress",
                                 "data": {
                                     "phase": "download",
-                                    "bandwidth_mbps": round(bw * 8 / 1_000_000, 2),
-                                    "progress": data.get("download", {}).get("progress", 0),
-                                    "elapsed": data.get("download", {}).get("elapsed", 0),
+                                    "bandwidth_mbps": bw_mbps,
+                                    "progress": dl_progress,
+                                    "elapsed": dl_elapsed,
                                 },
                             })
                         elif msg_type == "upload":
                             bw = data.get("upload", {}).get("bandwidth", 0)
+                            bw_mbps = round(bw * 8 / 1_000_000, 2)
+                            ul_progress = data.get("upload", {}).get("progress", 0)
+                            ul_elapsed = data.get("upload", {}).get("elapsed", 0)
+                            if prev_phase != "upload":
+                                logger.info("Phase: Upload")
+                                prev_phase = "upload"
                             event_bus.publish({
                                 "event": "progress",
                                 "data": {
                                     "phase": "upload",
-                                    "bandwidth_mbps": round(bw * 8 / 1_000_000, 2),
-                                    "progress": data.get("upload", {}).get("progress", 0),
-                                    "elapsed": data.get("upload", {}).get("elapsed", 0),
+                                    "bandwidth_mbps": bw_mbps,
+                                    "progress": ul_progress,
+                                    "elapsed": ul_elapsed,
                                 },
                             })
                         elif msg_type == "result":
