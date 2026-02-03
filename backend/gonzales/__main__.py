@@ -27,7 +27,10 @@ def main() -> None:
 
     url = f"http://{settings.host}:{settings.port}"
     print(f"  {GREEN}Web Interface:{RESET}  {url}")
-    print(f"  {DIM}Open this URL in your browser to access the dashboard.{RESET}")
+    if settings.ha_addon:
+        print(f"  {DIM}Access via Home Assistant sidebar (Ingress).{RESET}")
+    else:
+        print(f"  {DIM}Open this URL in your browser to access the dashboard.{RESET}")
     print()
 
     if settings.host != "127.0.0.1" and not settings.api_key:
