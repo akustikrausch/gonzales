@@ -4,9 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "gonzales"
-version = "2.0.7"
+version = "2.0.8"
 description = "Open-source internet speed monitor with automated testing, analytics dashboard, and Home Assistant integration"
-readme = "README.md"
 license = "MIT"
 authors = [{ name = "akustikrausch" }]
 keywords = [
