@@ -1,5 +1,5 @@
 {
-  "test_interval_minutes": 30,
+  "test_interval_minutes": 60,
   "download_threshold_mbps": 1000.0,
   "upload_threshold_mbps": 500.0,
   "preferred_server_id": 0,

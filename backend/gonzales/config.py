@@ -20,7 +20,7 @@ class Settings(BaseSettings):
 
     host: str = "127.0.0.1"
     port: int = 8470
-    test_interval_minutes: int = 30
+    test_interval_minutes: int = 60
     download_threshold_mbps: float = 1000.0
     upload_threshold_mbps: float = 500.0
     tolerance_percent: float = 15.0  # 15% = 85% of subscribed speed is acceptable

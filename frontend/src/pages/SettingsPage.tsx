@@ -56,6 +56,13 @@ export function SettingsPage() {
   const effectiveMinDownload = Number(dlThreshold) * (1 - tolerance / 100);
   const effectiveMinUpload = Number(ulThreshold) * (1 - tolerance / 100);
 
+  // Calculate estimated data usage per day based on interval
+  // Speedtest typically runs for ~10 seconds at full speed for download and upload
+  const testsPerDay = Math.floor(1440 / Number(interval || 60));
+  const mbPerTest = (Number(dlThreshold || 100) + Number(ulThreshold || 50)) * 10 / 8; // ~10s at full speed
+  const estimatedDataPerDayMB = testsPerDay * mbPerTest;
+  const estimatedDataPerDayGB = estimatedDataPerDayMB / 1024;
+
   const handleServerChange = (id: number) => {
     setServerId(id);
     updateConfig.mutate({ preferred_server_id: id });
@@ -80,14 +87,21 @@ export function SettingsPage() {
           Test Configuration
         </h3>
         <div className="space-y-4 max-w-md">
-          <GlassInput
-            label="Test Interval (minutes)"
-            type="number"
-            min={1}
-            max={1440}
-            value={interval}
-            onChange={(e) => setInterval_(e.target.value)}
-          />
+          <div>
+            <GlassInput
+              label="Test Interval (minutes)"
+              type="number"
+              min={1}
+              max={1440}
+              value={interval}
+              onChange={(e) => setInterval_(e.target.value)}
+            />
+            <p className="text-xs mt-2" style={{ color: "var(--g-text-secondary)" }}>
+              {testsPerDay} tests/day · Est. {estimatedDataPerDayGB >= 1
+                ? `${estimatedDataPerDayGB.toFixed(1)} GB`
+                : `${Math.round(estimatedDataPerDayMB)} MB`}/day data usage
+            </p>
+          </div>
           <GlassInput
             label="Download Threshold (Mbps)"
             type="number"

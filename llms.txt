@@ -70,7 +70,7 @@ Access at http://localhost:8470
 
 ## Configuration Options
 
-- test_interval_minutes: 1-1440 (default: 30)
+- test_interval_minutes: 1-1440 (default: 60)
 - download_threshold_mbps: Expected download speed
 - upload_threshold_mbps: Expected upload speed
 - tolerance_percent: 0-50% acceptable deviation
