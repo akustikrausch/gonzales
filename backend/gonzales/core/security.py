@@ -25,7 +25,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
                 "style-src 'self' 'unsafe-inline'; "
                 "img-src 'self' data:; "
                 "connect-src 'self'; "
-                "font-src 'self'; "
+                "font-src 'self' data:;"
                 "object-src 'none'"
             )
         else:
@@ -36,7 +36,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
                 "style-src 'self' 'unsafe-inline'; "
                 "img-src 'self' data:; "
                 "connect-src 'self'; "
-                "font-src 'self'; "
+                "font-src 'self' data:;"
                 "object-src 'none'; "
                 "frame-ancestors 'none'"
             )

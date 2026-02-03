@@ -148,8 +148,9 @@ cp .env.example .env
 | `GONZALES_TEST_INTERVAL_MINUTES` | `30` | Minutes between tests |
 | `GONZALES_MANUAL_TRIGGER_COOLDOWN_SECONDS` | `60` | Cooldown between manual tests |
 | `GONZALES_SPEEDTEST_BINARY` | `speedtest` | Path to speedtest CLI binary |
-| `GONZALES_DOWNLOAD_THRESHOLD_MBPS` | `1000.0` | Expected download speed |
-| `GONZALES_UPLOAD_THRESHOLD_MBPS` | `500.0` | Expected upload speed |
+| `GONZALES_DOWNLOAD_THRESHOLD_MBPS` | `1000.0` | Expected download speed (your subscribed plan) |
+| `GONZALES_UPLOAD_THRESHOLD_MBPS` | `500.0` | Expected upload speed (your subscribed plan) |
+| `GONZALES_TOLERANCE_PERCENT` | `15.0` | Acceptable deviation from threshold (15% = 85% of subscribed speed is OK) |
 | `GONZALES_DB_PATH` | `gonzales.db` | SQLite database file path |
 | `GONZALES_CORS_ORIGINS` | `localhost:5173,8470` | Allowed CORS origins (JSON array) |
 | `GONZALES_LOG_LEVEL` | `INFO` | Logging level |
@@ -356,8 +357,9 @@ cp .env.example .env
 | `GONZALES_TEST_INTERVAL_MINUTES` | `30` | Minuten zwischen Tests |
 | `GONZALES_MANUAL_TRIGGER_COOLDOWN_SECONDS` | `60` | Abklingzeit zwischen manuellen Tests |
 | `GONZALES_SPEEDTEST_BINARY` | `speedtest` | Pfad zur Speedtest-CLI |
-| `GONZALES_DOWNLOAD_THRESHOLD_MBPS` | `1000.0` | Erwartete Download-Geschwindigkeit |
-| `GONZALES_UPLOAD_THRESHOLD_MBPS` | `500.0` | Erwartete Upload-Geschwindigkeit |
+| `GONZALES_DOWNLOAD_THRESHOLD_MBPS` | `1000.0` | Erwartete Download-Geschwindigkeit (dein Tarif) |
+| `GONZALES_UPLOAD_THRESHOLD_MBPS` | `500.0` | Erwartete Upload-Geschwindigkeit (dein Tarif) |
+| `GONZALES_TOLERANCE_PERCENT` | `15.0` | Akzeptable Abweichung vom Schwellwert (15% = 85% der Vertragsgeschwindigkeit OK) |
 | `GONZALES_DB_PATH` | `gonzales.db` | SQLite-Datenbankdatei |
 | `GONZALES_CORS_ORIGINS` | `localhost:5173,8470` | Erlaubte CORS-Origins (JSON-Array) |
 | `GONZALES_LOG_LEVEL` | `INFO` | Log-Level |

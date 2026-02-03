@@ -14,6 +14,7 @@ async def get_config():
         test_interval_minutes=settings.test_interval_minutes,
         download_threshold_mbps=settings.download_threshold_mbps,
         upload_threshold_mbps=settings.upload_threshold_mbps,
+        tolerance_percent=settings.tolerance_percent,
         preferred_server_id=settings.preferred_server_id,
         manual_trigger_cooldown_seconds=settings.manual_trigger_cooldown_seconds,
         theme=settings.theme,
@@ -33,6 +34,8 @@ async def update_config(update: ConfigUpdate):
         settings.download_threshold_mbps = update.download_threshold_mbps
     if update.upload_threshold_mbps is not None:
         settings.upload_threshold_mbps = update.upload_threshold_mbps
+    if update.tolerance_percent is not None:
+        settings.tolerance_percent = update.tolerance_percent
     if update.preferred_server_id is not None:
         settings.preferred_server_id = update.preferred_server_id
     if update.manual_trigger_cooldown_seconds is not None:
@@ -46,6 +49,7 @@ async def update_config(update: ConfigUpdate):
         test_interval_minutes=settings.test_interval_minutes,
         download_threshold_mbps=settings.download_threshold_mbps,
         upload_threshold_mbps=settings.upload_threshold_mbps,
+        tolerance_percent=settings.tolerance_percent,
         preferred_server_id=settings.preferred_server_id,
         manual_trigger_cooldown_seconds=settings.manual_trigger_cooldown_seconds,
         theme=settings.theme,

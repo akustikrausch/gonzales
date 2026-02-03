@@ -7,6 +7,7 @@ MUTABLE_KEYS = {
     "test_interval_minutes",
     "download_threshold_mbps",
     "upload_threshold_mbps",
+    "tolerance_percent",
     "preferred_server_id",
     "manual_trigger_cooldown_seconds",
     "theme",
@@ -21,6 +22,7 @@ class Settings(BaseSettings):
     test_interval_minutes: int = 30
     download_threshold_mbps: float = 1000.0
     upload_threshold_mbps: float = 500.0
+    tolerance_percent: float = 15.0  # 15% = 85% of subscribed speed is acceptable
     log_level: str = "INFO"
     debug: bool = False
 

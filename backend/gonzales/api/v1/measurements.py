@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from gonzales.api.dependencies import get_db, require_api_key
@@ -48,6 +48,17 @@ async def get_measurement(measurement_id: int, session: AsyncSession = Depends(g
     if m is None:
         raise MeasurementNotFoundError(measurement_id)
     return MeasurementOut.model_validate(m)
+
+
+@router.delete("/all", dependencies=[Depends(require_api_key)])
+async def delete_all_measurements(
+    confirm: bool = Query(..., description="Must be true to confirm deletion"),
+    session: AsyncSession = Depends(get_db),
+):
+    if not confirm:
+        raise HTTPException(status_code=400, detail="Confirmation required: set confirm=true")
+    count = await measurement_service.delete_all(session)
+    return {"deleted": count, "message": f"Deleted {count} measurements"}
 
 
 @router.delete("/{measurement_id}", dependencies=[Depends(require_api_key)])

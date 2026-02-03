@@ -34,6 +34,12 @@ class MeasurementService:
     def _create_measurement_from_result(
         self, raw: SpeedtestRawResult, raw_json: str
     ) -> Measurement:
+        # Calculate effective thresholds with tolerance
+        # e.g., 1000 Mbps with 15% tolerance = 850 Mbps minimum acceptable
+        tolerance_factor = 1 - (settings.tolerance_percent / 100)
+        effective_download_threshold = settings.download_threshold_mbps * tolerance_factor
+        effective_upload_threshold = settings.upload_threshold_mbps * tolerance_factor
+
         return Measurement(
             download_bps=raw.download_bps,
             upload_bps=raw.upload_bps,
@@ -54,8 +60,8 @@ class MeasurementService:
             result_id=raw.result.id,
             result_url=raw.result.url,
             raw_json=raw_json,
-            below_download_threshold=raw.download_mbps < settings.download_threshold_mbps,
-            below_upload_threshold=raw.upload_mbps < settings.upload_threshold_mbps,
+            below_download_threshold=raw.download_mbps < effective_download_threshold,
+            below_upload_threshold=raw.upload_mbps < effective_upload_threshold,
         )
 
     async def run_test(self, session: AsyncSession, manual: bool = False) -> Measurement:
@@ -78,13 +84,15 @@ class MeasurementService:
                 saved = await repo.create(measurement)
 
                 if saved.below_download_threshold or saved.below_upload_threshold:
+                    tolerance_factor = 1 - (settings.tolerance_percent / 100)
                     logger.warning(
-                        "Threshold violation: DL=%.1f Mbps (threshold %.1f), "
-                        "UL=%.1f Mbps (threshold %.1f)",
+                        "Threshold violation: DL=%.1f Mbps (min %.1f), "
+                        "UL=%.1f Mbps (min %.1f) [tolerance %.0f%%]",
                         saved.download_mbps,
-                        settings.download_threshold_mbps,
+                        settings.download_threshold_mbps * tolerance_factor,
                         saved.upload_mbps,
-                        settings.upload_threshold_mbps,
+                        settings.upload_threshold_mbps * tolerance_factor,
+                        settings.tolerance_percent,
                     )
 
                 event_bus.publish({
@@ -140,6 +148,10 @@ class MeasurementService:
     async def delete_by_id(self, session: AsyncSession, measurement_id: int) -> bool:
         repo = MeasurementRepository(session)
         return await repo.delete_by_id(measurement_id)
+
+    async def delete_all(self, session: AsyncSession) -> int:
+        repo = MeasurementRepository(session)
+        return await repo.delete_all()
 
     async def count(self, session: AsyncSession) -> int:
         repo = MeasurementRepository(session)

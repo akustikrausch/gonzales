@@ -17,6 +17,7 @@ export function SettingsPage() {
   const [interval, setInterval_] = useState("");
   const [dlThreshold, setDlThreshold] = useState("");
   const [ulThreshold, setUlThreshold] = useState("");
+  const [tolerance, setTolerance] = useState(15);
   const [serverId, setServerId] = useState(0);
 
   useEffect(() => {
@@ -24,6 +25,7 @@ export function SettingsPage() {
       setInterval_(String(config.test_interval_minutes));
       setDlThreshold(String(config.download_threshold_mbps));
       setUlThreshold(String(config.upload_threshold_mbps));
+      setTolerance(config.tolerance_percent);
       setServerId(config.preferred_server_id);
     }
   }, [config]);
@@ -41,9 +43,14 @@ export function SettingsPage() {
       test_interval_minutes: Number(interval),
       download_threshold_mbps: Number(dlThreshold),
       upload_threshold_mbps: Number(ulThreshold),
+      tolerance_percent: tolerance,
       preferred_server_id: serverId,
     });
   };
+
+  // Calculate effective minimum speeds based on tolerance
+  const effectiveMinDownload = Number(dlThreshold) * (1 - tolerance / 100);
+  const effectiveMinUpload = Number(ulThreshold) * (1 - tolerance / 100);
 
   const handleServerChange = (id: number) => {
     setServerId(id);
@@ -93,6 +100,29 @@ export function SettingsPage() {
             value={ulThreshold}
             onChange={(e) => setUlThreshold(e.target.value)}
           />
+          <div>
+            <label
+              className="block text-sm font-medium mb-2"
+              style={{ color: "var(--g-text)" }}
+            >
+              Tolerance: {tolerance}%
+            </label>
+            <input
+              type="range"
+              min={0}
+              max={50}
+              step={1}
+              value={tolerance}
+              onChange={(e) => setTolerance(Number(e.target.value))}
+              className="w-full h-2 rounded-lg appearance-none cursor-pointer"
+              style={{
+                background: `linear-gradient(to right, var(--g-accent) 0%, var(--g-accent) ${tolerance * 2}%, var(--g-border) ${tolerance * 2}%, var(--g-border) 100%)`,
+              }}
+            />
+            <p className="text-xs mt-2" style={{ color: "var(--g-text-secondary)" }}>
+              Minimum acceptable: {effectiveMinDownload.toFixed(1)} Mbps down / {effectiveMinUpload.toFixed(1)} Mbps up
+            </p>
+          </div>
           <GlassButton
             variant="primary"
             onClick={handleSave}

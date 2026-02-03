@@ -83,6 +83,11 @@ class MeasurementRepository:
         await self.session.commit()
         return result.rowcount > 0
 
+    async def delete_all(self) -> int:
+        result = await self.session.execute(delete(Measurement))
+        await self.session.commit()
+        return result.rowcount
+
     async def count(self) -> int:
         result = await self.session.execute(select(func.count(Measurement.id)))
         return result.scalar_one()

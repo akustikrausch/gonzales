@@ -79,6 +79,7 @@ export interface Config {
   test_interval_minutes: number;
   download_threshold_mbps: number;
   upload_threshold_mbps: number;
+  tolerance_percent: number;
   preferred_server_id: number;
   manual_trigger_cooldown_seconds: number;
   theme: string;
@@ -92,6 +93,7 @@ export interface ConfigUpdate {
   test_interval_minutes?: number;
   download_threshold_mbps?: number;
   upload_threshold_mbps?: number;
+  tolerance_percent?: number;
   preferred_server_id?: number;
   manual_trigger_cooldown_seconds?: number;
   theme?: string;
@@ -192,6 +194,23 @@ export interface PeriodStats {
   count: number;
 }
 
+export interface TimePeriodStats {
+  period: string;
+  period_label: string;
+  hours: string;
+  avg_download_mbps: number;
+  avg_upload_mbps: number;
+  avg_ping_ms: number;
+  test_count: number;
+  compliance_pct: number;
+}
+
+export interface TimePeriodAnalysis {
+  periods: TimePeriodStats[];
+  best_period: string;
+  worst_period: string;
+}
+
 export interface PeakOffPeakAnalysis {
   peak: PeriodStats;
   offpeak: PeriodStats;
@@ -272,6 +291,7 @@ export interface EnhancedStatistics {
   by_server: ServerStats[];
   anomalies: AnomalyPoint[];
   peak_offpeak: PeakOffPeakAnalysis | null;
+  time_periods: TimePeriodAnalysis | null;
   isp_score: IspScore | null;
   best_worst_times: BestWorstTimes | null;
   correlations: CorrelationMatrix | null;

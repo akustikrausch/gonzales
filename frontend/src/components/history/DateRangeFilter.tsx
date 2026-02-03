@@ -7,6 +7,38 @@ interface DateRangeFilterProps {
   onEndDateChange: (v: string) => void;
 }
 
+function toLocalISOString(date: Date): string {
+  const offset = date.getTimezoneOffset();
+  const localDate = new Date(date.getTime() - offset * 60 * 1000);
+  return localDate.toISOString().slice(0, 16);
+}
+
+function startOfDay(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function startOfWeek(date: Date): Date {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Monday
+  return new Date(d.setDate(diff));
+}
+
+function startOfMonth(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
+function startOfYear(date: Date): Date {
+  return new Date(date.getFullYear(), 0, 1);
+}
+
+const presets = [
+  { label: "Today", getStart: () => startOfDay(new Date()) },
+  { label: "This Week", getStart: () => startOfWeek(new Date()) },
+  { label: "This Month", getStart: () => startOfMonth(new Date()) },
+  { label: "This Year", getStart: () => startOfYear(new Date()) },
+];
+
 export function DateRangeFilter({
   startDate,
   endDate,
@@ -15,8 +47,38 @@ export function DateRangeFilter({
 }: DateRangeFilterProps) {
   const hasFilter = startDate || endDate;
 
+  const applyPreset = (getStart: () => Date) => {
+    onStartDateChange(toLocalISOString(getStart()));
+    onEndDateChange(toLocalISOString(new Date()));
+  };
+
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex flex-wrap items-center gap-3">
+      <div className="flex items-center gap-1">
+        {presets.map((preset) => (
+          <button
+            key={preset.label}
+            onClick={() => applyPreset(preset.getStart)}
+            className="px-2 py-1 text-xs rounded-md transition-colors"
+            style={{
+              background: "var(--g-glass)",
+              color: "var(--g-text-secondary)",
+              border: "1px solid var(--g-border)",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "var(--g-accent)";
+              e.currentTarget.style.color = "white";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "var(--g-glass)";
+              e.currentTarget.style.color = "var(--g-text-secondary)";
+            }}
+          >
+            {preset.label}
+          </button>
+        ))}
+      </div>
+      <div className="h-4 w-px" style={{ background: "var(--g-border)" }} />
       <Calendar className="w-4 h-4" style={{ color: "var(--g-text-secondary)" }} />
       <label className="text-sm" style={{ color: "var(--g-text-secondary)" }}>From</label>
       <input

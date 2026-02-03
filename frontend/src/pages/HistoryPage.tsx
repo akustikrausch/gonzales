@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Clock } from "lucide-react";
-import { useDeleteMeasurement, useMeasurements } from "../hooks/useApi";
+import { Clock, Trash2 } from "lucide-react";
+import { useDeleteAllMeasurements, useDeleteMeasurement, useMeasurements } from "../hooks/useApi";
 import { GlassCard } from "../components/ui/GlassCard";
 import { GlassButton } from "../components/ui/GlassButton";
 import { Spinner } from "../components/ui/Spinner";
 import { DateRangeFilter } from "../components/history/DateRangeFilter";
+import { DeleteAllModal } from "../components/history/DeleteAllModal";
 import { MeasurementTable } from "../components/history/MeasurementTable";
 import type { SortField, SortOrder } from "../api/types";
 
@@ -14,6 +15,7 @@ export function HistoryPage() {
   const [endDate, setEndDate] = useState("");
   const [sortBy, setSortBy] = useState<SortField>("timestamp");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const handleSort = (field: SortField) => {
     if (field === sortBy) {
@@ -36,6 +38,16 @@ export function HistoryPage() {
 
   const { data, isLoading } = useMeasurements(params);
   const deleteMutation = useDeleteMeasurement();
+  const deleteAllMutation = useDeleteAllMeasurements();
+
+  const handleDeleteAll = () => {
+    deleteAllMutation.mutate(undefined, {
+      onSuccess: () => {
+        setShowDeleteModal(false);
+        setPage(1);
+      },
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -74,9 +86,19 @@ export function HistoryPage() {
                 className="flex items-center justify-between mt-4 pt-4 border-t"
                 style={{ borderColor: "var(--g-border)" }}
               >
-                <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>
-                  {data.total} measurements total
-                </p>
+                <div className="flex items-center gap-4">
+                  <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>
+                    {data.total} measurements total
+                  </p>
+                  <GlassButton
+                    size="sm"
+                    onClick={() => setShowDeleteModal(true)}
+                    style={{ color: "var(--g-red)" }}
+                  >
+                    <Trash2 className="w-3 h-3" />
+                    Delete All
+                  </GlassButton>
+                </div>
                 <div className="flex gap-2">
                   <GlassButton
                     size="sm"
@@ -111,6 +133,14 @@ export function HistoryPage() {
           )}
         </div>
       </GlassCard>
+
+      <DeleteAllModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDeleteAll}
+        isPending={deleteAllMutation.isPending}
+        totalCount={data?.total ?? 0}
+      />
     </div>
   );
 }

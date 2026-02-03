@@ -100,3 +100,16 @@ export function useDeleteMeasurement() {
     },
   });
 }
+
+export function useDeleteAllMeasurements() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => api.deleteAllMeasurements(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["measurements"] });
+      queryClient.invalidateQueries({ queryKey: ["measurement"] });
+      queryClient.invalidateQueries({ queryKey: ["statistics"] });
+      queryClient.invalidateQueries({ queryKey: ["status"] });
+    },
+  });
+}

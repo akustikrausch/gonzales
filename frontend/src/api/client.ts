@@ -60,6 +60,10 @@ export const api = {
     return fetchJSON(`${BASE}/measurements/${id}`, { method: "DELETE" });
   },
 
+  deleteAllMeasurements(): Promise<{ deleted: number; message: string }> {
+    return fetchJSON(`${BASE}/measurements/all?confirm=true`, { method: "DELETE" });
+  },
+
   getStatistics(params?: {
     start_date?: string;
     end_date?: string;

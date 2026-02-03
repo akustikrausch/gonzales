@@ -15,6 +15,7 @@ import { ReliabilityCard } from "../components/statistics/ReliabilityCard";
 import { ServerComparison } from "../components/statistics/ServerComparison";
 import { IspScoreCard } from "../components/statistics/IspScoreCard";
 import { PeakAnalysis } from "../components/statistics/PeakAnalysis";
+import { TimePeriodOverview } from "../components/statistics/TimePeriodOverview";
 import { QualityTimeline } from "../components/statistics/QualityTimeline";
 import { CorrelationMatrixView } from "../components/statistics/CorrelationMatrix";
 import { DegradationAlertBanner } from "../components/statistics/DegradationAlert";
@@ -133,6 +134,9 @@ export function StatisticsPage() {
 
         {activeTab === "time" && (
           <div className="space-y-4">
+            {enhanced.time_periods && (
+              <TimePeriodOverview data={enhanced.time_periods} />
+            )}
             <QualityTimeline
               data={enhanced.hourly}
               downloadThreshold={stats.download_threshold_mbps}

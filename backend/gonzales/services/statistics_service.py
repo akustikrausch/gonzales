@@ -27,6 +27,8 @@ from gonzales.schemas.statistics import (
     SlaCompliance,
     SpeedStatistics,
     StatisticsOut,
+    TimePeriodAnalysis,
+    TimePeriodStats,
     TimeWindowResult,
     TrendAnalysis,
     TrendPoint,
@@ -323,6 +325,96 @@ def _compute_peak_offpeak(measurements: list) -> PeakOffPeakAnalysis | None:
     return PeakOffPeakAnalysis(peak=peak, offpeak=offpeak, night=night, best_period=best, worst_period=worst)
 
 
+# Time period definitions: (start_hour, end_hour, label, period_key)
+TIME_PERIODS = [
+    (6, 10, "Morning (6-10)", "morning"),
+    (10, 14, "Midday (10-14)", "midday"),
+    (14, 18, "Afternoon (14-18)", "afternoon"),
+    (18, 22, "Evening (18-22)", "evening"),
+    (22, 6, "Night (22-6)", "night"),  # wraps around midnight
+]
+
+
+def _compute_time_periods(measurements: list) -> TimePeriodAnalysis | None:
+    """Analyze performance by 5 time periods throughout the day."""
+    if not measurements:
+        return None
+
+    # Calculate effective thresholds with tolerance
+    tolerance_factor = 1 - (settings.tolerance_percent / 100)
+    effective_dl_threshold = settings.download_threshold_mbps * tolerance_factor
+    effective_ul_threshold = settings.upload_threshold_mbps * tolerance_factor
+
+    # Group measurements by time period
+    buckets: dict[str, list] = {p[3]: [] for p in TIME_PERIODS}
+
+    for m in measurements:
+        h = m.timestamp.hour
+        for start, end, _, key in TIME_PERIODS:
+            if key == "night":
+                # Night period wraps: 22-23 and 0-5
+                if h >= 22 or h < 6:
+                    buckets[key].append(m)
+                    break
+            elif start <= h < end:
+                buckets[key].append(m)
+                break
+
+    results = []
+    for start, end, label, key in TIME_PERIODS:
+        items = buckets[key]
+        if key == "night":
+            hours_str = "22:00-06:00"
+        else:
+            hours_str = f"{start:02d}:00-{end:02d}:00"
+
+        if not items:
+            results.append(TimePeriodStats(
+                period=key,
+                period_label=label,
+                hours=hours_str,
+                avg_download_mbps=0,
+                avg_upload_mbps=0,
+                avg_ping_ms=0,
+                test_count=0,
+                compliance_pct=0,
+            ))
+        else:
+            avg_dl = sum(m.download_mbps for m in items) / len(items)
+            avg_ul = sum(m.upload_mbps for m in items) / len(items)
+            avg_ping = sum(m.ping_latency_ms for m in items) / len(items)
+
+            # Calculate compliance (meeting both thresholds)
+            compliant = sum(
+                1 for m in items
+                if m.download_mbps >= effective_dl_threshold
+                and m.upload_mbps >= effective_ul_threshold
+            )
+            compliance_pct = (compliant / len(items)) * 100 if items else 0
+
+            results.append(TimePeriodStats(
+                period=key,
+                period_label=label,
+                hours=hours_str,
+                avg_download_mbps=round(avg_dl, 2),
+                avg_upload_mbps=round(avg_ul, 2),
+                avg_ping_ms=round(avg_ping, 2),
+                test_count=len(items),
+                compliance_pct=round(compliance_pct, 1),
+            ))
+
+    # Find best/worst periods by download speed (among periods with data)
+    active = [r for r in results if r.test_count > 0]
+    if active:
+        best = max(active, key=lambda r: r.avg_download_mbps).period
+        worst = min(active, key=lambda r: r.avg_download_mbps).period
+    else:
+        best = "N/A"
+        worst = "N/A"
+
+    return TimePeriodAnalysis(periods=results, best_period=best, worst_period=worst)
+
+
 def _compute_isp_score(measurements: list) -> IspScore | None:
     """Compute a composite ISP performance score (0-100)."""
     if len(measurements) < 3:
@@ -610,6 +702,7 @@ class StatisticsService:
             by_server=_compute_by_server(measurements),
             anomalies=_detect_anomalies(measurements),
             peak_offpeak=_compute_peak_offpeak(measurements),
+            time_periods=_compute_time_periods(measurements),
             isp_score=_compute_isp_score(measurements),
             best_worst_times=_find_best_worst_times(hourly),
             correlations=_compute_correlations(measurements),

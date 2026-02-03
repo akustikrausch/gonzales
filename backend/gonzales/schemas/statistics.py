@@ -106,6 +106,23 @@ class PeriodStats(BaseModel):
     count: int
 
 
+class TimePeriodStats(BaseModel):
+    period: str  # morning, midday, afternoon, evening, night
+    period_label: str  # "Morning (6-10)"
+    hours: str  # "06:00-10:00"
+    avg_download_mbps: float
+    avg_upload_mbps: float
+    avg_ping_ms: float
+    test_count: int
+    compliance_pct: float  # percentage of tests meeting thresholds
+
+
+class TimePeriodAnalysis(BaseModel):
+    periods: list[TimePeriodStats]
+    best_period: str
+    worst_period: str
+
+
 class PeakOffPeakAnalysis(BaseModel):
     peak: PeriodStats
     offpeak: PeriodStats
@@ -186,6 +203,7 @@ class EnhancedStatisticsOut(BaseModel):
     by_server: list[ServerStats]
     anomalies: list[AnomalyPoint] = []
     peak_offpeak: PeakOffPeakAnalysis | None = None
+    time_periods: TimePeriodAnalysis | None = None
     isp_score: IspScore | None = None
     best_worst_times: BestWorstTimes | None = None
     correlations: CorrelationMatrix | None = None
