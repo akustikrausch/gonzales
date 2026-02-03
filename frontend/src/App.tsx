@@ -3,6 +3,16 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AppShell } from "./components/layout/AppShell";
 import { SpeedTestProvider } from "./context/SpeedTestContext";
 import { Spinner } from "./components/ui/Spinner";
+import { useVersionCheck } from "./hooks/useVersionCheck";
+
+/**
+ * Checks frontend/backend version match and auto-reloads on mismatch.
+ * This ensures users always get fresh assets after an update.
+ */
+function VersionGuard({ children }: { children: React.ReactNode }) {
+  useVersionCheck();
+  return <>{children}</>;
+}
 
 /**
  * Detect HA Ingress path prefix for router basename.
@@ -40,20 +50,22 @@ function PageLoader() {
 
 export default function App() {
   return (
-    <BrowserRouter basename={getBasename()}>
-      <SpeedTestProvider>
-        <Suspense fallback={<PageLoader />}>
-          <Routes>
-            <Route element={<AppShell />}>
-              <Route index element={<DashboardPage />} />
-              <Route path="history" element={<HistoryPage />} />
-              <Route path="statistics" element={<StatisticsPage />} />
-              <Route path="export" element={<ExportPage />} />
-              <Route path="settings" element={<SettingsPage />} />
-            </Route>
-          </Routes>
-        </Suspense>
-      </SpeedTestProvider>
-    </BrowserRouter>
+    <VersionGuard>
+      <BrowserRouter basename={getBasename()}>
+        <SpeedTestProvider>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route element={<AppShell />}>
+                <Route index element={<DashboardPage />} />
+                <Route path="history" element={<HistoryPage />} />
+                <Route path="statistics" element={<StatisticsPage />} />
+                <Route path="export" element={<ExportPage />} />
+                <Route path="settings" element={<SettingsPage />} />
+              </Route>
+            </Routes>
+          </Suspense>
+        </SpeedTestProvider>
+      </BrowserRouter>
+    </VersionGuard>
   );
 }
