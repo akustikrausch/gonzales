@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { Zap, ClipboardList, BarChart3, Download, Settings, type LucideIcon } from "lucide-react";
 import { Logo } from "../ui/Logo";
+import { useStatus } from "../../hooks/useApi";
 
 const navItems: { to: string; label: string; icon: LucideIcon }[] = [
   { to: "/", label: "Dashboard", icon: Zap },
@@ -15,6 +16,8 @@ interface SidebarProps {
 }
 
 export function Sidebar({ collapsed = false }: SidebarProps) {
+  const { data: status } = useStatus();
+
   return (
     <aside
       className="glass-sidebar min-h-screen flex flex-col transition-all"
@@ -72,7 +75,7 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
           }}
         >
           <p className="text-[10px]" style={{ color: "var(--g-text-secondary)" }}>
-            Gonzales v2.0
+            Gonzales v{status?.version ?? "..."}
           </p>
         </div>
       )}

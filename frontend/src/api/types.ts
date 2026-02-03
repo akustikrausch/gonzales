@@ -57,6 +57,9 @@ export interface Statistics {
   upload_violations: number;
   download_threshold_mbps: number;
   upload_threshold_mbps: number;
+  tolerance_percent: number;
+  effective_download_threshold_mbps: number;
+  effective_upload_threshold_mbps: number;
 }
 
 export interface SchedulerStatus {

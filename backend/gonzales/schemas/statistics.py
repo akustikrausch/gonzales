@@ -27,6 +27,9 @@ class StatisticsOut(BaseModel):
     upload_violations: int = 0
     download_threshold_mbps: float
     upload_threshold_mbps: float
+    tolerance_percent: float
+    effective_download_threshold_mbps: float  # threshold * (1 - tolerance/100)
+    effective_upload_threshold_mbps: float
 
 
 class HourlyAverage(BaseModel):

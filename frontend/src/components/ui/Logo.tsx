@@ -12,18 +12,37 @@ export function Logo({ size = 32, className = "" }: LogoProps) {
       viewBox="0 0 32 32"
       fill="none"
     >
-      <rect width="32" height="32" rx="8" fill="var(--g-blue)" />
+      {/* Teal circle background - matches HA addon icon */}
+      <circle cx="16" cy="16" r="15" fill="#1B9B8C" />
+      {/* Speed lines */}
       <path
-        d="M20.5 8H12C10.9 8 10 8.9 10 10V18.5C10 19.88 11.12 21 12.5 21H14L12 25H15L17 21H20.5C21.88 21 23 19.88 23 18.5V10.5C23 9.12 21.88 8 20.5 8Z"
-        fill="white"
-      />
-      <path
-        d="M25 12L27 11M25 16H28M25 20L27 21"
+        d="M6 10C10 10 18 8 26 12"
         stroke="white"
-        strokeWidth="1.5"
+        strokeWidth="2"
         strokeLinecap="round"
-        opacity="0.8"
       />
+      <path
+        d="M6 15C10 14 18 13 26 16"
+        stroke="white"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M6 20C10 19 18 18 26 20"
+        stroke="white"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M6 25C10 24 18 23 26 24"
+        stroke="white"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      {/* Speed dots */}
+      <circle cx="8" cy="7" r="1" fill="white" opacity="0.7" />
+      <circle cx="12" cy="5" r="0.8" fill="white" opacity="0.5" />
+      <circle cx="24" cy="8" r="0.8" fill="white" opacity="0.5" />
     </svg>
   );
 }

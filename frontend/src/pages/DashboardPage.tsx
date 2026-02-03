@@ -46,18 +46,23 @@ export function DashboardPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 g-animate-in g-stagger-1">
             <SpeedGauge
               label="Download"
+              sublabel="Latest Test"
               value={latest.download_mbps}
               color="var(--g-blue)"
-              threshold={stats?.download_threshold_mbps}
+              threshold={stats?.effective_download_threshold_mbps}
+              thresholdLabel={stats ? `Min. ${stats.effective_download_threshold_mbps} Mbps` : undefined}
             />
             <SpeedGauge
               label="Upload"
+              sublabel="Latest Test"
               value={latest.upload_mbps}
               color="var(--g-green)"
-              threshold={stats?.upload_threshold_mbps}
+              threshold={stats?.effective_upload_threshold_mbps}
+              thresholdLabel={stats ? `Min. ${stats.effective_upload_threshold_mbps} Mbps` : undefined}
             />
             <SpeedGauge
               label="Ping"
+              sublabel="Latest Test"
               value={latest.ping_latency_ms}
               unit="ms"
               color="var(--g-orange)"
