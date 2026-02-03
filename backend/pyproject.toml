@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "gonzales"
-version = "1.0.0"
+version = "1.2.5"
 description = "Internet Speed Monitor"
 requires-python = ">=3.10"
 dependencies = [

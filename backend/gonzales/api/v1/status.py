@@ -11,6 +11,7 @@ from gonzales.db.models import TestFailure
 from gonzales.schemas.status import SchedulerStatus, StatusOut
 from gonzales.services.measurement_service import measurement_service
 from gonzales.services.scheduler_service import scheduler_service
+from gonzales.version import __version__
 
 router = APIRouter(prefix="/status", tags=["status"])
 
@@ -32,6 +33,7 @@ async def get_status(session: AsyncSession = Depends(get_db)):
         db_size = os.path.getsize(settings.db_path)
 
     return StatusOut(
+        version=__version__,
         scheduler=SchedulerStatus(
             running=scheduler_service.running,
             next_run_time=scheduler_service.next_run_time,

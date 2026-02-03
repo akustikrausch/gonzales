@@ -11,6 +11,7 @@ class SchedulerStatus(BaseModel):
 
 
 class StatusOut(BaseModel):
+    version: str
     scheduler: SchedulerStatus
     last_test_time: datetime | None = None
     total_measurements: int

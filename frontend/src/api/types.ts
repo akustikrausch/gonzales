@@ -67,6 +67,7 @@ export interface SchedulerStatus {
 }
 
 export interface Status {
+  version: string;
   scheduler: SchedulerStatus;
   last_test_time: string | null;
   total_measurements: number;

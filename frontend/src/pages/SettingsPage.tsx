@@ -172,7 +172,13 @@ export function SettingsPage() {
             <Activity className="w-4 h-4" style={{ color: "var(--g-text-secondary)" }} />
             System Status
           </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 text-sm">
+            <div>
+              <p style={{ color: "var(--g-text-secondary)" }}>Version</p>
+              <p className="font-medium" style={{ color: "var(--g-accent)" }}>
+                v{status.version}
+              </p>
+            </div>
             <div>
               <p style={{ color: "var(--g-text-secondary)" }}>Uptime</p>
               <p className="font-medium" style={{ color: "var(--g-text)" }}>
