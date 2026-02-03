@@ -37,14 +37,20 @@ export function QosProfileCard({ result, onClick }: QosProfileCardProps) {
         >
           <Icon className="w-5 h-5" style={{ color: statusColor }} />
         </div>
-        <StatusIcon className="w-5 h-5" style={{ color: statusColor }} />
+        <span title={result.passed ? "All requirements met for this application" : "Some requirements not met - click for details"}>
+          <StatusIcon className="w-5 h-5" style={{ color: statusColor }} />
+        </span>
       </div>
 
       <h3 className="font-semibold text-sm mb-1" style={{ color: "var(--g-text)" }}>
         {result.profile_name}
       </h3>
 
-      <div className="flex items-center gap-1 text-xs" style={{ color: "var(--g-text-secondary)" }}>
+      <div
+        className="flex items-center gap-1 text-xs cursor-help"
+        style={{ color: "var(--g-text-secondary)" }}
+        title="Number of quality requirements met (download, upload, ping, jitter, packet loss)"
+      >
         <span>{result.passed_count}/{result.total_checks} checks passed</span>
       </div>
 

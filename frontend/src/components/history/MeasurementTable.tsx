@@ -59,7 +59,11 @@ export function MeasurementTable({ measurements, onDelete, sortBy, sortOrder, on
             <th className="text-left py-3 px-3 font-medium" style={{ color: "var(--g-text-secondary)", fontSize: "var(--g-text-xs)" }}>
               Server
             </th>
-            <th className="text-center py-3 px-3 font-medium" style={{ color: "var(--g-text-secondary)", fontSize: "var(--g-text-xs)" }}>
+            <th
+              className="text-center py-3 px-3 font-medium"
+              style={{ color: "var(--g-text-secondary)", fontSize: "var(--g-text-xs)" }}
+              title="Threshold violations: DL = Download below minimum, UL = Upload below minimum"
+            >
               Issues
             </th>
             <th className="py-3 px-3"></th>
@@ -97,7 +101,11 @@ export function MeasurementTable({ measurements, onDelete, sortBy, sortOrder, on
                 </td>
                 <td className="py-2.5 px-3 text-center">
                   {hasViolation && (
-                    <span className="text-xs font-medium" style={{ color: "var(--g-red)" }}>
+                    <span
+                      className="text-xs font-medium cursor-help"
+                      style={{ color: "var(--g-red)" }}
+                      title={`${m.below_download_threshold ? "Download below threshold" : ""}${m.below_download_threshold && m.below_upload_threshold ? ", " : ""}${m.below_upload_threshold ? "Upload below threshold" : ""}`}
+                    >
                       {m.below_download_threshold && "DL"}
                       {m.below_download_threshold && m.below_upload_threshold && " / "}
                       {m.below_upload_threshold && "UL"}

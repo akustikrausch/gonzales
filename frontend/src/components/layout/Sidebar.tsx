@@ -76,7 +76,11 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
             borderColor: "var(--g-border)",
           }}
         >
-          <p className="text-[10px]" style={{ color: "var(--g-text-secondary)" }}>
+          <p
+            className="text-[10px] cursor-help"
+            style={{ color: "var(--g-text-secondary)" }}
+            title="Backend version - refresh page if outdated"
+          >
             Gonzales v{status?.version ?? "..."}
           </p>
         </div>

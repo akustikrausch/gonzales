@@ -88,26 +88,26 @@ export function TopologyPage() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div>
-              <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>Local Network Health</p>
+            <div title="Percentage of analyses where local network hops had acceptable latency">
+              <p className="text-xs cursor-help" style={{ color: "var(--g-text-secondary)" }}>Local Network Health</p>
               <p className="text-xl font-bold" style={{ color: "var(--g-text)" }}>
                 {diagnosis.local_network_health_pct.toFixed(0)}%
               </p>
             </div>
-            <div>
-              <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>Avg Hops</p>
+            <div title="Average number of network hops to reach the target">
+              <p className="text-xs cursor-help" style={{ color: "var(--g-text-secondary)" }}>Avg Hops</p>
               <p className="text-xl font-bold" style={{ color: "var(--g-text)" }}>
                 {diagnosis.avg_total_hops.toFixed(1)}
               </p>
             </div>
-            <div>
-              <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>Avg Latency</p>
+            <div title="Average total round-trip time across all hops">
+              <p className="text-xs cursor-help" style={{ color: "var(--g-text-secondary)" }}>Avg Latency</p>
               <p className="text-xl font-bold" style={{ color: "var(--g-text)" }}>
                 {diagnosis.avg_total_latency_ms.toFixed(1)} ms
               </p>
             </div>
-            <div>
-              <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>Analyses</p>
+            <div title="Total number of traceroute analyses performed">
+              <p className="text-xs cursor-help" style={{ color: "var(--g-text-secondary)" }}>Analyses</p>
               <p className="text-xl font-bold" style={{ color: "var(--g-text)" }}>
                 {diagnosis.total_analyses}
               </p>

@@ -30,15 +30,15 @@ function getStatusBadge(status: string): { color: string; label: string } {
 
 function HopIcon({ hop }: { hop: NetworkHop }) {
   if (hop.hop_number === 1) {
-    return <Home className="w-5 h-5" style={{ color: "var(--g-blue)" }} />;
+    return <span title="Local gateway (your router)"><Home className="w-5 h-5" style={{ color: "var(--g-blue)" }} /></span>;
   }
   if (hop.is_local) {
-    return <Router className="w-5 h-5" style={{ color: "var(--g-purple)" }} />;
+    return <span title="Local network device"><Router className="w-5 h-5" style={{ color: "var(--g-purple)" }} /></span>;
   }
   if (hop.is_timeout) {
-    return <Clock className="w-5 h-5" style={{ color: "var(--g-text-secondary)" }} />;
+    return <span title="No response (may be blocked)"><Clock className="w-5 h-5" style={{ color: "var(--g-text-secondary)" }} /></span>;
   }
-  return <Server className="w-5 h-5" style={{ color: "var(--g-cyan)" }} />;
+  return <span title="Internet server/router"><Server className="w-5 h-5" style={{ color: "var(--g-cyan)" }} /></span>;
 }
 
 export function HopVisualization({ hops, bottleneckHop }: HopVisualizationProps) {
@@ -151,11 +151,17 @@ export function HopVisualization({ hops, bottleneckHop }: HopVisualizationProps)
 
                 {/* Status badge */}
                 <div
-                  className="px-2 py-1 rounded text-xs font-medium"
+                  className="px-2 py-1 rounded text-xs font-medium cursor-help"
                   style={{
                     backgroundColor: `${status.color}20`,
                     color: status.color,
                   }}
+                  title={
+                    hop.status === "ok" ? "Response time within normal range" :
+                    hop.status === "high_latency" ? "Response time above 50ms - may indicate congestion" :
+                    hop.status === "packet_loss" ? "Some packets lost - network instability" :
+                    hop.status === "timeout" ? "No response - node may block ICMP or be unreachable" : ""
+                  }
                 >
                   {status.label}
                 </div>

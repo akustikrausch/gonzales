@@ -37,17 +37,6 @@ export function LatestResult({ measurement: m }: LatestResultProps) {
           </p>
         </div>
       </div>
-      {m.result_url && (
-        <a
-          href={m.result_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-block mt-3 text-xs hover:underline"
-          style={{ color: "var(--g-blue)" }}
-        >
-          View on Speedtest.net
-        </a>
-      )}
     </GlassCard>
   );
 }
