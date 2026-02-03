@@ -183,6 +183,7 @@ All under `/api/v1`:
 | GET | `/measurements/latest` | Most recent result |
 | GET | `/measurements/{id}` | Single measurement |
 | DELETE | `/measurements/{id}` | Delete measurement |
+| DELETE | `/measurements/all` | Delete all measurements (requires `?confirm=true`) |
 | GET | `/statistics` | Aggregates and percentiles |
 | GET | `/statistics/enhanced` | Enhanced stats (hourly, daily, trend, SLA, reliability, per-server) |
 | GET | `/status` | Scheduler state, uptime |
