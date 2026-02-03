@@ -1,11 +1,11 @@
-import{c as o}from"./index-CpR9d3vK.js";/**
+import{c as o}from"./index-B7Zwhsdz.js";/**
  * @license lucide-react v0.563.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
- */const r=[["path",{d:"M12 5v14",key:"s699le"}],["path",{d:"m19 12-7 7-7-7",key:"1idqje"}]],t=o("arrow-down",r);/**
+ */const e=[["path",{d:"m9 18 6-6-6-6",key:"mthhwq"}]],c=o("chevron-right",e);/**
  * @license lucide-react v0.563.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
- */const a=[["path",{d:"m5 12 7-7 7 7",key:"hav0vg"}],["path",{d:"M12 19V5",key:"x0mq9r"}]],c=o("arrow-up",a);export{c as A,t as a};
+ */const t=[["path",{d:"m12 14 4-4",key:"9kzdfg"}],["path",{d:"M3.34 19a10 10 0 1 1 17.32 0",key:"19p75a"}]],h=o("gauge",t);export{c as C,h as G};
