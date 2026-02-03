@@ -405,7 +405,7 @@ action:
           <DocParagraph>
             Gonzales uses FastAPI (Python) with SQLite for storage.
             The frontend is built with React and communicates via REST API.
-            Speed tests use the official Ookla Speedtest CLI.
+            Speed tests use the Ookla Speedtest CLI (third-party, see license notice).
           </DocParagraph>
           <DocHeading>Resource Usage</DocHeading>
           <DocList
