@@ -113,3 +113,68 @@ export function useDeleteAllMeasurements() {
     },
   });
 }
+
+// QoS Hooks
+export function useQosProfiles() {
+  return useQuery({
+    queryKey: ["qos", "profiles"],
+    queryFn: () => api.getQosProfiles(),
+    staleTime: 60000,
+  });
+}
+
+export function useCurrentQosStatus() {
+  return useQuery({
+    queryKey: ["qos", "current"],
+    queryFn: () => api.getCurrentQosStatus(),
+    refetchInterval: 30000,
+  });
+}
+
+export function useQosHistory(profileId: string, days: number = 7) {
+  return useQuery({
+    queryKey: ["qos", "history", profileId, days],
+    queryFn: () => api.getQosHistory(profileId, days),
+    enabled: !!profileId,
+  });
+}
+
+// Topology Hooks
+export function useLatestTopology() {
+  return useQuery({
+    queryKey: ["topology", "latest"],
+    queryFn: () => api.getLatestTopology(),
+  });
+}
+
+export function useTopology(id: number | undefined) {
+  return useQuery({
+    queryKey: ["topology", id],
+    queryFn: () => api.getTopology(id!),
+    enabled: id !== undefined,
+  });
+}
+
+export function useTopologyHistory(limit: number = 10) {
+  return useQuery({
+    queryKey: ["topology", "history", limit],
+    queryFn: () => api.getTopologyHistory(limit),
+  });
+}
+
+export function useNetworkDiagnosis(days: number = 7) {
+  return useQuery({
+    queryKey: ["topology", "diagnosis", days],
+    queryFn: () => api.getNetworkDiagnosis(days),
+  });
+}
+
+export function useAnalyzeTopology() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => api.analyzeTopology(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["topology"] });
+    },
+  });
+}

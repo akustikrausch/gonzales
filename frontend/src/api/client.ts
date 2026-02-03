@@ -4,11 +4,17 @@ import type {
   EnhancedStatistics,
   Measurement,
   MeasurementPage,
+  NetworkDiagnosis,
+  NetworkTopology,
+  QosHistory,
+  QosOverview,
+  QosProfile,
   ServerListResponse,
   SortField,
   SortOrder,
   Statistics,
   Status,
+  TopologyHistory,
 } from "./types";
 
 function getApiBase(): string {
@@ -124,5 +130,43 @@ export const api = {
     if (params?.end_date) search.set("end_date", params.end_date);
     const qs = search.toString();
     return `${BASE}/export/pdf${qs ? `?${qs}` : ""}`;
+  },
+
+  // QoS API
+  getQosProfiles(): Promise<QosProfile[]> {
+    return fetchJSON(`${BASE}/qos/profiles`);
+  },
+
+  getCurrentQosStatus(): Promise<QosOverview | null> {
+    return fetchJSON(`${BASE}/qos/current`);
+  },
+
+  evaluateMeasurementQos(measurementId: number): Promise<QosOverview> {
+    return fetchJSON(`${BASE}/qos/evaluate/${measurementId}`);
+  },
+
+  getQosHistory(profileId: string, days: number = 7): Promise<QosHistory> {
+    return fetchJSON(`${BASE}/qos/history/${profileId}?days=${days}`);
+  },
+
+  // Topology API
+  analyzeTopology(): Promise<NetworkTopology> {
+    return fetchJSON(`${BASE}/topology/analyze`, { method: "POST" });
+  },
+
+  getLatestTopology(): Promise<NetworkTopology | null> {
+    return fetchJSON(`${BASE}/topology/latest`);
+  },
+
+  getTopology(id: number): Promise<NetworkTopology> {
+    return fetchJSON(`${BASE}/topology/${id}`);
+  },
+
+  getTopologyHistory(limit: number = 10): Promise<TopologyHistory> {
+    return fetchJSON(`${BASE}/topology/history?limit=${limit}`);
+  },
+
+  getNetworkDiagnosis(days: number = 7): Promise<NetworkDiagnosis> {
+    return fetchJSON(`${BASE}/topology/diagnosis?days=${days}`);
   },
 };

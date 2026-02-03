@@ -96,6 +96,7 @@ export interface Config {
   preferred_server_id: number;
   manual_trigger_cooldown_seconds: number;
   theme: string;
+  isp_name: string;
   host: string;
   port: number;
   log_level: string;
@@ -110,6 +111,7 @@ export interface ConfigUpdate {
   preferred_server_id?: number;
   manual_trigger_cooldown_seconds?: number;
   theme?: string;
+  isp_name?: string;
 }
 
 export type SortField = "timestamp" | "download_mbps" | "upload_mbps" | "ping_latency_ms" | "ping_jitter_ms";
@@ -310,4 +312,116 @@ export interface EnhancedStatistics {
   correlations: CorrelationMatrix | null;
   degradation_alerts: DegradationAlert[];
   predictions: PredictiveTrend | null;
+}
+
+// QoS Types
+export interface QosProfile {
+  id: string;
+  name: string;
+  icon: string;
+  description: string;
+  min_download_mbps: number | null;
+  min_upload_mbps: number | null;
+  max_ping_ms: number | null;
+  max_jitter_ms: number | null;
+  max_packet_loss_pct: number | null;
+}
+
+export interface QosCheck {
+  metric: string;
+  label: string;
+  required: number | null;
+  actual: number | null;
+  passed: boolean;
+  unit: string;
+  threshold_type: string;
+}
+
+export interface QosTestResult {
+  profile_id: string;
+  profile_name: string;
+  icon: string;
+  passed: boolean;
+  checks: QosCheck[];
+  passed_count: number;
+  total_checks: number;
+  recommendation: string | null;
+}
+
+export interface QosOverview {
+  measurement_id: number | null;
+  timestamp: string;
+  results: QosTestResult[];
+  passed_profiles: number;
+  total_profiles: number;
+  summary: string;
+}
+
+export interface QosHistoryEntry {
+  timestamp: string;
+  measurement_id: number;
+  passed: boolean;
+  download_mbps: number;
+  upload_mbps: number;
+  ping_ms: number;
+  jitter_ms: number | null;
+  packet_loss_pct: number | null;
+}
+
+export interface QosHistory {
+  profile_id: string;
+  profile_name: string;
+  entries: QosHistoryEntry[];
+  compliance_pct: number;
+  total_tests: number;
+  passed_tests: number;
+}
+
+// Topology Types
+export interface NetworkHop {
+  hop_number: number;
+  ip_address: string | null;
+  hostname: string | null;
+  latency_ms: number | null;
+  packet_loss_pct: number;
+  is_local: boolean;
+  is_timeout: boolean;
+  status: string;
+}
+
+export interface NetworkTopology {
+  id: number | null;
+  timestamp: string;
+  target_host: string;
+  total_hops: number;
+  total_latency_ms: number;
+  hops: NetworkHop[];
+  bottleneck_hop: number | null;
+  local_network_ok: boolean;
+  diagnosis: string;
+}
+
+export interface TopologyHistoryEntry {
+  id: number;
+  timestamp: string;
+  target_host: string;
+  total_hops: number;
+  total_latency_ms: number;
+  local_network_ok: boolean;
+}
+
+export interface TopologyHistory {
+  entries: TopologyHistoryEntry[];
+  total: number;
+}
+
+export interface NetworkDiagnosis {
+  total_analyses: number;
+  local_network_issues: number;
+  local_network_health_pct: number;
+  avg_total_hops: number;
+  avg_total_latency_ms: number;
+  common_bottleneck_hops: number[];
+  overall_status: string;
+  recommendations: string[];
 }

@@ -57,3 +57,36 @@ async def export_pdf(
         media_type="application/pdf",
         headers={"Content-Disposition": "attachment; filename=gonzales_report.pdf"},
     )
+
+
+@router.get("/report/professional")
+async def export_professional_report(
+    start_date: datetime | None = Query(default=None),
+    end_date: datetime | None = Query(default=None),
+    session: AsyncSession = Depends(get_db),
+):
+    """Generate a professional compliance report with detailed analysis."""
+    repo = MeasurementRepository(session)
+    measurements = await repo.get_all_in_range(start_date, end_date)
+
+    # Get enhanced statistics for the report
+    enhanced = await statistics_service.get_enhanced_statistics(session, start_date, end_date)
+
+    # Convert to dict for the export service
+    enhanced_dict = None
+    if enhanced:
+        enhanced_dict = {
+            "isp_score": enhanced.isp_score.model_dump() if enhanced.isp_score else None,
+            "time_periods": enhanced.time_periods.model_dump() if enhanced.time_periods else None,
+            "sla": enhanced.sla.model_dump() if enhanced.sla else None,
+        }
+
+    pdf_content = export_service.generate_professional_report(
+        measurements, enhanced_dict, start_date, end_date
+    )
+    filename = f"gonzales_compliance_report_{datetime.now().strftime('%Y%m%d')}.pdf"
+    return Response(
+        content=pdf_content,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename={filename}"},
+    )

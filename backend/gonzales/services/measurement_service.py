@@ -159,5 +159,14 @@ class MeasurementService:
         repo = MeasurementRepository(session)
         return await repo.count()
 
+    async def get_all_in_range(
+        self,
+        session: AsyncSession,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+    ) -> list[Measurement]:
+        repo = MeasurementRepository(session)
+        return await repo.get_all_in_range(start_date, end_date)
+
 
 measurement_service = MeasurementService()

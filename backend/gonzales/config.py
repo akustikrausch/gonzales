@@ -11,6 +11,7 @@ MUTABLE_KEYS = {
     "preferred_server_id",
     "manual_trigger_cooldown_seconds",
     "theme",
+    "isp_name",
 }
 
 
@@ -36,6 +37,7 @@ class Settings(BaseSettings):
     theme: str = "auto"
     api_key: str = ""
     ha_addon: bool = False
+    isp_name: str = ""  # Provider name for reports
 
     @property
     def database_url(self) -> str:

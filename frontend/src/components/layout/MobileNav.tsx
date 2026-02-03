@@ -1,10 +1,12 @@
 import { NavLink } from "react-router-dom";
-import { Zap, ClipboardList, BarChart3, Download, Settings, type LucideIcon } from "lucide-react";
+import { Zap, ClipboardList, BarChart3, Download, Settings, Activity, Network, type LucideIcon } from "lucide-react";
 
 const navItems: { to: string; label: string; icon: LucideIcon }[] = [
   { to: "/", label: "Dashboard", icon: Zap },
   { to: "/history", label: "History", icon: ClipboardList },
   { to: "/statistics", label: "Stats", icon: BarChart3 },
+  { to: "/qos", label: "QoS", icon: Activity },
+  { to: "/topology", label: "Network", icon: Network },
   { to: "/export", label: "Export", icon: Download },
   { to: "/settings", label: "Settings", icon: Settings },
 ];

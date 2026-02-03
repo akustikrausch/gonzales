@@ -39,6 +39,12 @@ const ExportPage = lazy(() =>
 const SettingsPage = lazy(() =>
   import("./pages/SettingsPage").then((m) => ({ default: m.SettingsPage }))
 );
+const QosPage = lazy(() =>
+  import("./pages/QosPage").then((m) => ({ default: m.QosPage }))
+);
+const TopologyPage = lazy(() =>
+  import("./pages/TopologyPage").then((m) => ({ default: m.TopologyPage }))
+);
 
 function PageLoader() {
   return (
@@ -59,6 +65,8 @@ export default function App() {
                 <Route index element={<DashboardPage />} />
                 <Route path="history" element={<HistoryPage />} />
                 <Route path="statistics" element={<StatisticsPage />} />
+                <Route path="qos" element={<QosPage />} />
+                <Route path="topology" element={<TopologyPage />} />
                 <Route path="export" element={<ExportPage />} />
                 <Route path="settings" element={<SettingsPage />} />
               </Route>

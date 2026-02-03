@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Timer, Activity, Server, Save, Palette } from "lucide-react";
+import { Timer, Activity, Server, Save, Palette, FileText } from "lucide-react";
 import { useConfig, useStatus, useUpdateConfig, useStatistics } from "../hooks/useApi";
 import { GlassCard } from "../components/ui/GlassCard";
 import { GlassInput } from "../components/ui/GlassInput";
@@ -20,6 +20,7 @@ export function SettingsPage() {
   const [ulThreshold, setUlThreshold] = useState("");
   const [tolerance, setTolerance] = useState(15);
   const [serverId, setServerId] = useState(0);
+  const [ispName, setIspName] = useState("");
 
   useEffect(() => {
     if (config) {
@@ -28,6 +29,7 @@ export function SettingsPage() {
       setUlThreshold(String(config.upload_threshold_mbps));
       setTolerance(config.tolerance_percent);
       setServerId(config.preferred_server_id);
+      setIspName(config.isp_name || "");
     }
   }, [config]);
 
@@ -46,6 +48,7 @@ export function SettingsPage() {
       upload_threshold_mbps: Number(ulThreshold),
       tolerance_percent: tolerance,
       preferred_server_id: serverId,
+      isp_name: ispName,
     });
   };
 
@@ -143,6 +146,29 @@ export function SettingsPage() {
           className="text-sm font-semibold mb-4 flex items-center gap-2"
           style={{ color: "var(--g-text)" }}
         >
+          <FileText className="w-4 h-4" style={{ color: "var(--g-text-secondary)" }} />
+          Contract Details
+        </h3>
+        <div className="space-y-4 max-w-md">
+          <GlassInput
+            label="ISP / Provider Name"
+            type="text"
+            placeholder="e.g., Deutsche Telekom"
+            value={ispName}
+            onChange={(e) => setIspName(e.target.value)}
+          />
+          <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>
+            This information will be included in professional compliance reports.
+            The speed thresholds above are used as your contracted speeds.
+          </p>
+        </div>
+      </GlassCard>
+
+      <GlassCard className="g-animate-in g-stagger-3">
+        <h3
+          className="text-sm font-semibold mb-4 flex items-center gap-2"
+          style={{ color: "var(--g-text)" }}
+        >
           <Server className="w-4 h-4" style={{ color: "var(--g-text-secondary)" }} />
           Server Selection
         </h3>
@@ -151,7 +177,7 @@ export function SettingsPage() {
         </div>
       </GlassCard>
 
-      <GlassCard className="g-animate-in g-stagger-3">
+      <GlassCard className="g-animate-in g-stagger-4">
         <h3
           className="text-sm font-semibold mb-4 flex items-center gap-2"
           style={{ color: "var(--g-text)" }}
@@ -165,7 +191,7 @@ export function SettingsPage() {
       </GlassCard>
 
       {status && (
-        <GlassCard className="g-animate-in g-stagger-4">
+        <GlassCard className="g-animate-in g-stagger-5">
           <h3
             className="text-sm font-semibold mb-4 flex items-center gap-2"
             style={{ color: "var(--g-text)" }}
@@ -215,7 +241,7 @@ export function SettingsPage() {
       )}
 
       {config && (
-        <GlassCard className="g-animate-in g-stagger-5">
+        <GlassCard className="g-animate-in g-stagger-6">
           <h3
             className="text-sm font-semibold mb-4 flex items-center gap-2"
             style={{ color: "var(--g-text)" }}

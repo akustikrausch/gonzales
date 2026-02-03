@@ -1,3 +1,3 @@
 """Gonzales - Internet Speed Monitor."""
 
-__version__ = "1.2.7"
+__version__ = "2.0.0"

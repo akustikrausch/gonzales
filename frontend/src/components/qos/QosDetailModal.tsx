@@ -1,0 +1,128 @@
+import { X, CheckCircle, XCircle, Tv, Video, Gamepad2, Briefcase, Upload, Radio, Home, PlayCircle, Users, Swords } from "lucide-react";
+import type { QosTestResult, QosCheck } from "../../api/types";
+import { GlassButton } from "../ui/GlassButton";
+
+const iconMap: Record<string, React.ElementType> = {
+  tv: Tv,
+  video: Video,
+  "gamepad-2": Gamepad2,
+  briefcase: Briefcase,
+  upload: Upload,
+  radio: Radio,
+  home: Home,
+  "play-circle": PlayCircle,
+  users: Users,
+  swords: Swords,
+};
+
+interface QosDetailModalProps {
+  result: QosTestResult;
+  onClose: () => void;
+}
+
+function CheckBar({ check }: { check: QosCheck }) {
+  const passed = check.passed;
+  const color = passed ? "var(--g-green)" : "var(--g-red)";
+  const bgColor = passed ? "var(--g-green-muted)" : "var(--g-red-muted)";
+
+  // Calculate bar width (relative to requirement)
+  let barWidth = 100;
+  if (check.required && check.actual !== null) {
+    if (check.threshold_type === "min") {
+      barWidth = Math.min(100, (check.actual / check.required) * 100);
+    } else {
+      barWidth = Math.min(100, (check.required / check.actual) * 100);
+    }
+  }
+
+  return (
+    <div className="mb-3">
+      <div className="flex justify-between text-xs mb-1">
+        <span style={{ color: "var(--g-text)" }}>{check.label}</span>
+        <span style={{ color }}>
+          {check.actual?.toFixed(1)} / {check.required?.toFixed(1)} {check.unit}
+        </span>
+      </div>
+      <div className="h-2 rounded-full" style={{ backgroundColor: bgColor }}>
+        <div
+          className="h-full rounded-full transition-all"
+          style={{
+            width: `${barWidth}%`,
+            backgroundColor: color,
+          }}
+        />
+      </div>
+      <div className="flex justify-between text-[10px] mt-0.5" style={{ color: "var(--g-text-secondary)" }}>
+        <span>{check.threshold_type === "min" ? "Min required" : "Max allowed"}</span>
+        <span className="flex items-center gap-1">
+          {passed ? <CheckCircle className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+          {passed ? "Pass" : "Fail"}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+export function QosDetailModal({ result, onClose }: QosDetailModalProps) {
+  const Icon = iconMap[result.icon] || Tv;
+  const statusColor = result.passed ? "var(--g-green)" : "var(--g-red)";
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ backgroundColor: "rgba(0, 0, 0, 0.6)" }}
+      onClick={onClose}
+    >
+      <div
+        className="glass-card p-6 w-full max-w-md"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div
+              className="p-2 rounded-lg"
+              style={{ backgroundColor: result.passed ? "var(--g-green-muted)" : "var(--g-red-muted)" }}
+            >
+              <Icon className="w-6 h-6" style={{ color: statusColor }} />
+            </div>
+            <div>
+              <h3 className="font-bold" style={{ color: "var(--g-text)" }}>
+                {result.profile_name}
+              </h3>
+              <p className="text-sm" style={{ color: statusColor }}>
+                {result.passed ? "All requirements met" : "Requirements not met"}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1 rounded hover:bg-white/10"
+          >
+            <X className="w-5 h-5" style={{ color: "var(--g-text-secondary)" }} />
+          </button>
+        </div>
+
+        <div className="space-y-1">
+          {result.checks.map((check, i) => (
+            <CheckBar key={i} check={check} />
+          ))}
+        </div>
+
+        {!result.passed && result.recommendation && (
+          <div
+            className="mt-4 p-3 rounded-lg text-sm"
+            style={{ backgroundColor: "var(--g-red-muted)", color: "var(--g-red)" }}
+          >
+            {result.recommendation}
+          </div>
+        )}
+
+        <div className="mt-4 flex justify-end">
+          <GlassButton size="sm" onClick={onClose}>
+            Close
+          </GlassButton>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
-from sqlalchemy import Boolean, DateTime, Float, Index, Integer, String, Text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Index, Integer, String, Text
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from gonzales.db.base import Base
 
@@ -59,3 +59,53 @@ class TestFailure(Base):
     error_type: Mapped[str] = mapped_column(String(255), nullable=False)
     error_message: Mapped[str] = mapped_column(Text, nullable=False)
     raw_output: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
+class NetworkTopology(Base):
+    """Traceroute analysis result."""
+
+    __tablename__ = "network_topology"
+    __table_args__ = (Index("ix_network_topology_timestamp", "timestamp"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    timestamp: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False,
+    )
+    target_host: Mapped[str] = mapped_column(String(255), nullable=False)
+    total_hops: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    total_latency_ms: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    completed: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    local_network_ok: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    diagnosis: Mapped[str] = mapped_column(Text, nullable=False, default="")
+
+    # Optional link to a measurement
+    measurement_id: Mapped[int | None] = mapped_column(
+        Integer, ForeignKey("measurements.id"), nullable=True
+    )
+
+    hops: Mapped[list["NetworkHop"]] = relationship(
+        "NetworkHop", back_populates="topology", cascade="all, delete-orphan"
+    )
+
+
+class NetworkHop(Base):
+    """Single hop in a traceroute."""
+
+    __tablename__ = "network_hops"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    topology_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("network_topology.id"), nullable=False
+    )
+    hop_number: Mapped[int] = mapped_column(Integer, nullable=False)
+    ip_address: Mapped[str | None] = mapped_column(String(45), nullable=True)
+    hostname: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    latency_ms: Mapped[float | None] = mapped_column(Float, nullable=True)
+    packet_loss_pct: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    is_local: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    is_timeout: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+
+    topology: Mapped["NetworkTopology"] = relationship("NetworkTopology", back_populates="hops")

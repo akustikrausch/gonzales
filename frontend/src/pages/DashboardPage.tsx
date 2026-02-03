@@ -6,6 +6,7 @@ import { SpeedGauge } from "../components/dashboard/SpeedGauge";
 import { LatestResult } from "../components/dashboard/LatestResult";
 import { SpeedChart } from "../components/dashboard/SpeedChart";
 import { PingChart } from "../components/dashboard/PingChart";
+import { QuickQosStatus } from "../components/dashboard/QuickQosStatus";
 import { LiveTestView } from "../components/speedtest/LiveTestView";
 import { Spinner } from "../components/ui/Spinner";
 
@@ -69,8 +70,9 @@ export function DashboardPage() {
             />
           </div>
 
-          <div className="g-animate-in g-stagger-2">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 g-animate-in g-stagger-2">
             <LatestResult measurement={latest} />
+            <QuickQosStatus />
           </div>
 
           {page && page.items.length > 1 && (
