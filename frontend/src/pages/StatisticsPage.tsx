@@ -154,7 +154,12 @@ export function StatisticsPage() {
 
         {activeTab === "trends" && (
           <div className="space-y-4">
-            <TrendChart trend={enhanced.trend} predictions={enhanced.predictions} />
+            <TrendChart
+              trend={enhanced.trend}
+              predictions={enhanced.predictions}
+              downloadThreshold={stats.effective_download_threshold_mbps}
+              uploadThreshold={stats.effective_upload_threshold_mbps}
+            />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <SlaCard sla={enhanced.sla} />
               <ReliabilityCard reliability={enhanced.reliability} />

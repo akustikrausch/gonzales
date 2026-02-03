@@ -3,6 +3,7 @@ import {
   Legend,
   Line,
   LineChart,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -14,9 +15,11 @@ import { GlassCard } from "../ui/GlassCard";
 
 interface SpeedChartProps {
   measurements: Measurement[];
+  downloadThreshold?: number;
+  uploadThreshold?: number;
 }
 
-export function SpeedChart({ measurements }: SpeedChartProps) {
+export function SpeedChart({ measurements, downloadThreshold, uploadThreshold }: SpeedChartProps) {
   const data = [...measurements].reverse().map((m) => ({
     time: formatShortDate(m.timestamp),
     download: Number(m.download_mbps.toFixed(1)),
@@ -43,6 +46,34 @@ export function SpeedChart({ measurements }: SpeedChartProps) {
             }}
           />
           <Legend />
+          {downloadThreshold && (
+            <ReferenceLine
+              y={downloadThreshold}
+              stroke="var(--g-blue)"
+              strokeDasharray="5 5"
+              strokeOpacity={0.7}
+              label={{
+                value: `Min ${downloadThreshold} Mbps`,
+                position: "right",
+                fill: "var(--g-blue)",
+                fontSize: 10,
+              }}
+            />
+          )}
+          {uploadThreshold && (
+            <ReferenceLine
+              y={uploadThreshold}
+              stroke="var(--g-green)"
+              strokeDasharray="5 5"
+              strokeOpacity={0.7}
+              label={{
+                value: `Min ${uploadThreshold} Mbps`,
+                position: "right",
+                fill: "var(--g-green)",
+                fontSize: 10,
+              }}
+            />
+          )}
           <Line
             type="monotone"
             dataKey="download"

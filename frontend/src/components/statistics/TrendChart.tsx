@@ -3,6 +3,7 @@ import {
   AreaChart,
   CartesianGrid,
   Line,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -16,9 +17,11 @@ import { formatShortDate } from "../../utils/format";
 interface TrendChartProps {
   trend: TrendAnalysis;
   predictions?: PredictiveTrend | null;
+  downloadThreshold?: number;
+  uploadThreshold?: number;
 }
 
-export function TrendChart({ trend, predictions }: TrendChartProps) {
+export function TrendChart({ trend, predictions, downloadThreshold, uploadThreshold }: TrendChartProps) {
   if (trend.points.length === 0) return null;
 
   const data = trend.points.map((p) => ({
@@ -97,6 +100,34 @@ export function TrendChart({ trend, predictions }: TrendChartProps) {
               fontSize: "var(--g-text-xs)",
             }}
           />
+          {downloadThreshold && (
+            <ReferenceLine
+              y={downloadThreshold}
+              stroke="var(--g-blue)"
+              strokeDasharray="5 5"
+              strokeOpacity={0.6}
+              label={{
+                value: `Min ${downloadThreshold} Mbps`,
+                position: "right",
+                fill: "var(--g-blue)",
+                fontSize: 10,
+              }}
+            />
+          )}
+          {uploadThreshold && (
+            <ReferenceLine
+              y={uploadThreshold}
+              stroke="var(--g-green)"
+              strokeDasharray="5 5"
+              strokeOpacity={0.6}
+              label={{
+                value: `Min ${uploadThreshold} Mbps`,
+                position: "right",
+                fill: "var(--g-green)",
+                fontSize: 10,
+              }}
+            />
+          )}
           <Area
             type="monotone"
             dataKey="download"

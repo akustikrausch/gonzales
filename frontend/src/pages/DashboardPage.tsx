@@ -75,7 +75,11 @@ export function DashboardPage() {
 
           {page && page.items.length > 1 && (
             <div className="space-y-4 g-animate-in g-stagger-3">
-              <SpeedChart measurements={page.items} />
+              <SpeedChart
+                measurements={page.items}
+                downloadThreshold={stats?.effective_download_threshold_mbps}
+                uploadThreshold={stats?.effective_upload_threshold_mbps}
+              />
               <PingChart measurements={page.items} />
             </div>
           )}
