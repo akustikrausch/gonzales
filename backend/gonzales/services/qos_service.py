@@ -105,7 +105,7 @@ class QosService:
 
         # Packet loss check
         if profile.max_packet_loss_pct is not None:
-            packet_loss = measurement.packet_loss_percent
+            packet_loss = measurement.packet_loss_pct
             if packet_loss is not None:
                 passed = packet_loss <= profile.max_packet_loss_pct
                 checks.append(QosCheck(
@@ -201,7 +201,7 @@ class QosService:
                     upload_mbps=m.upload_mbps,
                     ping_ms=m.ping_latency_ms,
                     jitter_ms=m.ping_jitter_ms,
-                    packet_loss_pct=m.packet_loss_percent,
+                    packet_loss_pct=m.packet_loss_pct,
                 ))
                 if result.passed:
                     passed_count += 1
