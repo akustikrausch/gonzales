@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Timer, Activity, Server, Save, Palette } from "lucide-react";
-import { useConfig, useStatus, useUpdateConfig } from "../hooks/useApi";
+import { useConfig, useStatus, useUpdateConfig, useStatistics } from "../hooks/useApi";
 import { GlassCard } from "../components/ui/GlassCard";
 import { GlassInput } from "../components/ui/GlassInput";
 import { GlassButton } from "../components/ui/GlassButton";
@@ -12,6 +12,7 @@ import { formatBytes, formatDuration } from "../utils/format";
 export function SettingsPage() {
   const { data: config, isLoading } = useConfig();
   const { data: status } = useStatus();
+  const { data: stats } = useStatistics();
   const updateConfig = useUpdateConfig();
 
   const [interval, setInterval_] = useState("");
@@ -172,7 +173,7 @@ export function SettingsPage() {
             <Activity className="w-4 h-4" style={{ color: "var(--g-text-secondary)" }} />
             System Status
           </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 text-sm">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 text-sm">
             <div>
               <p style={{ color: "var(--g-text-secondary)" }}>Version</p>
               <p className="font-medium" style={{ color: "var(--g-accent)" }}>
@@ -201,6 +202,12 @@ export function SettingsPage() {
               <p style={{ color: "var(--g-text-secondary)" }}>Database Size</p>
               <p className="font-medium" style={{ color: "var(--g-text)" }}>
                 {formatBytes(status.db_size_bytes)}
+              </p>
+            </div>
+            <div>
+              <p style={{ color: "var(--g-text-secondary)" }}>Data Used by Tests</p>
+              <p className="font-medium" style={{ color: "var(--g-text)" }}>
+                {stats ? formatBytes(stats.total_data_used_bytes) : "—"}
               </p>
             </div>
           </div>

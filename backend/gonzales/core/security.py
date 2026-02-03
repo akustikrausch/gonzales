@@ -18,14 +18,15 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 
         if settings.ha_addon:
             # HA Ingress embeds the UI in an iframe — allow framing
+            # More permissive CSP for addon: allow SSE/WS through Ingress proxy
             response.headers["X-Frame-Options"] = "SAMEORIGIN"
             response.headers["Content-Security-Policy"] = (
                 "default-src 'self'; "
-                "script-src 'self'; "
+                "script-src 'self' 'unsafe-inline'; "
                 "style-src 'self' 'unsafe-inline'; "
-                "img-src 'self' data:; "
-                "connect-src 'self'; "
-                "font-src 'self' data:;"
+                "img-src 'self' data: blob:; "
+                "connect-src 'self' ws: wss: http: https:; "
+                "font-src 'self' data:; "
                 "object-src 'none'"
             )
         else:

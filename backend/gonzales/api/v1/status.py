@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from gonzales.api.dependencies import get_db
 from gonzales.config import settings
 from gonzales.db.models import TestFailure
-from gonzales.schemas.status import SchedulerStatus, StatusOut
+from gonzales.schemas.status import OutageStatus, SchedulerStatus, StatusOut
 from gonzales.services.measurement_service import measurement_service
 from gonzales.services.scheduler_service import scheduler_service
 from gonzales.version import __version__
@@ -32,13 +32,22 @@ async def get_status(session: AsyncSession = Depends(get_db)):
     if settings.db_path.exists():
         db_size = os.path.getsize(settings.db_path)
 
+    # Get outage status from scheduler
+    outage_data = scheduler_service.outage_status
+
     return StatusOut(
         version=__version__,
         scheduler=SchedulerStatus(
             running=scheduler_service.running,
             next_run_time=scheduler_service.next_run_time,
             interval_minutes=settings.test_interval_minutes,
-            test_in_progress=measurement_service.test_in_progress,
+            test_in_progress=scheduler_service.test_in_progress,
+        ),
+        outage=OutageStatus(
+            outage_active=outage_data["outage_active"],
+            outage_started_at=outage_data["outage_started_at"],
+            consecutive_failures=outage_data["consecutive_failures"],
+            last_failure_message=outage_data["last_failure_message"],
         ),
         last_test_time=latest.timestamp if latest else None,
         total_measurements=total_measurements,

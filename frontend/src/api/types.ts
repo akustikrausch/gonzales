@@ -60,6 +60,7 @@ export interface Statistics {
   tolerance_percent: number;
   effective_download_threshold_mbps: number;
   effective_upload_threshold_mbps: number;
+  total_data_used_bytes: number;
 }
 
 export interface SchedulerStatus {
@@ -69,9 +70,17 @@ export interface SchedulerStatus {
   test_in_progress: boolean;
 }
 
+export interface OutageStatus {
+  outage_active: boolean;
+  outage_started_at: string | null;
+  consecutive_failures: number;
+  last_failure_message: string;
+}
+
 export interface Status {
   version: string;
   scheduler: SchedulerStatus;
+  outage: OutageStatus;
   last_test_time: string | null;
   total_measurements: number;
   total_failures: number;

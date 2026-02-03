@@ -21,6 +21,8 @@ class Measurement(Base):
     upload_bps: Mapped[float] = mapped_column(Float, nullable=False)
     download_mbps: Mapped[float] = mapped_column(Float, nullable=False)
     upload_mbps: Mapped[float] = mapped_column(Float, nullable=False)
+    download_bytes: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    upload_bytes: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
     ping_latency_ms: Mapped[float] = mapped_column(Float, nullable=False)
     ping_jitter_ms: Mapped[float] = mapped_column(Float, nullable=False)

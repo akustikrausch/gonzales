@@ -30,6 +30,7 @@ class StatisticsOut(BaseModel):
     tolerance_percent: float
     effective_download_threshold_mbps: float  # threshold * (1 - tolerance/100)
     effective_upload_threshold_mbps: float
+    total_data_used_bytes: int = 0  # Total bytes transferred by all tests
 
 
 class HourlyAverage(BaseModel):

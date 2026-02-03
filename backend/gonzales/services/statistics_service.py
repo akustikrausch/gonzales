@@ -668,6 +668,12 @@ class StatisticsService:
         upload_values = [m.upload_mbps for m in measurements]
         ping_values = [m.ping_latency_ms for m in measurements]
 
+        # Calculate total data used by all tests
+        total_data_bytes = sum(
+            getattr(m, "download_bytes", 0) + getattr(m, "upload_bytes", 0)
+            for m in measurements
+        )
+
         tolerance_factor = 1 - (settings.tolerance_percent / 100)
         return StatisticsOut(
             total_tests=agg["total_tests"] or 0,
@@ -681,6 +687,7 @@ class StatisticsService:
             tolerance_percent=settings.tolerance_percent,
             effective_download_threshold_mbps=round(settings.download_threshold_mbps * tolerance_factor, 1),
             effective_upload_threshold_mbps=round(settings.upload_threshold_mbps * tolerance_factor, 1),
+            total_data_used_bytes=total_data_bytes,
         )
 
     async def get_enhanced_statistics(

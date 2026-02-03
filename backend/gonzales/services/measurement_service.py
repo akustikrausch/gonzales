@@ -45,6 +45,8 @@ class MeasurementService:
             upload_bps=raw.upload_bps,
             download_mbps=raw.download_mbps,
             upload_mbps=raw.upload_mbps,
+            download_bytes=raw.download.bytes,
+            upload_bytes=raw.upload.bytes,
             ping_latency_ms=raw.ping.latency,
             ping_jitter_ms=raw.ping.jitter,
             packet_loss_pct=raw.packetLoss,
