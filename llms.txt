@@ -1,0 +1,87 @@
+# Gonzales - Internet Speed Monitor
+
+> Gonzales is an open-source internet speed monitoring tool with a web dashboard for Home Assistant and standalone use.
+
+## What is Gonzales?
+
+Gonzales automatically runs internet speed tests at configurable intervals, stores results locally, and provides analytics through a modern web interface. It integrates with Home Assistant as an add-on or standalone installation.
+
+## Key Features
+
+- Automated speed testing (download, upload, ping, jitter)
+- Web dashboard with real-time test visualization
+- Historical data with charts and statistics
+- ISP performance scoring (A-F grade)
+- SLA compliance tracking
+- QoS tests for applications (Netflix 4K, Zoom, Gaming, VPN)
+- Network topology analysis (traceroute)
+- PDF/CSV export for ISP complaints
+- Home Assistant integration with sensors and automations
+- Dark/light theme support
+- Mobile-responsive design
+
+## Technical Stack
+
+- Backend: Python, FastAPI, SQLAlchemy, SQLite
+- Frontend: React, TypeScript, Vite, Recharts, TanStack Query
+- Speed Testing: Ookla Speedtest CLI (third-party, separate license)
+- Home Assistant: Add-on with Ingress support
+
+## Installation
+
+### Home Assistant Add-on (Recommended)
+1. Add repository: https://github.com/akustikrausch/gonzales-ha
+2. Install "Gonzales Speed Monitor" add-on
+3. Start and access via sidebar
+
+### Standalone
+```bash
+git clone https://github.com/akustikrausch/gonzales
+cd gonzales
+make install && make build && make run
+```
+Access at http://localhost:8470
+
+## API Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | /api/v1/measurements | List speed test results |
+| GET | /api/v1/measurements/latest | Latest result |
+| GET | /api/v1/statistics | Aggregated statistics |
+| GET | /api/v1/statistics/enhanced | Detailed analytics |
+| POST | /api/v1/speedtest/trigger | Run manual test |
+| GET | /api/v1/config | Current configuration |
+| PUT | /api/v1/config | Update configuration |
+| GET | /api/v1/export/csv | Export as CSV |
+| GET | /api/v1/export/pdf | Export as PDF report |
+| GET | /api/v1/qos/evaluate/{id} | QoS evaluation |
+| POST | /api/v1/topology/analyze | Network topology analysis |
+
+## Home Assistant Sensors
+
+- sensor.gonzales_download_speed (Mbit/s)
+- sensor.gonzales_upload_speed (Mbit/s)
+- sensor.gonzales_ping_latency (ms)
+- sensor.gonzales_ping_jitter (ms)
+- sensor.gonzales_packet_loss (%)
+- sensor.gonzales_isp_score (0-100)
+- binary_sensor.gonzales_internet_outage
+
+## Configuration Options
+
+- test_interval_minutes: 1-1440 (default: 30)
+- download_threshold_mbps: Expected download speed
+- upload_threshold_mbps: Expected upload speed
+- tolerance_percent: 0-50% acceptable deviation
+- preferred_server_id: Specific test server (0 = auto)
+
+## License
+
+Gonzales is MIT licensed. The Ookla Speedtest CLI is proprietary third-party software with a separate EULA.
+
+## Links
+
+- Main Repository: https://github.com/akustikrausch/gonzales
+- Home Assistant Add-on: https://github.com/akustikrausch/gonzales-ha
+- Documentation: In-app docs page or repository README

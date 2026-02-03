@@ -1,8 +1,23 @@
 {
   "name": "gonzales-frontend",
+  "description": "Web dashboard for Gonzales internet speed monitor - React frontend with real-time speed test visualization and analytics",
   "private": true,
-  "version": "2.0.3",
+  "version": "2.0.5",
   "type": "module",
+  "keywords": [
+    "internet speed test",
+    "bandwidth monitor",
+    "network analytics",
+    "home assistant",
+    "speed monitor",
+    "isp tracker"
+  ],
+  "author": "akustikrausch",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/akustikrausch/gonzales"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

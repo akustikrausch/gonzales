@@ -5,8 +5,36 @@ build-backend = "hatchling.build"
 [project]
 name = "gonzales"
 version = "2.0.5"
-description = "Internet Speed Monitor"
+description = "Open-source internet speed monitor with automated testing, analytics dashboard, and Home Assistant integration"
+readme = "README.md"
+license = "MIT"
+authors = [{ name = "akustikrausch" }]
+keywords = [
+    "internet speed test",
+    "bandwidth monitor",
+    "network analytics",
+    "home assistant",
+    "speed monitor",
+    "isp tracker",
+    "fastapi",
+    "sqlite",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Web Environment",
+    "Framework :: FastAPI",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Internet",
+    "Topic :: System :: Networking :: Monitoring",
+]
 requires-python = ">=3.10"
+
 dependencies = [
     "fastapi>=0.115.0",
     "uvicorn[standard]>=0.32.0",
@@ -18,6 +46,13 @@ dependencies = [
     "reportlab>=4.2.0",
     "icmplib>=3.0.4",
 ]
+
+[project.urls]
+Homepage = "https://github.com/akustikrausch/gonzales"
+Documentation = "https://github.com/akustikrausch/gonzales#readme"
+Repository = "https://github.com/akustikrausch/gonzales"
+Issues = "https://github.com/akustikrausch/gonzales/issues"
+"Home Assistant Add-on" = "https://github.com/akustikrausch/gonzales-ha"
 
 [project.optional-dependencies]
 tui = [
