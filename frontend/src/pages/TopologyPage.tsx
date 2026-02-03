@@ -39,12 +39,14 @@ export function TopologyPage() {
           </h2>
         </div>
         <button
+          type="button"
           onClick={handleAnalyze}
           disabled={analyzeMutation.isPending}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 flex-shrink-0 hover:opacity-90"
           style={{
-            backgroundColor: "var(--g-accent)",
-            color: "var(--g-bg)",
+            backgroundColor: "#22c55e",
+            color: "#ffffff",
+            minWidth: "140px",
           }}
         >
           {analyzeMutation.isPending ? (
