@@ -163,6 +163,10 @@ cp .env.example .env
 
 Settings can also be changed at runtime via the web UI (Settings page) or the API (`PUT /api/v1/config`). Runtime changes are persisted to `config.json`, which is auto-created and gitignored.
 
+#### In-App Documentation
+
+The web dashboard includes a built-in **Docs** page accessible from the sidebar. It covers all features, configuration options, QoS profiles, network topology analysis, troubleshooting tips, and Home Assistant integration examples.
+
 #### Theme Support
 
 Gonzales supports three theme modes:

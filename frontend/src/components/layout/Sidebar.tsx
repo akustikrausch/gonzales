@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { Zap, ClipboardList, BarChart3, Download, Settings, Activity, Network, type LucideIcon } from "lucide-react";
+import { Zap, ClipboardList, BarChart3, Download, Settings, Activity, Network, BookOpen, type LucideIcon } from "lucide-react";
 import { Logo } from "../ui/Logo";
 import { useStatus } from "../../hooks/useApi";
 
@@ -11,6 +11,7 @@ const navItems: { to: string; label: string; icon: LucideIcon }[] = [
   { to: "/topology", label: "Network", icon: Network },
   { to: "/export", label: "Export", icon: Download },
   { to: "/settings", label: "Settings", icon: Settings },
+  { to: "/docs", label: "Docs", icon: BookOpen },
 ];
 
 interface SidebarProps {

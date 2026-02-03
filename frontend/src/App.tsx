@@ -45,6 +45,9 @@ const QosPage = lazy(() =>
 const TopologyPage = lazy(() =>
   import("./pages/TopologyPage").then((m) => ({ default: m.TopologyPage }))
 );
+const DocsPage = lazy(() =>
+  import("./pages/DocsPage").then((m) => ({ default: m.DocsPage }))
+);
 
 function PageLoader() {
   return (
@@ -69,6 +72,7 @@ export default function App() {
                 <Route path="topology" element={<TopologyPage />} />
                 <Route path="export" element={<ExportPage />} />
                 <Route path="settings" element={<SettingsPage />} />
+                <Route path="docs" element={<DocsPage />} />
               </Route>
             </Routes>
           </Suspense>
