@@ -161,6 +161,14 @@ export function SettingsPage() {
             This information will be included in professional compliance reports.
             The speed thresholds above are used as your contracted speeds.
           </p>
+          <GlassButton
+            variant="primary"
+            onClick={handleSave}
+            disabled={updateConfig.isPending}
+          >
+            <Save className="w-4 h-4" />
+            {updateConfig.isPending ? "Saving..." : "Save Settings"}
+          </GlassButton>
         </div>
       </GlassCard>
 
