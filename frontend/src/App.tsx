@@ -4,6 +4,16 @@ import { AppShell } from "./components/layout/AppShell";
 import { SpeedTestProvider } from "./context/SpeedTestContext";
 import { Spinner } from "./components/ui/Spinner";
 
+/**
+ * Detect HA Ingress path prefix for router basename.
+ * Without this, routes don't match when served under /api/hassio_ingress/<token>/
+ */
+function getBasename(): string {
+  const path = window.location.pathname;
+  const match = path.match(/^(\/api\/hassio_ingress\/[^/]+)/);
+  return match ? match[1] : "";
+}
+
 const DashboardPage = lazy(() =>
   import("./pages/DashboardPage").then((m) => ({ default: m.DashboardPage }))
 );
@@ -30,7 +40,7 @@ function PageLoader() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={getBasename()}>
       <SpeedTestProvider>
         <Suspense fallback={<PageLoader />}>
           <Routes>
