@@ -9,6 +9,7 @@ class ConfigOut(BaseModel):
     preferred_server_id: int
     manual_trigger_cooldown_seconds: int
     theme: str
+    isp_name: str
     host: str
     port: int
     log_level: str
@@ -23,3 +24,4 @@ class ConfigUpdate(BaseModel):
     preferred_server_id: int | None = Field(default=None, ge=0)
     manual_trigger_cooldown_seconds: int | None = Field(default=None, ge=0, le=3600)
     theme: str | None = Field(default=None, pattern=r"^(auto|light|dark)$")
+    isp_name: str | None = Field(default=None, max_length=255)

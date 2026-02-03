@@ -18,6 +18,7 @@ async def get_config():
         preferred_server_id=settings.preferred_server_id,
         manual_trigger_cooldown_seconds=settings.manual_trigger_cooldown_seconds,
         theme=settings.theme,
+        isp_name=settings.isp_name,
         host=settings.host,
         port=settings.port,
         log_level=settings.log_level,
@@ -42,6 +43,8 @@ async def update_config(update: ConfigUpdate):
         settings.manual_trigger_cooldown_seconds = update.manual_trigger_cooldown_seconds
     if update.theme is not None:
         settings.theme = update.theme
+    if update.isp_name is not None:
+        settings.isp_name = update.isp_name
 
     settings.save_config()
 
@@ -53,6 +56,7 @@ async def update_config(update: ConfigUpdate):
         preferred_server_id=settings.preferred_server_id,
         manual_trigger_cooldown_seconds=settings.manual_trigger_cooldown_seconds,
         theme=settings.theme,
+        isp_name=settings.isp_name,
         host=settings.host,
         port=settings.port,
         log_level=settings.log_level,
