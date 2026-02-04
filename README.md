@@ -548,3 +548,5 @@ MIT -- see [LICENSE](LICENSE) for details.
 - **Redistribution**: Not permitted -- users must install it independently
 
 Gonzales itself (this repository) is MIT-licensed. All other dependencies are permissively licensed (MIT/BSD/Apache-2.0).
+
+

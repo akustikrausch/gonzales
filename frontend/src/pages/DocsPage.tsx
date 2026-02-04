@@ -10,16 +10,14 @@ import {
   AlertTriangle,
   Shield,
   Zap,
-  Clock,
   Server,
   Activity,
   Network,
-  GitCompare,
-  TrendingUp,
-  MousePointerClick,
-  Bell,
-  Sparkles,
-  Terminal,
+  Wifi,
+  HardDrive,
+  RefreshCw,
+  FileText,
+  Home,
 } from "lucide-react";
 import { GlassCard } from "../components/ui/GlassCard";
 
@@ -125,6 +123,17 @@ function DocTable({ headers, rows }: { headers: string[]; rows: string[][] }) {
   );
 }
 
+function CodeBlock({ children }: { children: string }) {
+  return (
+    <pre
+      className="text-xs p-3 rounded-lg overflow-x-auto mb-3"
+      style={{ backgroundColor: "var(--g-surface)" }}
+    >
+      {children}
+    </pre>
+  );
+}
+
 export function DocsPage() {
   return (
     <div className="space-y-4">
@@ -142,18 +151,38 @@ export function DocsPage() {
           defaultOpen={true}
         >
           <DocParagraph>
-            Gonzales automatically tests your internet speed and keeps track of the results.
-            It runs speed tests at regular intervals and provides detailed analytics.
+            Gonzales monitors your internet speed automatically. It runs tests at regular intervals
+            and tracks your ISP's performance over time. No technical knowledge required.
           </DocParagraph>
-          <DocHeading>What you get</DocHeading>
+          <DocHeading>First Steps</DocHeading>
           <DocList
             items={[
-              "Dashboard showing current internet speed with live updates",
-              "History of all past speed tests with filtering options",
-              "Alerts when your internet is slower than expected",
-              "Statistics to see if your ISP delivers what you pay for",
-              "QoS tests for specific applications (Netflix, Zoom, Gaming)",
-              "Network topology analysis to identify bottlenecks",
+              "1. Install Gonzales as a Home Assistant addon",
+              "2. Restart Home Assistant after first addon start",
+              "3. Add the Gonzales integration (Settings → Devices & Services)",
+              "4. Click 'Gonzales' in the sidebar to open the dashboard",
+              "5. The first speed test runs automatically within minutes",
+            ]}
+          />
+          <DocHeading>Features Overview</DocHeading>
+          <DocTable
+            headers={["Feature", "Description"]}
+            rows={[
+              ["Dashboard", "Real-time speed display with live test progress"],
+              ["History", "All past tests with filtering and deletion"],
+              ["Statistics", "ISP grading, trends, and SLA compliance"],
+              ["QoS Tests", "Application-specific tests (Netflix, Zoom, Gaming)"],
+              ["Topology", "Network route analysis to find bottlenecks"],
+              ["Export", "CSV data export and professional PDF reports"],
+            ]}
+          />
+          <DocHeading>Keyboard Shortcuts</DocHeading>
+          <DocTable
+            headers={["Key", "Action"]}
+            rows={[
+              ["Tab / Shift+Tab", "Navigate between elements"],
+              ["Enter / Space", "Activate buttons and links"],
+              ["Escape", "Close dialogs and menus"],
             ]}
           />
         </DocSection>
@@ -163,24 +192,39 @@ export function DocsPage() {
           icon={<Gauge className="w-4 h-4" style={{ color: "var(--g-accent)" }} />}
         >
           <DocParagraph>
-            The main dashboard shows your latest speed test results at a glance.
+            The dashboard shows your latest speed test results and allows you to run manual tests.
           </DocParagraph>
-          <DocHeading>Speed Metrics</DocHeading>
-          <DocList
-            items={[
-              "Download Speed: How fast you can receive data (streaming, downloads)",
-              "Upload Speed: How fast you can send data (video calls, uploads)",
-              "Ping: How quickly your connection responds (important for gaming)",
-              "Jitter: Variation in ping times (affects call quality)",
+          <DocHeading>Speed Metrics Explained</DocHeading>
+          <DocTable
+            headers={["Metric", "What It Means", "Good Values"]}
+            rows={[
+              ["Download", "Speed for receiving data (streaming, downloads)", "Depends on your plan"],
+              ["Upload", "Speed for sending data (video calls, uploads)", "Depends on your plan"],
+              ["Ping", "Response time - how fast the connection reacts", "< 20ms excellent, < 50ms good"],
+              ["Jitter", "Variation in ping - affects call quality", "< 10ms excellent, < 30ms acceptable"],
+              ["Packet Loss", "Data packets that didn't arrive", "0% ideal, < 1% acceptable"],
             ]}
           />
           <DocHeading>Color Indicators</DocHeading>
           <DocList
             items={[
-              "Green: Your speed is above your configured threshold",
-              "Red: Your speed is below threshold - potential issue",
+              "Green: Speed is above your configured threshold - everything OK",
+              "Red: Speed is below threshold - potential problem with your connection",
+              "The threshold considers your tolerance setting (default 15%)",
             ]}
           />
+          <DocHeading>Header Status</DocHeading>
+          <DocParagraph>
+            The header shows scheduler status and next test time. When the scheduler is active,
+            you'll see a countdown to the next automatic test (e.g., "45 min"). During tests,
+            you'll see "Test running..." with a pulsing animation.
+          </DocParagraph>
+          <DocHeading>Running Manual Tests</DocHeading>
+          <DocParagraph>
+            Click "Run Test" to start a speed test immediately. The test takes 2-3 minutes and
+            uses your full bandwidth. Results appear in real-time as the test progresses through
+            download, upload, and latency phases.
+          </DocParagraph>
         </DocSection>
 
         <DocSection
@@ -188,55 +232,139 @@ export function DocsPage() {
           icon={<Settings className="w-4 h-4" style={{ color: "var(--g-accent)" }} />}
         >
           <DocHeading>Test Interval</DocHeading>
+          <DocTable
+            headers={["Interval", "Tests/Day", "Data Usage", "Recommended For"]}
+            rows={[
+              ["15 min", "96", "~10-15 GB", "Short-term monitoring, ISP issues"],
+              ["30 min", "48", "~5-7 GB", "Active monitoring"],
+              ["60 min (default)", "24", "~2.5-4 GB", "Normal use - best balance"],
+              ["120 min", "12", "~1.2-2 GB", "Light monitoring"],
+              ["240 min", "6", "~0.6-1 GB", "Minimal monitoring"],
+            ]}
+          />
           <DocParagraph>
-            How often Gonzales runs a speed test. Default is 30 minutes.
-            Range: 1-1440 minutes. Recommendation: 30-60 minutes is usually enough.
+            Each speed test uses approximately 100-150 MB of data. Choose an interval that
+            balances monitoring frequency with data usage.
           </DocParagraph>
-          <DocHeading>Speed Thresholds</DocHeading>
+          <DocHeading>Download & Upload Thresholds</DocHeading>
           <DocParagraph>
-            Enter the speed your ISP promises you. Check your contract or bill for these values.
+            Enter the speeds your ISP promises in your contract. These are used to:
           </DocParagraph>
-          <DocHeading>Tolerance</DocHeading>
+          <DocList
+            items={[
+              "Calculate whether tests pass or fail (green/red colors)",
+              "Compute SLA compliance percentage",
+              "Generate the ISP score grade",
+              "Create professional reports for ISP complaints",
+            ]}
+          />
           <DocParagraph>
-            How much slower than your plan is still acceptable. Default: 15% (meaning 85% of your plan speed is OK).
-            Internet speeds naturally fluctuate, so some tolerance is normal.
+            Where to find your promised speeds: Check your ISP contract, bill, router admin page,
+            or contact your ISP directly.
+          </DocParagraph>
+          <DocHeading>Tolerance Setting</DocHeading>
+          <DocParagraph>
+            Internet speeds naturally fluctuate. The tolerance defines how much below your
+            threshold is still considered acceptable.
           </DocParagraph>
           <DocTable
-            headers={["Plan", "Tolerance", "Minimum OK Speed"]}
+            headers={["Your Plan", "Tolerance", "Minimum OK", "What It Means"]}
             rows={[
-              ["1000 Mbps", "15%", "850 Mbps"],
-              ["500 Mbps", "15%", "425 Mbps"],
-              ["100 Mbps", "20%", "80 Mbps"],
+              ["1000 Mbps", "15%", "850 Mbps", "850+ Mbps = green, below = red"],
+              ["500 Mbps", "15%", "425 Mbps", "425+ Mbps = green, below = red"],
+              ["100 Mbps", "20%", "80 Mbps", "80+ Mbps = green, below = red"],
+              ["50 Mbps", "10%", "45 Mbps", "45+ Mbps = green, below = red"],
             ]}
           />
           <DocHeading>ISP / Provider Name</DocHeading>
           <DocParagraph>
-            Enter your internet provider's name. This will be included in professional compliance reports for documentation purposes.
+            Enter your internet provider's name (e.g., "Telekom", "Vodafone", "O2").
+            This appears on professional PDF reports and helps identify the provider
+            when documenting issues.
           </DocParagraph>
+          <DocHeading>Preferred Server ID</DocHeading>
+          <DocParagraph>
+            By default (ID = 0), Gonzales auto-selects the nearest Ookla server. If results
+            seem inconsistent, you can specify a server:
+          </DocParagraph>
+          <DocList
+            items={[
+              "Go to speedtest.net and click 'Change Server'",
+              "Select a server near you",
+              "Note the server ID from the URL or page",
+              "Enter this ID in Gonzales settings",
+            ]}
+          />
         </DocSection>
 
         <DocSection
           title="Statistics & Analytics"
           icon={<BarChart3 className="w-4 h-4" style={{ color: "var(--g-accent)" }} />}
         >
+          <DocHeading>ISP Score & Grade</DocHeading>
           <DocParagraph>
-            The Statistics page shows detailed analytics about your connection.
+            The ISP score (0-100) rates your provider's overall performance. It considers:
           </DocParagraph>
-          <DocHeading>ISP Score</DocHeading>
-          <DocParagraph>
-            A grade from A to F based on how consistently your ISP delivers promised speeds.
-            Factors include average speed, compliance rate, and stability.
-          </DocParagraph>
+          <DocList
+            items={[
+              "Average speed vs. your threshold (how close to promised speeds)",
+              "Consistency (how stable are the speeds)",
+              "SLA compliance (percentage of tests meeting threshold)",
+              "Reliability (failed test rate)",
+            ]}
+          />
+          <DocTable
+            headers={["Grade", "Score Range", "Interpretation"]}
+            rows={[
+              ["A", "90-100", "Excellent - ISP delivers as promised"],
+              ["B", "80-89", "Good - Minor issues occasionally"],
+              ["C", "70-79", "Fair - Noticeable underperformance"],
+              ["D", "60-69", "Poor - Frequent problems"],
+              ["F", "0-59", "Failing - Consider switching ISP"],
+            ]}
+          />
           <DocHeading>Time-of-Day Analysis</DocHeading>
           <DocParagraph>
-            See how your speeds vary throughout the day. Useful for identifying
-            peak congestion times (usually evenings).
+            This chart shows how your speeds vary throughout the day. Typical patterns:
+          </DocParagraph>
+          <DocList
+            items={[
+              "Morning (6-9): Usually good speeds, low congestion",
+              "Daytime (9-17): Generally stable",
+              "Evening (17-23): Often slower - peak usage time",
+              "Night (23-6): Usually fastest - least users online",
+            ]}
+          />
+          <DocParagraph>
+            If you see consistent slowdowns at certain times, this data helps when
+            complaining to your ISP - it proves the issue is recurring.
           </DocParagraph>
           <DocHeading>SLA Compliance</DocHeading>
           <DocParagraph>
-            Percentage of tests that met your configured threshold.
-            This helps document ISP performance for potential complaints.
+            Shows the percentage of tests that met your configured threshold.
+            This is important for ISP complaints:
           </DocParagraph>
+          <DocList
+            items={[
+              "Above 95%: ISP is delivering well",
+              "90-95%: Acceptable, minor issues",
+              "80-90%: Issues worth documenting",
+              "Below 80%: Strong grounds for complaint or contract cancellation",
+            ]}
+          />
+          <DocHeading>Trend Analysis</DocHeading>
+          <DocParagraph>
+            The trend chart shows whether your connection is improving, stable, or degrading
+            over time. Look for:
+          </DocParagraph>
+          <DocList
+            items={[
+              "Downward trend: Connection getting worse - contact ISP",
+              "Stable line: Consistent performance",
+              "Sudden drops: May indicate network issues or ISP problems",
+              "Seasonal patterns: Some areas have congestion at certain times",
+            ]}
+          />
         </DocSection>
 
         <DocSection
@@ -244,23 +372,44 @@ export function DocsPage() {
           icon={<Activity className="w-4 h-4" style={{ color: "var(--g-accent)" }} />}
         >
           <DocParagraph>
-            Quality of Service tests check if your connection meets requirements for specific applications.
+            Quality of Service tests check if your connection meets the requirements for
+            specific applications. Each app has different needs.
           </DocParagraph>
-          <DocHeading>Available Profiles</DocHeading>
+          <DocHeading>Application Requirements</DocHeading>
           <DocTable
-            headers={["Application", "Min Download", "Max Ping", "Max Jitter"]}
+            headers={["Application", "Min Download", "Min Upload", "Max Ping", "Max Jitter"]}
             rows={[
-              ["Netflix 4K", "25 Mbps", "100 ms", "30 ms"],
-              ["Zoom HD", "3 Mbps", "150 ms", "40 ms"],
-              ["Cloud Gaming", "35 Mbps", "40 ms", "10 ms"],
-              ["VPN Work", "10 Mbps", "100 ms", "50 ms"],
-              ["Video Upload", "20 Mbps", "200 ms", "-"],
+              ["Netflix 4K", "25 Mbps", "3 Mbps", "100 ms", "30 ms"],
+              ["YouTube 4K", "20 Mbps", "3 Mbps", "100 ms", "30 ms"],
+              ["Zoom HD Video", "3.8 Mbps", "3 Mbps", "150 ms", "40 ms"],
+              ["Teams/Skype", "4 Mbps", "4 Mbps", "100 ms", "30 ms"],
+              ["Cloud Gaming", "35 Mbps", "5 Mbps", "40 ms", "10 ms"],
+              ["Online Gaming", "5 Mbps", "2 Mbps", "50 ms", "15 ms"],
+              ["VPN Work", "10 Mbps", "5 Mbps", "100 ms", "50 ms"],
+              ["Video Upload (1080p)", "10 Mbps", "20 Mbps", "200 ms", "-"],
+              ["Video Upload (4K)", "25 Mbps", "50 Mbps", "200 ms", "-"],
             ]}
           />
+          <DocHeading>Understanding Results</DocHeading>
+          <DocList
+            items={[
+              "Green check: All requirements met - app should work well",
+              "Red X: One or more requirements not met - expect issues",
+              "Individual metrics show which specific requirement failed",
+            ]}
+          />
+          <DocHeading>Troubleshooting Failed QoS</DocHeading>
           <DocParagraph>
-            Each profile tests multiple metrics. Green means all requirements are met,
-            red indicates some requirements are not satisfied.
+            If a QoS test fails:
           </DocParagraph>
+          <DocList
+            items={[
+              "Ping too high: Use wired connection, check for background downloads",
+              "Jitter too high: Usually WiFi interference - try different channel",
+              "Download too low: Contact ISP, check for network congestion",
+              "Upload too low: Common with cable connections - may need upgrade",
+            ]}
+          />
         </DocSection>
 
         <DocSection
@@ -268,27 +417,44 @@ export function DocsPage() {
           icon={<Network className="w-4 h-4" style={{ color: "var(--g-accent)" }} />}
         >
           <DocParagraph>
-            Network topology analysis traces the route your data takes to reach the internet,
-            helping identify where slowdowns occur.
+            Network topology traces the path your data takes to reach the internet.
+            This helps identify where slowdowns occur.
           </DocParagraph>
-          <DocHeading>How to Use</DocHeading>
-          <DocList
-            items={[
-              "Click 'Analyze Now' to run a traceroute analysis",
-              "Each hop shows latency and packet loss",
-              "Local network hops (your router) are highlighted",
-              "Bottlenecks are marked with warnings",
+          <DocHeading>What Each Hop Means</DocHeading>
+          <DocTable
+            headers={["Hop Type", "Example", "What It Is"]}
+            rows={[
+              ["Your Router", "192.168.1.1", "Your home network gateway"],
+              ["ISP Node", "10.x.x.x", "Your ISP's internal network"],
+              ["Backbone", "Various public IPs", "Internet infrastructure"],
+              ["Destination", "speedtest.net server", "Test server"],
             ]}
           />
           <DocHeading>Latency Colors</DocHeading>
           <DocList
             items={[
-              "Green (<20ms): Excellent response time",
-              "Yellow (20-50ms): Good, normal for internet hops",
-              "Red (>50ms): High latency, potential issue",
-              "Gray: Timeout - node didn't respond",
+              "Green (< 20ms): Excellent - no issues",
+              "Yellow (20-50ms): Good - normal for internet hops",
+              "Orange (50-100ms): Elevated - may cause lag",
+              "Red (> 100ms): High - likely causing problems",
+              "Gray (timeout): Node didn't respond - may be blocking ICMP",
             ]}
           />
+          <DocHeading>Common Issues</DocHeading>
+          <DocList
+            items={[
+              "High latency at first hop: Router problem - restart or replace",
+              "High latency at ISP node: ISP issue - contact support",
+              "High latency far away: Normal for distant servers",
+              "All hops timeout: Firewall may be blocking traceroute",
+            ]}
+          />
+          <DocHeading>Packet Loss</DocHeading>
+          <DocParagraph>
+            Packet loss above 0% indicates unstable connection. Any packet loss on
+            your local network (first 1-2 hops) needs immediate attention - check cables
+            and router.
+          </DocParagraph>
         </DocSection>
 
         <DocSection
@@ -296,285 +462,471 @@ export function DocsPage() {
           icon={<Download className="w-4 h-4" style={{ color: "var(--g-accent)" }} />}
         >
           <DocHeading>Export Formats</DocHeading>
-          <DocList
-            items={[
-              "CSV: For spreadsheets (Excel, Google Sheets)",
-              "PDF: Professional report with charts and analysis",
+          <DocTable
+            headers={["Format", "Use Case", "Contains"]}
+            rows={[
+              ["CSV", "Data analysis in Excel/Sheets", "All raw measurement data"],
+              ["PDF Report", "ISP complaints, documentation", "Summary, charts, analysis"],
             ]}
           />
-          <DocHeading>Professional Report</DocHeading>
+          <DocHeading>CSV Export</DocHeading>
           <DocParagraph>
-            The PDF report includes executive summary, SLA compliance metrics,
-            time-of-day analysis, and is suitable for documentation or ISP complaints.
-            Configure your ISP name in Settings for it to appear on reports.
+            The CSV file contains all measurements with columns for timestamp, download,
+            upload, ping, jitter, packet loss, server info, and more. Open in Excel,
+            Google Sheets, or any spreadsheet application for custom analysis.
           </DocParagraph>
+          <DocHeading>Professional PDF Report</DocHeading>
+          <DocParagraph>
+            The PDF report is designed for documentation and ISP complaints. It includes:
+          </DocParagraph>
+          <DocList
+            items={[
+              "Executive summary with key metrics",
+              "ISP score and grade with explanation",
+              "SLA compliance statistics",
+              "Time-of-day performance analysis",
+              "Charts showing trends and patterns",
+              "Individual test results table",
+              "Your ISP name (if configured in settings)",
+            ]}
+          />
+          <DocHeading>Using Reports for ISP Complaints</DocHeading>
+          <DocParagraph>
+            When complaining to your ISP about slow speeds:
+          </DocParagraph>
+          <DocList
+            items={[
+              "Collect at least 1-2 weeks of data",
+              "Export the PDF report",
+              "Highlight SLA compliance percentage",
+              "Reference specific dates/times with issues",
+              "Keep a copy for your records",
+            ]}
+          />
         </DocSection>
 
         <DocSection
           title="Troubleshooting"
           icon={<AlertTriangle className="w-4 h-4" style={{ color: "var(--g-amber)" }} />}
         >
-          <DocHeading>Blank Page / Loading Issues</DocHeading>
+          <DocHeading>Web Interface Not Loading</DocHeading>
           <DocList
             items={[
-              "Restart the addon in Home Assistant",
-              "Clear browser cache (Ctrl+Shift+R)",
-              "Wait 30 seconds and try again",
+              "Restart the Gonzales addon (Settings → Add-ons → Gonzales → Restart)",
+              "Clear browser cache (Ctrl+Shift+R or Cmd+Shift+R)",
+              "Wait 30-60 seconds after restart",
+              "Try a different browser or incognito mode",
+              "Check addon logs for errors",
             ]}
           />
-          <DocHeading>Speed Test Failures</DocHeading>
-          <DocList
-            items={[
-              "Check your internet connection",
-              "Firewall may be blocking Ookla servers",
-              "Try setting a specific preferred server ID",
-              "Wait and retry - servers may be busy",
+          <DocHeading>Speed Tests Failing</DocHeading>
+          <DocTable
+            headers={["Error", "Cause", "Solution"]}
+            rows={[
+              ["Connection timeout", "No internet or firewall", "Check connection, firewall rules"],
+              ["Server not found", "DNS issues", "Try different preferred server ID"],
+              ["License not accepted", "First-run issue", "Restart addon, EULA auto-accepts"],
+              ["Test stuck at 0%", "Server overloaded", "Wait and retry, or change server"],
             ]}
           />
           <DocHeading>Speeds Lower Than Expected</DocHeading>
           <DocList
             items={[
-              "WiFi vs Cable: Wired connections are faster",
-              "Time of day: Evening is typically slower",
-              "Other devices using bandwidth",
-              "Distance from router to Home Assistant device",
+              "WiFi vs Cable: Wired connections are significantly faster and more consistent",
+              "Time of day: Evening (17-23h) is peak time - expect slower speeds",
+              "Other devices: Check if other devices are downloading/streaming",
+              "Router position: Distance and walls affect WiFi signal",
+              "Router age: Old routers may not support full speeds",
+              "ISP throttling: Some ISPs throttle certain traffic types",
             ]}
           />
-          <DocHeading>Sensors Show Unavailable</DocHeading>
+          <DocHeading>Sensors Show 'Unavailable' in Home Assistant</DocHeading>
+          <DocList
+            items={[
+              "At least one speed test must complete before sensors work",
+              "Run a manual test from the dashboard",
+              "Check that the Gonzales integration is configured",
+              "Restart Home Assistant if sensors don't appear after first test",
+            ]}
+          />
+          <DocHeading>Integration Cannot Connect</DocHeading>
           <DocParagraph>
-            Run at least one speed test manually. Sensors update after a completed test.
+            If auto-discovery doesn't find the addon, manually enter the hostname:
           </DocParagraph>
+          <DocList
+            items={[
+              "Go to Settings → Add-ons → Gonzales",
+              "Look at the browser URL: .../hassio/addon/XXXXX_gonzales/info",
+              "The hostname is the addon slug with underscores → dashes",
+              "Example: 546fc077_gonzales → 546fc077-gonzales",
+              "Enter this hostname in the integration setup",
+            ]}
+          />
+          <DocHeading>Addon Keeps Restarting</DocHeading>
+          <DocList
+            items={[
+              "Check addon logs for error messages",
+              "Database may be corrupted - delete gonzales.db and restart",
+              "Disk may be full - free up space",
+              "Memory issues - check if device has enough RAM",
+            ]}
+          />
         </DocSection>
 
         <DocSection
           title="Data & Privacy"
           icon={<Shield className="w-4 h-4" style={{ color: "var(--g-green)" }} />}
         >
-          <DocHeading>Where Data is Stored</DocHeading>
+          <DocHeading>Data Storage</DocHeading>
+          <DocParagraph>
+            All data is stored locally on your Home Assistant device in the addon's data folder:
+          </DocParagraph>
           <DocTable
-            headers={["File", "Contents"]}
+            headers={["File", "Purpose", "Can Delete?"]}
             rows={[
-              ["gonzales.db", "All speed test results"],
-              ["config.json", "Your settings"],
-              [".api_key", "Security key (auto-generated)"],
+              ["gonzales.db", "All speed test results (SQLite database)", "Yes - loses all history"],
+              ["config.json", "Your settings and preferences", "Yes - resets to defaults"],
+              [".api_key", "Security key for API access", "Yes - auto-regenerates"],
             ]}
           />
           <DocHeading>Privacy</DocHeading>
+          <DocList
+            items={[
+              "All measurement data stays on YOUR device",
+              "Nothing is sent to external analytics or cloud services",
+              "Gonzales only connects to Ookla servers to measure speed",
+              "No tracking, no telemetry, no data collection",
+              "Open source - you can verify the code yourself",
+            ]}
+          />
+          <DocHeading>Backup</DocHeading>
           <DocParagraph>
-            All data stays on your device. Gonzales only connects to Ookla servers
-            to measure speed. No analytics, no tracking, no cloud storage.
+            Your data is automatically included in Home Assistant backups. You can also
+            manually copy the data folder via SSH or Samba if needed.
+          </DocParagraph>
+          <DocHeading>Data Retention</DocHeading>
+          <DocParagraph>
+            By default, all measurements are kept indefinitely. The database grows slowly
+            (~50 KB per test, about 1.2 MB per month with hourly tests). You can manually
+            delete old entries in the History page if needed.
           </DocParagraph>
         </DocSection>
 
         <DocSection
           title="Home Assistant Integration"
-          icon={<Server className="w-4 h-4" style={{ color: "var(--g-blue)" }} />}
+          icon={<Home className="w-4 h-4" style={{ color: "var(--g-blue)" }} />}
         >
           <DocHeading>Available Sensors</DocHeading>
           <DocTable
-            headers={["Sensor", "Entity ID"]}
+            headers={["Sensor", "Entity ID", "Unit", "Description"]}
             rows={[
-              ["Download Speed", "sensor.gonzales_download_speed"],
-              ["Upload Speed", "sensor.gonzales_upload_speed"],
-              ["Ping", "sensor.gonzales_ping_latency"],
-              ["Jitter", "sensor.gonzales_ping_jitter"],
-              ["Packet Loss", "sensor.gonzales_packet_loss"],
-              ["ISP Score", "sensor.gonzales_isp_score"],
-              ["Last Test", "sensor.gonzales_last_test_time"],
+              ["Download Speed", "sensor.gonzales_download_speed", "Mbps", "Latest download speed"],
+              ["Upload Speed", "sensor.gonzales_upload_speed", "Mbps", "Latest upload speed"],
+              ["Ping Latency", "sensor.gonzales_ping_latency", "ms", "Response time"],
+              ["Ping Jitter", "sensor.gonzales_ping_jitter", "ms", "Latency variation"],
+              ["Packet Loss", "sensor.gonzales_packet_loss", "%", "Lost data packets"],
+              ["ISP Score", "sensor.gonzales_isp_score", "0-100", "Overall rating"],
+              ["Last Test Time", "sensor.gonzales_last_test_time", "timestamp", "When last test ran"],
             ]}
           />
-          <DocHeading>Automation Example</DocHeading>
-          <DocParagraph>
-            Create automations to get notified when internet is slow:
-          </DocParagraph>
-          <pre
-            className="text-xs p-3 rounded-lg overflow-x-auto mb-3"
-            style={{ backgroundColor: "var(--g-surface)" }}
-          >
-{`trigger:
-  platform: numeric_state
-  entity_id: sensor.gonzales_download_speed
-  below: 100
-action:
-  service: notify.mobile_app
-  data:
-    title: "Slow Internet"
-    message: "Speed: {{ states('sensor.gonzales_download_speed') }} Mbps"`}
-          </pre>
-        </DocSection>
-
-        <DocSection
-          title="Connection Comparison"
-          icon={<GitCompare className="w-4 h-4" style={{ color: "var(--g-accent)" }} />}
-        >
-          <DocParagraph>
-            Automatically detects and compares performance across different connection types
-            (Ethernet, Wi-Fi, VPN) to help you understand which connection works best.
-          </DocParagraph>
-          <DocHeading>Connection Types</DocHeading>
-          <DocList
-            items={[
-              "Ethernet: Wired connections (eth*, enp* interfaces)",
-              "Wi-Fi: Wireless connections (wlan*, wlp* interfaces)",
-              "VPN: Virtual private network connections (tun*, tap* interfaces)",
-            ]}
-          />
-          <DocHeading>Comparison Metrics</DocHeading>
-          <DocParagraph>
-            The comparison shows average speeds, reliability scores, and recommendations
-            for which connection type is best for downloads, uploads, and latency.
-          </DocParagraph>
-        </DocSection>
-
-        <DocSection
-          title="Predictive Analytics"
-          icon={<TrendingUp className="w-4 h-4" style={{ color: "var(--g-accent)" }} />}
-        >
-          <DocParagraph>
-            Advanced prediction algorithms forecast your future internet speeds
-            based on historical patterns and seasonal factors.
-          </DocParagraph>
-          <DocHeading>Features</DocHeading>
-          <DocList
-            items={[
-              "7-day forecast with confidence intervals",
-              "Day-of-week seasonal factors (e.g., weekends vs weekdays)",
-              "Exponential smoothing for trend analysis",
-              "Data quality score indicates prediction reliability",
-            ]}
-          />
-          <DocHeading>Confidence Levels</DocHeading>
-          <DocParagraph>
-            Predictions include upper and lower bounds showing the expected range.
-            Higher data quality scores mean more reliable predictions.
-          </DocParagraph>
-        </DocSection>
-
-        <DocSection
-          title="Quick Actions"
-          icon={<MousePointerClick className="w-4 h-4" style={{ color: "var(--g-accent)" }} />}
-        >
-          <DocParagraph>
-            The floating action button (FAB) in the bottom-right corner provides
-            quick access to common actions from any page.
-          </DocParagraph>
-          <DocHeading>Available Actions</DocHeading>
-          <DocList
-            items={[
-              "Run Speed Test: Start a manual speed test immediately",
-              "Export Data: Go to the export page",
-              "Settings: Quick access to configuration",
-            ]}
-          />
-          <DocParagraph>
-            Click the + button to expand the menu, then select an action.
-            Click outside or on the backdrop to close.
-          </DocParagraph>
-        </DocSection>
-
-        <DocSection
-          title="Notifications"
-          icon={<Bell className="w-4 h-4" style={{ color: "var(--g-accent)" }} />}
-        >
-          <DocParagraph>
-            Toast notifications appear in the top-right corner to provide feedback
-            about actions and important events.
-          </DocParagraph>
-          <DocHeading>Notification Types</DocHeading>
-          <DocList
-            items={[
-              "Success (green): Action completed successfully",
-              "Error (red): Something went wrong",
-              "Warning (orange): Important notice",
-              "Info (blue): General information",
-            ]}
-          />
-          <DocHeading>Home Assistant Automations</DocHeading>
-          <DocParagraph>
-            Combine Gonzales sensors with Home Assistant to create custom notifications
-            on your phone, smart speakers, or other devices when speeds drop.
-          </DocParagraph>
-        </DocSection>
-
-        <DocSection
-          title="Setup Wizard"
-          icon={<Sparkles className="w-4 h-4" style={{ color: "var(--g-accent)" }} />}
-        >
-          <DocParagraph>
-            First-time users see an onboarding wizard that guides through initial setup.
-          </DocParagraph>
-          <DocHeading>Wizard Steps</DocHeading>
-          <DocList
-            items={[
-              "Welcome: Introduction to Gonzales",
-              "ISP Info: Enter your internet provider name (optional)",
-              "Thresholds: Set download and upload speed expectations",
-              "Interval: Choose how often to run tests",
-              "Finish: Review and save settings",
-            ]}
-          />
-          <DocParagraph>
-            You can skip the wizard and configure settings later. To re-run the wizard,
-            clear your browser's local storage for this site.
-          </DocParagraph>
-        </DocSection>
-
-        <DocSection
-          title="Terminal Interface"
-          icon={<Terminal className="w-4 h-4" style={{ color: "var(--g-accent)" }} />}
-        >
-          <DocParagraph>
-            Gonzales includes a command-line interface (CLI) and text-based user interface (TUI)
-            for terminal-only environments.
-          </DocParagraph>
-          <DocHeading>CLI Commands</DocHeading>
+          <DocHeading>Binary Sensors</DocHeading>
           <DocTable
-            headers={["Command", "Description"]}
+            headers={["Sensor", "Entity ID", "ON When"]}
             rows={[
-              ["gonzales run", "Run a speed test"],
-              ["gonzales status", "Show current status"],
-              ["gonzales history", "View measurement history"],
-              ["gonzales stats", "Show statistics"],
-              ["gonzales export", "Export data to file"],
-              ["gonzales config", "View or modify settings"],
-              ["gonzales server", "Start the web server"],
+              ["Internet Outage", "binary_sensor.gonzales_internet_outage", "3 consecutive test failures"],
             ]}
           />
-          <DocHeading>TUI Navigation</DocHeading>
-          <DocList
-            items={[
-              "d: Dashboard",
-              "h: History",
-              "a: Analytics/Statistics",
-              "s: Settings",
-              "t: Run speed test",
-              "?: Help screen",
-              "q: Quit",
-            ]}
-          />
-          <DocParagraph>
-            Install CLI with: pip install gonzales[cli]
-          </DocParagraph>
+          <DocHeading>Dashboard Card Example</DocHeading>
+          <CodeBlock>{`type: entities
+title: Internet Speed
+entities:
+  - entity: sensor.gonzales_download_speed
+    name: Download
+    icon: mdi:download
+  - entity: sensor.gonzales_upload_speed
+    name: Upload
+    icon: mdi:upload
+  - entity: sensor.gonzales_ping_latency
+    name: Ping
+    icon: mdi:timer-outline
+  - entity: sensor.gonzales_isp_score
+    name: ISP Score
+    icon: mdi:gauge`}</CodeBlock>
+          <DocHeading>Gauge Card Example</DocHeading>
+          <CodeBlock>{`type: gauge
+entity: sensor.gonzales_download_speed
+name: Download Speed
+min: 0
+max: 1000
+severity:
+  green: 850
+  yellow: 500
+  red: 0
+unit: Mbps`}</CodeBlock>
+          <DocHeading>History Graph</DocHeading>
+          <CodeBlock>{`type: history-graph
+title: Speed History (24h)
+hours_to_show: 24
+entities:
+  - entity: sensor.gonzales_download_speed
+    name: Download
+  - entity: sensor.gonzales_upload_speed
+    name: Upload`}</CodeBlock>
+          <DocHeading>Slow Internet Notification</DocHeading>
+          <CodeBlock>{`automation:
+  - alias: "Slow Internet Alert"
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.gonzales_download_speed
+        below: 100
+        for:
+          minutes: 5
+    action:
+      - service: notify.mobile_app_your_phone
+        data:
+          title: "Slow Internet!"
+          message: "Download: {{ states('sensor.gonzales_download_speed') }} Mbps"
+          data:
+            tag: "slow-internet"
+            importance: high`}</CodeBlock>
+          <DocHeading>Internet Outage Alert</DocHeading>
+          <CodeBlock>{`automation:
+  - alias: "Internet Outage Alert"
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.gonzales_internet_outage
+        to: "on"
+    action:
+      - service: notify.mobile_app_your_phone
+        data:
+          title: "Internet Outage!"
+          message: "Connection down for multiple consecutive tests"
+      # Optional: Auto-restart router via smart plug
+      - service: switch.turn_off
+        entity_id: switch.router_plug
+      - delay: "00:00:30"
+      - service: switch.turn_on
+        entity_id: switch.router_plug
+
+  - alias: "Internet Restored"
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.gonzales_internet_outage
+        to: "off"
+    action:
+      - service: notify.mobile_app_your_phone
+        data:
+          title: "Internet Restored"
+          message: "Connection is back online"`}</CodeBlock>
+          <DocHeading>Daily Speed Report</DocHeading>
+          <CodeBlock>{`automation:
+  - alias: "Daily Speed Report"
+    trigger:
+      - platform: time
+        at: "08:00:00"
+    action:
+      - service: notify.mobile_app_your_phone
+        data:
+          title: "Daily Internet Report"
+          message: >
+            Download: {{ states('sensor.gonzales_download_speed') }} Mbps
+            Upload: {{ states('sensor.gonzales_upload_speed') }} Mbps
+            Ping: {{ states('sensor.gonzales_ping_latency') }} ms
+            ISP Score: {{ states('sensor.gonzales_isp_score') }}`}</CodeBlock>
         </DocSection>
 
         <DocSection
-          title="Technical Details"
-          icon={<Clock className="w-4 h-4" style={{ color: "var(--g-text-secondary)" }} />}
+          title="Standalone Installation"
+          icon={<Server className="w-4 h-4" style={{ color: "var(--g-accent)" }} />}
+        >
+          <DocParagraph>
+            You can run Gonzales on any device with Python (Raspberry Pi, NAS, server)
+            and connect it to Home Assistant via the integration.
+          </DocParagraph>
+          <DocHeading>Requirements</DocHeading>
+          <DocList
+            items={[
+              "Python 3.10 or newer",
+              "Linux, macOS, or Windows",
+              "Network access to Home Assistant",
+            ]}
+          />
+          <DocHeading>Installation</DocHeading>
+          <CodeBlock>{`# Install Gonzales
+pip install gonzales
+
+# Or with optional CLI tools
+pip install gonzales[cli]
+
+# Run the server
+gonzales server
+
+# Or with Python module
+python -m gonzales`}</CodeBlock>
+          <DocHeading>Configuration</DocHeading>
+          <DocParagraph>
+            On first run, Gonzales creates a config file. The web UI runs on port 8099
+            by default. You can change settings via the web interface or config file.
+          </DocParagraph>
+          <DocHeading>Connecting to Home Assistant</DocHeading>
+          <DocList
+            items={[
+              "Install HACS in Home Assistant (if not already)",
+              "Add custom repository: https://github.com/akustikrausch/gonzales-ha",
+              "Install the Gonzales integration",
+              "Restart Home Assistant",
+              "Add integration: Settings → Devices & Services → Add → Gonzales",
+              "Enter your Gonzales server's IP address and port (8099)",
+            ]}
+          />
+        </DocSection>
+
+        <DocSection
+          title="Understanding Speed Tests"
+          icon={<Wifi className="w-4 h-4" style={{ color: "var(--g-accent)" }} />}
+        >
+          <DocHeading>How Speed Tests Work</DocHeading>
+          <DocParagraph>
+            Gonzales uses the Ookla Speedtest CLI (same as speedtest.net) to measure speeds.
+            Each test has three phases:
+          </DocParagraph>
+          <DocList
+            items={[
+              "1. Latency test: Measures ping and jitter",
+              "2. Download test: Downloads data from server to measure receive speed",
+              "3. Upload test: Uploads data to server to measure send speed",
+            ]}
+          />
+          <DocHeading>Factors Affecting Results</DocHeading>
+          <DocTable
+            headers={["Factor", "Impact", "Solution"]}
+            rows={[
+              ["WiFi interference", "High - can reduce speeds 30-50%", "Use ethernet cable"],
+              ["Router distance", "Medium - signal degrades with distance", "Move closer or use mesh"],
+              ["Time of day", "Medium - peak hours are slower", "Test at different times"],
+              ["Other devices", "High - bandwidth is shared", "Pause other downloads"],
+              ["Server selection", "Low-Medium - varies by location", "Try different server ID"],
+              ["Router age", "Medium - old routers bottleneck", "Upgrade if older than 5 years"],
+            ]}
+          />
+          <DocHeading>WiFi vs Ethernet</DocHeading>
+          <DocParagraph>
+            For accurate ISP speed measurement, use a wired ethernet connection. WiFi has
+            inherent overhead and interference that makes it unreliable for testing.
+            Typical WiFi speed loss:
+          </DocParagraph>
+          <DocList
+            items={[
+              "WiFi 5 (802.11ac): 30-50% of wired speed",
+              "WiFi 6 (802.11ax): 50-70% of wired speed",
+              "WiFi through walls: Additional 20-40% loss per wall",
+            ]}
+          />
+          <DocHeading>Why Results Vary</DocHeading>
+          <DocParagraph>
+            Speed test results naturally fluctuate by 10-20%. This is normal and due to:
+          </DocParagraph>
+          <DocList
+            items={[
+              "Internet backbone congestion",
+              "Test server load",
+              "ISP network state",
+              "Time of day",
+              "Background processes on your network",
+            ]}
+          />
+        </DocSection>
+
+        <DocSection
+          title="Technical Information"
+          icon={<HardDrive className="w-4 h-4" style={{ color: "var(--g-text-secondary)" }} />}
         >
           <DocHeading>Architecture</DocHeading>
-          <DocParagraph>
-            Gonzales uses FastAPI (Python) with SQLite for storage.
-            The frontend is built with React and communicates via REST API.
-            Speed tests use the Ookla Speedtest CLI (third-party, see license notice).
-          </DocParagraph>
-          <DocHeading>Resource Usage</DocHeading>
           <DocList
             items={[
-              "Memory: ~100-200 MB during speed tests",
-              "Disk: ~50 KB per test",
-              "Network: Full bandwidth for 2-3 minutes during tests",
+              "Backend: FastAPI (Python) with async/await",
+              "Database: SQLite with SQLAlchemy ORM",
+              "Frontend: React with TypeScript and Vite",
+              "Styling: TailwindCSS with custom design system",
+              "Speed Tests: Ookla Speedtest CLI",
             ]}
           />
+          <DocHeading>Resource Usage</DocHeading>
+          <DocTable
+            headers={["Resource", "Idle", "During Test", "Note"]}
+            rows={[
+              ["Memory", "~50 MB", "~150-200 MB", "Temporary spike during tests"],
+              ["CPU", "~1%", "~10-20%", "Higher during analysis"],
+              ["Disk", "-", "~50 KB/test", "Database grows slowly"],
+              ["Network", "Minimal", "Full bandwidth", "2-3 minutes per test"],
+            ]}
+          />
+          <DocHeading>API Endpoints</DocHeading>
+          <DocParagraph>
+            Gonzales provides a REST API for custom integrations. Main endpoints:
+          </DocParagraph>
+          <DocList
+            items={[
+              "GET /api/v1/status - Current status and scheduler state",
+              "GET /api/v1/measurements - List all measurements",
+              "POST /api/v1/speedtest/run - Start a speed test",
+              "GET /api/v1/statistics - Get calculated statistics",
+              "GET /api/v1/config - Get/update configuration",
+            ]}
+          />
+          <DocHeading>Security</DocHeading>
+          <DocList
+            items={[
+              "API key authentication (auto-generated)",
+              "Rate limiting: 100 requests/minute per IP",
+              "No external data transmission",
+              "AppArmor profile for Home Assistant addon",
+            ]}
+          />
+        </DocSection>
+
+        <DocSection
+          title="Updates & Changelog"
+          icon={<RefreshCw className="w-4 h-4" style={{ color: "var(--g-accent)" }} />}
+        >
+          <DocHeading>How to Update</DocHeading>
+          <DocList
+            items={[
+              "Home Assistant auto-updates addons (if enabled)",
+              "Manual: Settings → Add-ons → Gonzales → Update",
+              "After major updates, restart Home Assistant",
+            ]}
+          />
+          <DocHeading>What's New</DocHeading>
+          <DocParagraph>
+            See the GitHub repository for full changelog and release notes.
+          </DocParagraph>
+        </DocSection>
+
+        <DocSection
+          title="License & Credits"
+          icon={<FileText className="w-4 h-4" style={{ color: "var(--g-text-secondary)" }} />}
+        >
+          <DocHeading>Gonzales</DocHeading>
+          <DocParagraph>
+            Gonzales is open source software licensed under MIT. You can view the source code,
+            contribute, and report issues on GitHub.
+          </DocParagraph>
+          <DocHeading>Ookla Speedtest CLI</DocHeading>
+          <DocParagraph>
+            Speed tests use the Ookla Speedtest CLI, which is proprietary third-party software.
+            By using Gonzales, you accept the Ookla EULA:
+          </DocParagraph>
+          <DocList
+            items={[
+              "Personal, non-commercial use: Permitted",
+              "Commercial use: Requires separate Ookla license",
+              "Speedtest® is a trademark of Ookla, LLC",
+            ]}
+          />
+          <DocParagraph>
+            Gonzales is not affiliated with or endorsed by Ookla.
+          </DocParagraph>
         </DocSection>
       </div>
 
@@ -582,7 +934,17 @@ action:
         className="text-xs text-center mt-6 g-animate-in"
         style={{ color: "var(--g-text-secondary)" }}
       >
-        For more detailed documentation, visit the{" "}
+        For more information, visit the{" "}
+        <a
+          href="https://github.com/akustikrausch/gonzales"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:no-underline"
+          style={{ color: "var(--g-accent)" }}
+        >
+          Gonzales GitHub
+        </a>
+        {" | "}
         <a
           href="https://github.com/akustikrausch/gonzales-ha"
           target="_blank"
@@ -590,7 +952,7 @@ action:
           className="underline hover:no-underline"
           style={{ color: "var(--g-accent)" }}
         >
-          GitHub repository
+          Home Assistant Integration
         </a>
       </p>
     </div>
