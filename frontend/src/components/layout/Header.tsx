@@ -1,4 +1,4 @@
-import { Play, Loader2, Sun, Moon, Monitor } from "lucide-react";
+import { Play, Loader2, Sun, Moon, Monitor, Clock } from "lucide-react";
 import { useStatus } from "../../hooks/useApi";
 import { useTheme } from "../../hooks/useTheme";
 import { useSpeedTest } from "../../context/SpeedTestContext";
@@ -10,6 +10,24 @@ const themeIcons = {
   light: Sun,
   dark: Moon,
 } as const;
+
+function formatNextRun(nextRunTime: string | null): string | null {
+  if (!nextRunTime) return null;
+  const next = new Date(nextRunTime);
+  const now = new Date();
+  const diffMs = next.getTime() - now.getTime();
+
+  if (diffMs < 0) return null;
+
+  const diffMin = Math.round(diffMs / 60000);
+  if (diffMin < 1) return "< 1 min";
+  if (diffMin < 60) return `${diffMin} min`;
+
+  const hours = Math.floor(diffMin / 60);
+  const mins = diffMin % 60;
+  if (mins === 0) return `${hours}h`;
+  return `${hours}h ${mins}m`;
+}
 
 const themeOrder: Array<"auto" | "light" | "dark"> = ["auto", "light", "dark"];
 
@@ -49,6 +67,16 @@ export function Header() {
               />
               {status.scheduler.running ? "Scheduler Active" : "Scheduler Stopped"}
             </GlassBadge>
+            {status.scheduler.running && !status.scheduler.test_in_progress && formatNextRun(status.scheduler.next_run_time) && (
+              <span
+                className="flex items-center gap-1 text-xs"
+                style={{ color: "var(--g-text-secondary)" }}
+                title={`Next test in ${formatNextRun(status.scheduler.next_run_time)}`}
+              >
+                <Clock className="w-3 h-3" aria-hidden="true" />
+                {formatNextRun(status.scheduler.next_run_time)}
+              </span>
+            )}
             {status.scheduler.test_in_progress && (
               <span
                 className="text-xs font-medium animate-pulse"
