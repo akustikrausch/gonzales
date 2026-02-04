@@ -1,33 +1,74 @@
 import { NavLink } from "react-router-dom";
-import { Zap, ClipboardList, BarChart3, Download, Settings, Activity, Network, BookOpen, type LucideIcon } from "lucide-react";
 import { Logo } from "../ui/Logo";
 import { useStatus } from "../../hooks/useApi";
-
-const navItems: { to: string; label: string; icon: LucideIcon }[] = [
-  { to: "/", label: "Dashboard", icon: Zap },
-  { to: "/history", label: "History", icon: ClipboardList },
-  { to: "/statistics", label: "Statistics", icon: BarChart3 },
-  { to: "/qos", label: "QoS Tests", icon: Activity },
-  { to: "/topology", label: "Network", icon: Network },
-  { to: "/export", label: "Export", icon: Download },
-  { to: "/settings", label: "Settings", icon: Settings },
-  { to: "/docs", label: "Docs", icon: BookOpen },
-];
+import {
+  getNavItemsByGroup,
+  type NavItem,
+} from "../../config/navigation";
 
 interface SidebarProps {
   collapsed?: boolean;
 }
 
+function NavGroup({
+  items,
+  collapsed,
+}: {
+  items: NavItem[];
+  collapsed: boolean;
+}) {
+  return (
+    <>
+      {items.map((item) => (
+        <NavLink
+          key={item.to}
+          to={item.to}
+          end={item.to === "/"}
+          title={collapsed ? item.label : undefined}
+          className={({ isActive }) =>
+            `glass-nav-item mb-0.5 ${
+              collapsed ? "justify-center !px-2.5 !gap-0" : ""
+            } ${isActive ? "glass-nav-item-active" : ""}`
+          }
+        >
+          <item.icon className="glass-nav-icon w-4 h-4 shrink-0" />
+          {!collapsed && <span>{item.label}</span>}
+        </NavLink>
+      ))}
+    </>
+  );
+}
+
+function GroupDivider({ label }: { label: string }) {
+  return (
+    <div
+      className="mt-4 mb-2 px-3"
+      style={{ color: "var(--g-text-tertiary)" }}
+    >
+      <span className="text-[10px] uppercase tracking-wider font-medium">
+        {label}
+      </span>
+    </div>
+  );
+}
+
 export function Sidebar({ collapsed = false }: SidebarProps) {
   const { data: status } = useStatus();
+
+  const mainItems = getNavItemsByGroup("main");
+  const toolsItems = getNavItemsByGroup("tools");
+  const systemItems = getNavItemsByGroup("system");
 
   return (
     <aside
       className="glass-sidebar min-h-screen flex flex-col transition-all"
       style={{
-        width: collapsed ? "var(--g-sidebar-collapsed)" : "var(--g-sidebar-width)",
+        width: collapsed
+          ? "var(--g-sidebar-collapsed)"
+          : "var(--g-sidebar-width)",
       }}
     >
+      {/* Header */}
       <div
         className="flex items-center gap-3 border-b"
         style={{
@@ -51,24 +92,24 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
           </div>
         )}
       </div>
-      <nav className="flex-1" style={{ padding: "var(--g-space-3)" }}>
-        {navItems.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            end={item.to === "/"}
-            title={collapsed ? item.label : undefined}
-            className={({ isActive }) =>
-              `glass-nav-item mb-0.5 ${
-                collapsed ? "justify-center !px-2.5 !gap-0" : ""
-              } ${isActive ? "glass-nav-item-active" : ""}`
-            }
-          >
-            <item.icon className="glass-nav-icon w-4 h-4" />
-            {!collapsed && item.label}
-          </NavLink>
-        ))}
+
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto" style={{ padding: "var(--g-space-3)" }}>
+        {/* Main group - no label */}
+        <NavGroup items={mainItems} collapsed={collapsed} />
+
+        {/* Tools group */}
+        {!collapsed && <GroupDivider label="Tools" />}
+        {collapsed && <div className="my-2" />}
+        <NavGroup items={toolsItems} collapsed={collapsed} />
+
+        {/* System group */}
+        {!collapsed && <GroupDivider label="System" />}
+        {collapsed && <div className="my-2" />}
+        <NavGroup items={systemItems} collapsed={collapsed} />
       </nav>
+
+      {/* Footer */}
       {!collapsed && (
         <div
           className="border-t"

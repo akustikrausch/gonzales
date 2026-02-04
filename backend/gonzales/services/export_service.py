@@ -44,6 +44,16 @@ class ExportService:
         output.write("# https://github.com/akustikrausch/gonzales\n")
         output.write(f"# Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
         output.write("#\n")
+        # Contract/threshold information (Soll-Stand)
+        output.write(f"# Subscribed Download: {settings.download_threshold_mbps:.0f} Mbps\n")
+        output.write(f"# Subscribed Upload: {settings.upload_threshold_mbps:.0f} Mbps\n")
+        output.write(f"# Tolerance: {settings.tolerance_percent:.0f}%\n")
+        tolerance_factor = 1 - (settings.tolerance_percent / 100)
+        eff_dl = settings.download_threshold_mbps * tolerance_factor
+        eff_ul = settings.upload_threshold_mbps * tolerance_factor
+        output.write(f"# Effective Min Download: {eff_dl:.0f} Mbps\n")
+        output.write(f"# Effective Min Upload: {eff_ul:.0f} Mbps\n")
+        output.write("#\n")
         writer = csv.writer(output)
         writer.writerow(self.CSV_COLUMNS)
         for m in measurements:
@@ -129,6 +139,61 @@ class ExportService:
                 elements.append(Paragraph("Summary Statistics", styles["Heading2"]))
                 elements.append(summary_table)
                 elements.append(Spacer(1, 6 * mm))
+
+        # Contract vs. Actual comparison (Soll vs. Ist)
+        if measurements:
+            tolerance_factor = 1 - (settings.tolerance_percent / 100)
+            eff_dl = settings.download_threshold_mbps * tolerance_factor
+            eff_ul = settings.upload_threshold_mbps * tolerance_factor
+            avg_dl = sum(m.download_mbps for m in measurements) / len(measurements)
+            avg_ul = sum(m.upload_mbps for m in measurements) / len(measurements)
+
+            dl_status = "OK" if avg_dl >= eff_dl else "Below"
+            ul_status = "OK" if avg_ul >= eff_ul else "Below"
+
+            contract_data = [
+                ["Metric", "Contracted", "Min Required", "Avg Actual", "Status"],
+                [
+                    "Download",
+                    f"{settings.download_threshold_mbps:.0f} Mbps",
+                    f"{eff_dl:.0f} Mbps",
+                    f"{avg_dl:.1f} Mbps",
+                    dl_status,
+                ],
+                [
+                    "Upload",
+                    f"{settings.upload_threshold_mbps:.0f} Mbps",
+                    f"{eff_ul:.0f} Mbps",
+                    f"{avg_ul:.1f} Mbps",
+                    ul_status,
+                ],
+            ]
+            contract_table = Table(contract_data, repeatRows=1)
+
+            # Color the status column based on OK/Below
+            table_style = [
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#007AFF")),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("FONTSIZE", (0, 0), (-1, -1), 9),
+                ("GRID", (0, 0), (-1, -1), 0.5, colors.grey),
+                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#F5F5F5")]),
+                ("ALIGN", (1, 0), (-1, -1), "RIGHT"),
+            ]
+            # Color status cells
+            if dl_status == "Below":
+                table_style.append(("TEXTCOLOR", (4, 1), (4, 1), colors.HexColor("#EF4444")))
+            else:
+                table_style.append(("TEXTCOLOR", (4, 1), (4, 1), colors.HexColor("#22C55E")))
+            if ul_status == "Below":
+                table_style.append(("TEXTCOLOR", (4, 2), (4, 2), colors.HexColor("#EF4444")))
+            else:
+                table_style.append(("TEXTCOLOR", (4, 2), (4, 2), colors.HexColor("#22C55E")))
+
+            contract_table.setStyle(TableStyle(table_style))
+            elements.append(Paragraph("Contract vs. Actual", styles["Heading2"]))
+            elements.append(contract_table)
+            elements.append(Spacer(1, 6 * mm))
 
         headers = ["#", "Timestamp", "DL (Mbps)", "UL (Mbps)", "Ping (ms)", "Jitter (ms)", "ISP", "Server"]
         table_data = [headers]

@@ -28,3 +28,35 @@ class StatusOut(BaseModel):
     total_failures: int
     uptime_seconds: float
     db_size_bytes: int
+
+
+class OutageRecord(BaseModel):
+    """Historical outage record."""
+
+    id: int
+    started_at: datetime
+    ended_at: datetime | None = None
+    duration_seconds: float | None = None
+    failure_count: int
+    trigger_error: str
+    is_active: bool = False
+
+    class Config:
+        from_attributes = True
+
+
+class OutageListResponse(BaseModel):
+    """Response for listing outages."""
+
+    items: list[OutageRecord]
+    total: int
+
+
+class OutageStatistics(BaseModel):
+    """Aggregated outage statistics."""
+
+    total_outages: int
+    total_duration_seconds: float
+    avg_duration_seconds: float
+    longest_outage_seconds: float
+    uptime_pct: float

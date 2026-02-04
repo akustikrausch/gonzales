@@ -1,38 +1,10 @@
 import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import {
-  Zap,
-  ClipboardList,
-  BarChart3,
-  Menu,
-  X,
-  Activity,
-  Network,
-  Download,
-  Settings,
-  BookOpen,
-  type LucideIcon,
-} from "lucide-react";
+import { Menu, X } from "lucide-react";
+import { getMainNavItems, getMoreNavItems, type NavItem } from "../../config/navigation";
 
-interface NavItem {
-  to: string;
-  label: string;
-  icon: LucideIcon;
-}
-
-const mainNavItems: NavItem[] = [
-  { to: "/", label: "Dashboard", icon: Zap },
-  { to: "/history", label: "History", icon: ClipboardList },
-  { to: "/statistics", label: "Stats", icon: BarChart3 },
-];
-
-const moreNavItems: NavItem[] = [
-  { to: "/qos", label: "QoS Tests", icon: Activity },
-  { to: "/topology", label: "Network", icon: Network },
-  { to: "/export", label: "Export", icon: Download },
-  { to: "/settings", label: "Settings", icon: Settings },
-  { to: "/docs", label: "Documentation", icon: BookOpen },
-];
+const mainNavItems = getMainNavItems();
+const moreNavItems = getMoreNavItems();
 
 function BottomSheet({
   isOpen,
@@ -103,11 +75,13 @@ function BottomSheet({
                 onClick={onClose}
                 className="flex items-center gap-4 px-4 py-3 rounded-xl transition-colors"
                 style={{
-                  backgroundColor: isActive ? "var(--g-accent-dim)" : "transparent",
+                  backgroundColor: isActive
+                    ? "var(--g-accent-dim)"
+                    : "transparent",
                   color: isActive ? "var(--g-accent)" : "var(--g-text)",
                 }}
               >
-                <item.icon className="w-5 h-5" />
+                <item.icon className="w-5 h-5 shrink-0" />
                 <span className="font-medium">{item.label}</span>
               </NavLink>
             );
@@ -123,7 +97,9 @@ export function MobileNav() {
   const location = useLocation();
 
   // Check if current path is in "more" items
-  const isMoreActive = moreNavItems.some((item) => location.pathname === item.to);
+  const isMoreActive = moreNavItems.some(
+    (item) => location.pathname === item.to
+  );
 
   return (
     <>
@@ -132,39 +108,63 @@ export function MobileNav() {
         onClose={() => setIsMoreOpen(false)}
         items={moreNavItems}
       />
+      {/* Fixed nav container with proper safe-area handling */}
       <nav
-        className="glass-header fixed bottom-0 left-0 right-0 flex items-center justify-around"
+        className="fixed bottom-0 left-0 right-0"
         style={{
-          height: "var(--g-mobile-nav-height)",
-          paddingBottom: "env(safe-area-inset-bottom, 0px)",
           zIndex: 30,
+          background: "var(--g-card-bg)",
+          borderTop: "1px solid var(--g-card-border)",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
         }}
       >
-        {mainNavItems.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            end={item.to === "/"}
-            className="flex flex-col items-center gap-1 py-2 px-4"
-            style={({ isActive }) => ({
-              color: isActive ? "var(--g-blue)" : "var(--g-text-secondary)",
-            })}
-          >
-            <item.icon className="w-5 h-5" />
-            <span className="text-[10px] font-medium">{item.label}</span>
-          </NavLink>
-        ))}
-        {/* More button */}
-        <button
-          onClick={() => setIsMoreOpen(true)}
-          className="flex flex-col items-center gap-1 py-2 px-4"
+        {/* Navigation items container - fixed height */}
+        <div
+          className="flex items-center justify-around"
           style={{
-            color: isMoreActive ? "var(--g-blue)" : "var(--g-text-secondary)",
+            height: "var(--g-mobile-nav-height)",
           }}
         >
-          <Menu className="w-5 h-5" />
-          <span className="text-[10px] font-medium">More</span>
-        </button>
+          {mainNavItems.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.to === "/"}
+              className="flex flex-col items-center justify-center h-full"
+              style={({ isActive }) => ({
+                color: isActive ? "var(--g-blue)" : "var(--g-text-secondary)",
+                paddingInline: "var(--g-space-4)",
+                minWidth: "64px",
+              })}
+            >
+              <item.icon className="w-5 h-5 shrink-0" />
+              <span className="text-[10px] font-medium mt-1">
+                {item.shortLabel || item.label}
+              </span>
+            </NavLink>
+          ))}
+          {/* More button */}
+          <button
+            onClick={() => setIsMoreOpen(true)}
+            className="flex flex-col items-center justify-center h-full"
+            style={{
+              color: isMoreActive ? "var(--g-blue)" : "var(--g-text-secondary)",
+              paddingInline: "var(--g-space-4)",
+              minWidth: "64px",
+            }}
+          >
+            <Menu className="w-5 h-5 shrink-0" />
+            <span className="text-[10px] font-medium mt-1">More</span>
+          </button>
+        </div>
+        {/* Safe area spacer - only adds padding, not affecting nav item positioning */}
+        <div
+          style={{
+            height: "env(safe-area-inset-bottom, 0px)",
+            background: "var(--g-card-bg)",
+          }}
+        />
       </nav>
     </>
   );

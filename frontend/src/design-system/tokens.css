@@ -173,3 +173,31 @@
   --g-text-tertiary: #636366;
   --g-border: rgba(255, 255, 255, 0.08);
 }
+
+/* Responsive tokens - Mobile */
+@media (max-width: 767px) {
+  :root {
+    --g-page-padding: var(--g-space-4);
+    --g-card-padding: var(--g-space-3);
+    --g-grid-gap: var(--g-space-3);
+  }
+}
+
+/* Responsive tokens - Small Mobile (< 360px) */
+@media (max-width: 359px) {
+  :root {
+    --g-page-padding: var(--g-space-3);
+    --g-card-padding: var(--g-space-2);
+    --g-grid-gap: var(--g-space-2);
+    --g-mobile-nav-height: 56px;
+  }
+}
+
+/* Responsive tokens - Desktop (default) */
+@media (min-width: 768px) {
+  :root {
+    --g-page-padding: var(--g-space-6);
+    --g-card-padding: var(--g-space-4);
+    --g-grid-gap: var(--g-space-4);
+  }
+}

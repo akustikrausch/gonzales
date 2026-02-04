@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import asc, delete, desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from gonzales.db.models import Measurement, TestFailure
+from gonzales.db.models import Measurement, Outage, TestFailure
 
 
 class MeasurementRepository:
@@ -141,3 +141,113 @@ class TestFailureRepository:
             select(TestFailure).order_by(desc(TestFailure.timestamp)).limit(limit)
         )
         return list(result.scalars().all())
+
+    async def count(self) -> int:
+        result = await self.session.execute(select(func.count(TestFailure.id)))
+        return result.scalar_one()
+
+
+class OutageRepository:
+    """Repository for managing outage records."""
+
+    def __init__(self, session: AsyncSession):
+        self.session = session
+
+    async def create(self, outage: Outage) -> Outage:
+        self.session.add(outage)
+        await self.session.commit()
+        await self.session.refresh(outage)
+        return outage
+
+    async def get_active(self) -> Outage | None:
+        """Get the currently active (unresolved) outage."""
+        result = await self.session.execute(
+            select(Outage)
+            .where(Outage.ended_at.is_(None))
+            .order_by(desc(Outage.started_at))
+            .limit(1)
+        )
+        return result.scalar_one_or_none()
+
+    async def resolve(
+        self,
+        outage_id: int,
+        ended_at: datetime,
+        measurement_id: int | None = None,
+    ) -> Outage | None:
+        """Resolve an outage by setting end time and calculating duration."""
+        result = await self.session.execute(
+            select(Outage).where(Outage.id == outage_id)
+        )
+        outage = result.scalar_one_or_none()
+        if outage:
+            outage.ended_at = ended_at
+            outage.duration_seconds = (ended_at - outage.started_at).total_seconds()
+            outage.resolution_measurement_id = measurement_id
+            await self.session.commit()
+            await self.session.refresh(outage)
+        return outage
+
+    async def increment_failure_count(self, outage_id: int) -> None:
+        """Increment the failure count for an outage."""
+        result = await self.session.execute(
+            select(Outage).where(Outage.id == outage_id)
+        )
+        outage = result.scalar_one_or_none()
+        if outage:
+            outage.failure_count += 1
+            await self.session.commit()
+
+    async def get_in_range(
+        self,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+    ) -> list[Outage]:
+        """Get all outages in a date range."""
+        query = select(Outage)
+        if start_date:
+            query = query.where(Outage.started_at >= start_date)
+        if end_date:
+            query = query.where(Outage.started_at <= end_date)
+        query = query.order_by(desc(Outage.started_at))
+        result = await self.session.execute(query)
+        return list(result.scalars().all())
+
+    async def get_statistics(
+        self,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+    ) -> dict:
+        """Get aggregated outage statistics."""
+        query = select(Outage).where(Outage.ended_at.isnot(None))
+        if start_date:
+            query = query.where(Outage.started_at >= start_date)
+        if end_date:
+            query = query.where(Outage.started_at <= end_date)
+
+        result = await self.session.execute(query)
+        outages = list(result.scalars().all())
+
+        total_outages = len(outages)
+        total_duration = sum(o.duration_seconds or 0 for o in outages)
+        avg_duration = total_duration / total_outages if total_outages > 0 else 0
+        longest = max((o.duration_seconds or 0 for o in outages), default=0)
+
+        # Calculate uptime percentage
+        if start_date and end_date:
+            total_period = (end_date - start_date).total_seconds()
+            uptime_pct = ((total_period - total_duration) / total_period * 100) if total_period > 0 else 100
+        else:
+            uptime_pct = 100.0  # Default if no date range
+
+        return {
+            "total_outages": total_outages,
+            "total_duration_seconds": total_duration,
+            "avg_duration_seconds": avg_duration,
+            "longest_outage_seconds": longest,
+            "uptime_pct": uptime_pct,
+        }
+
+    async def count(self) -> int:
+        result = await self.session.execute(select(func.count(Outage.id)))
+        return result.scalar_one()

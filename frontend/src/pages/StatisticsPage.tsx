@@ -19,8 +19,9 @@ import { TimePeriodOverview } from "../components/statistics/TimePeriodOverview"
 import { QualityTimeline } from "../components/statistics/QualityTimeline";
 import { CorrelationMatrixView } from "../components/statistics/CorrelationMatrix";
 import { DegradationAlertBanner } from "../components/statistics/DegradationAlert";
+import { OutageSection } from "../components/statistics/OutageSection";
 
-type Tab = "overview" | "time" | "trends" | "insights" | "servers";
+type Tab = "overview" | "time" | "trends" | "insights" | "servers" | "outages";
 
 const tabs: { key: Tab; label: string }[] = [
   { key: "overview", label: "Overview" },
@@ -28,6 +29,7 @@ const tabs: { key: Tab; label: string }[] = [
   { key: "trends", label: "Trends" },
   { key: "insights", label: "Insights" },
   { key: "servers", label: "Servers" },
+  { key: "outages", label: "Outages" },
 ];
 
 export function StatisticsPage() {
@@ -216,6 +218,13 @@ export function StatisticsPage() {
 
         {activeTab === "servers" && (
           <ServerComparison servers={enhanced.by_server} />
+        )}
+
+        {activeTab === "outages" && (
+          <OutageSection
+            startDate={dateParams.start_date}
+            endDate={dateParams.end_date}
+          />
         )}
       </div>
     </div>

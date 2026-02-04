@@ -178,3 +178,24 @@ export function useAnalyzeTopology() {
     },
   });
 }
+
+// Outages Hooks
+export function useOutages(params?: {
+  start_date?: string;
+  end_date?: string;
+}) {
+  return useQuery({
+    queryKey: ["outages", params],
+    queryFn: () => api.getOutages(params),
+  });
+}
+
+export function useOutageStatistics(params?: {
+  start_date?: string;
+  end_date?: string;
+}) {
+  return useQuery({
+    queryKey: ["outages", "statistics", params],
+    queryFn: () => api.getOutageStatistics(params),
+  });
+}

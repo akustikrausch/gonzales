@@ -109,3 +109,26 @@ class NetworkHop(Base):
     is_timeout: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
     topology: Mapped["NetworkTopology"] = relationship("NetworkTopology", back_populates="hops")
+
+
+class Outage(Base):
+    """Historical outage record for tracking internet connectivity failures."""
+
+    __tablename__ = "outages"
+    __table_args__ = (Index("ix_outages_started_at", "started_at"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    started_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+    )
+    ended_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
+    duration_seconds: Mapped[float | None] = mapped_column(Float, nullable=True)
+    failure_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    trigger_error: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    resolution_measurement_id: Mapped[int | None] = mapped_column(
+        Integer, ForeignKey("measurements.id"), nullable=True
+    )

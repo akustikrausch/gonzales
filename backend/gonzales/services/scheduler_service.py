@@ -6,6 +6,8 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from gonzales.config import settings
 from gonzales.core.logging import logger
 from gonzales.db.engine import async_session
+from gonzales.db.models import Outage
+from gonzales.db.repository import OutageRepository
 from gonzales.services.measurement_service import measurement_service
 from gonzales.services.event_bus import event_bus
 
@@ -24,6 +26,7 @@ class SchedulerService:
         self._outage_started_at: datetime | None = None
         self._last_failure_message: str = ""
         self._retry_pending: bool = False
+        self._current_outage_id: int | None = None  # DB outage record ID
 
     @property
     def scheduler(self) -> AsyncIOScheduler | None:
@@ -118,6 +121,18 @@ class SchedulerService:
                     f"Internet restored after {self._consecutive_failures} failed tests "
                     f"({duration_seconds / 60:.1f} minutes outage)",
                 )
+                # Persist outage resolution to DB
+                if self._current_outage_id:
+                    try:
+                        async with async_session() as db_session:
+                            outage_repo = OutageRepository(db_session)
+                            await outage_repo.resolve(
+                                self._current_outage_id,
+                                datetime.now(timezone.utc),
+                            )
+                    except Exception as db_err:
+                        logger.error("Failed to persist outage resolution: %s", db_err)
+                    self._current_outage_id = None
                 self._outage_active = False
                 self._outage_started_at = None
             elif self._consecutive_failures > 0:
@@ -154,6 +169,19 @@ class SchedulerService:
                         f"Internet outage: {self._consecutive_failures} consecutive failures. "
                         f"Last error: {e}",
                     )
+                    # Persist outage to DB
+                    try:
+                        async with async_session() as db_session:
+                            outage_repo = OutageRepository(db_session)
+                            outage = Outage(
+                                started_at=self._outage_started_at,
+                                failure_count=self._consecutive_failures,
+                                trigger_error=str(e)[:1000],  # Limit error message length
+                            )
+                            created_outage = await outage_repo.create(outage)
+                            self._current_outage_id = created_outage.id
+                    except Exception as db_err:
+                        logger.error("Failed to persist outage to DB: %s", db_err)
                 # During active outage, continue with normal schedule
                 # (don't spam retries, just wait for next scheduled test)
             else:

@@ -425,3 +425,27 @@ export interface NetworkDiagnosis {
   overall_status: string;
   recommendations: string[];
 }
+
+// Outage Types (Historical)
+export interface OutageRecord {
+  id: number;
+  started_at: string;
+  ended_at: string | null;
+  duration_seconds: number | null;
+  failure_count: number;
+  trigger_error: string;
+  is_active: boolean;
+}
+
+export interface OutageListResponse {
+  items: OutageRecord[];
+  total: number;
+}
+
+export interface OutageStatistics {
+  total_outages: number;
+  total_duration_seconds: number;
+  avg_duration_seconds: number;
+  longest_outage_seconds: number;
+  uptime_pct: number;
+}

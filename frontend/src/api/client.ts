@@ -6,6 +6,8 @@ import type {
   MeasurementPage,
   NetworkDiagnosis,
   NetworkTopology,
+  OutageListResponse,
+  OutageStatistics,
   QosHistory,
   QosOverview,
   QosProfile,
@@ -168,5 +170,28 @@ export const api = {
 
   getNetworkDiagnosis(days: number = 7): Promise<NetworkDiagnosis> {
     return fetchJSON(`${BASE}/topology/diagnosis?days=${days}`);
+  },
+
+  // Outages API
+  getOutages(params?: {
+    start_date?: string;
+    end_date?: string;
+  }): Promise<OutageListResponse> {
+    const search = new URLSearchParams();
+    if (params?.start_date) search.set("start_date", params.start_date);
+    if (params?.end_date) search.set("end_date", params.end_date);
+    const qs = search.toString();
+    return fetchJSON(`${BASE}/outages${qs ? `?${qs}` : ""}`);
+  },
+
+  getOutageStatistics(params?: {
+    start_date?: string;
+    end_date?: string;
+  }): Promise<OutageStatistics> {
+    const search = new URLSearchParams();
+    if (params?.start_date) search.set("start_date", params.start_date);
+    if (params?.end_date) search.set("end_date", params.end_date);
+    const qs = search.toString();
+    return fetchJSON(`${BASE}/outages/statistics${qs ? `?${qs}` : ""}`);
   },
 };
