@@ -1,14 +1,17 @@
 from textual.app import ComposeResult
-from textual.containers import Container, Vertical
+from textual.containers import Container, Horizontal, Vertical
 from textual.screen import Screen
-from textual.widgets import Footer, Header, Input, Label, Static
+from textual.widgets import Button, Footer, Header, Input, Label, Static
 
 
 class SettingsScreen(Screen):
     BINDINGS = [
         ("d", "app.switch_mode('dashboard')", "Dashboard"),
         ("h", "app.switch_mode('history')", "History"),
+        ("a", "app.switch_mode('statistics')", "Analytics"),
         ("s", "app.switch_mode('settings')", "Settings"),
+        ("ctrl+s", "save_settings", "Save"),
+        ("?", "show_help", "Help"),
         ("q", "app.quit", "Quit"),
     ]
 
@@ -35,6 +38,9 @@ class SettingsScreen(Screen):
                     id="ul-threshold-input",
                     type="number",
                 )
+                yield Static("")
+                with Horizontal(id="settings-buttons"):
+                    yield Button("Save [Ctrl+S]", id="save-btn", variant="primary")
             yield Static("", id="settings-status")
         yield Footer()
 
@@ -64,3 +70,25 @@ class SettingsScreen(Screen):
 
     def show_status(self, msg: str) -> None:
         self.query_one("#settings-status", Static).update(f"  {msg}")
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "save-btn":
+            self.action_save_settings()
+
+    def action_save_settings(self) -> None:
+        """Save current settings."""
+        from gonzales.config import settings
+
+        try:
+            new_settings = self.get_settings()
+            settings.test_interval_minutes = new_settings["test_interval_minutes"]
+            settings.download_threshold_mbps = new_settings["download_threshold_mbps"]
+            settings.upload_threshold_mbps = new_settings["upload_threshold_mbps"]
+            settings.save_config()
+            self.show_status("[green]Settings saved successfully![/]")
+        except Exception as e:
+            self.show_status(f"[red]Error saving settings: {e}[/]")
+
+    def action_show_help(self) -> None:
+        """Show help modal."""
+        self.app.push_screen("help")

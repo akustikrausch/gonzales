@@ -10,6 +10,8 @@ from gonzales.db.models import Outage
 from gonzales.db.repository import OutageRepository
 from gonzales.services.measurement_service import measurement_service
 from gonzales.services.event_bus import event_bus
+from gonzales.services.retention_service import retention_service
+from gonzales.services.webhook_service import webhook_service
 
 # Outage detection constants
 RETRY_DELAY_SECONDS = 60  # Wait 1 minute between retries
@@ -121,6 +123,13 @@ class SchedulerService:
                     f"Internet restored after {self._consecutive_failures} failed tests "
                     f"({duration_seconds / 60:.1f} minutes outage)",
                 )
+                # Send webhook notification
+                asyncio.create_task(
+                    webhook_service.notify_outage_resolved(
+                        duration_seconds=duration_seconds,
+                        consecutive_failures=self._consecutive_failures,
+                    )
+                )
                 # Persist outage resolution to DB
                 if self._current_outage_id:
                     try:
@@ -168,6 +177,13 @@ class SchedulerService:
                         "outage_detected",
                         f"Internet outage: {self._consecutive_failures} consecutive failures. "
                         f"Last error: {e}",
+                    )
+                    # Send webhook notification
+                    asyncio.create_task(
+                        webhook_service.notify_outage_detected(
+                            consecutive_failures=self._consecutive_failures,
+                            error_message=str(e)[:500],
+                        )
                     )
                     # Persist outage to DB
                     try:
@@ -218,10 +234,21 @@ class SchedulerService:
             max_instances=1,
             misfire_grace_time=120,
         )
+        # Add daily retention cleanup job (runs at 3 AM)
+        self._scheduler.add_job(
+            retention_service.cleanup_old_data,
+            "cron",
+            hour=3,
+            minute=0,
+            id="data_retention",
+            max_instances=1,
+            misfire_grace_time=3600,  # 1 hour grace period
+        )
         self._scheduler.start()
         logger.info(
-            "Scheduler started: running every %d minutes",
+            "Scheduler started: running every %d minutes (retention: %s)",
             settings.test_interval_minutes,
+            f"{settings.data_retention_days} days" if settings.data_retention_days > 0 else "disabled",
         )
 
     def stop(self) -> None:

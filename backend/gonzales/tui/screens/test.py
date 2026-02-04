@@ -15,8 +15,10 @@ class TestScreen(Screen):
     BINDINGS = [
         ("d", "app.switch_mode('dashboard')", "Dashboard"),
         ("h", "app.switch_mode('history')", "History"),
+        ("a", "app.switch_mode('statistics')", "Analytics"),
         ("s", "app.switch_mode('settings')", "Settings"),
         ("t", "run_test", "New Test"),
+        ("?", "show_help", "Help"),
         ("q", "app.quit", "Quit"),
     ]
 
@@ -131,3 +133,7 @@ class TestScreen(Screen):
         self._running = False
         hint = self.query_one("#test-hint", Static)
         hint.update("  Press [bold cyan]T[/] to start a new test")
+
+    def action_show_help(self) -> None:
+        """Show help modal."""
+        self.app.push_screen("help")

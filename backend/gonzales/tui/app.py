@@ -12,8 +12,10 @@ from gonzales.db.repository import MeasurementRepository
 from gonzales.services.scheduler_service import scheduler_service
 from gonzales.services.speedtest_runner import speedtest_runner
 from gonzales.tui.screens.dashboard import DashboardScreen
+from gonzales.tui.screens.help import HelpScreen
 from gonzales.tui.screens.history import HistoryScreen
 from gonzales.tui.screens.settings import SettingsScreen
+from gonzales.tui.screens.statistics import StatisticsScreen
 from gonzales.tui.screens.test import TestScreen
 
 CSS_PATH = Path(__file__).parent / "styles" / "gonzales.tcss"
@@ -27,8 +29,13 @@ class GonzalesApp(App):
     MODES = {
         "dashboard": DashboardScreen,
         "history": HistoryScreen,
+        "statistics": StatisticsScreen,
         "settings": SettingsScreen,
         "test": TestScreen,
+    }
+
+    SCREENS = {
+        "help": HelpScreen,
     }
 
     def __init__(self):
@@ -103,6 +110,42 @@ class GonzalesApp(App):
                 "download_threshold_mbps": settings.download_threshold_mbps,
                 "upload_threshold_mbps": settings.upload_threshold_mbps,
             })
+
+        elif isinstance(screen, StatisticsScreen):
+            await self._refresh_statistics(screen, measurements)
+
+    async def _refresh_statistics(self, screen: StatisticsScreen, measurements: list) -> None:
+        """Refresh statistics screen with computed data."""
+        from collections import defaultdict
+        from datetime import datetime, timedelta
+
+        from gonzales.services.statistics_service import statistics_service
+
+        try:
+            async with async_session() as session:
+                start_date = datetime.now() - timedelta(days=7)
+                stats = await statistics_service.get_enhanced_statistics(session, start_date)
+                stats_dict = stats.model_dump()
+                screen.update_stats(stats_dict)
+
+                if stats.connection_comparison:
+                    screen.update_connection_comparison(stats.connection_comparison.model_dump())
+
+            hourly_download: dict[int, list[float]] = defaultdict(list)
+            hourly_upload: dict[int, list[float]] = defaultdict(list)
+
+            for m in measurements:
+                hour = m.timestamp.hour
+                hourly_download[hour].append(m.download_mbps)
+                hourly_upload[hour].append(m.upload_mbps)
+
+            avg_download = {h: sum(v) / len(v) for h, v in hourly_download.items() if v}
+            avg_upload = {h: sum(v) / len(v) for h, v in hourly_upload.items() if v}
+
+            screen.update_hourly(avg_download, avg_upload)
+
+        except Exception:
+            pass
 
     async def _countdown_loop(self) -> None:
         while True:

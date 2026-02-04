@@ -1,8 +1,11 @@
 """Network topology analysis API endpoints."""
-from fastapi import APIRouter, Depends, HTTPException, Query
+import ipaddress
+
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from gonzales.api.dependencies import get_db
+from gonzales.core.rate_limit import limiter
 from gonzales.schemas.topology import (
     NetworkDiagnosisOut,
     NetworkTopologyOut,
@@ -12,14 +15,82 @@ from gonzales.services.topology_service import topology_service
 
 router = APIRouter(prefix="/topology", tags=["topology"])
 
+# Allowlisted public DNS servers for topology analysis
+ALLOWED_TARGETS = frozenset({
+    "1.1.1.1",        # Cloudflare
+    "8.8.8.8",        # Google
+    "8.8.4.4",        # Google
+    "208.67.222.222", # OpenDNS
+    "208.67.220.220", # OpenDNS
+    "9.9.9.9",        # Quad9
+    "149.112.112.112",# Quad9
+})
+
+
+def _validate_target(target: str | None) -> str:
+    """Validate and sanitize the target IP address.
+
+    Args:
+        target: IP address to validate, or None for default.
+
+    Returns:
+        Validated IP address string.
+
+    Raises:
+        HTTPException: If the target is invalid or not allowed.
+    """
+    if target is None:
+        return "1.1.1.1"
+
+    # Check against allowlist first (fast path)
+    if target in ALLOWED_TARGETS:
+        return target
+
+    # Validate IP format and check for private/loopback
+    try:
+        ip = ipaddress.ip_address(target)
+        if ip.is_private:
+            raise HTTPException(
+                status_code=400,
+                detail="Private IP addresses are not allowed for security reasons"
+            )
+        if ip.is_loopback:
+            raise HTTPException(
+                status_code=400,
+                detail="Loopback addresses are not allowed"
+            )
+        if ip.is_multicast:
+            raise HTTPException(
+                status_code=400,
+                detail="Multicast addresses are not allowed"
+            )
+        if ip.is_reserved:
+            raise HTTPException(
+                status_code=400,
+                detail="Reserved addresses are not allowed"
+            )
+        return str(ip)
+    except ValueError:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid IP address format. Use IPv4 or IPv6 address."
+        )
+
 
 @router.post("/analyze", response_model=NetworkTopologyOut)
+@limiter.limit("5/minute")
 async def analyze_topology(
+    request: Request,
     target: str | None = Query(default=None, description="Target host (default: 1.1.1.1)"),
     session: AsyncSession = Depends(get_db),
 ):
-    """Run a traceroute analysis to the specified target."""
-    topology = await topology_service.analyze(session, target)
+    """Run a traceroute analysis to the specified target.
+
+    Only public IP addresses are allowed to prevent SSRF attacks.
+    Common DNS servers (1.1.1.1, 8.8.8.8, etc.) are pre-approved.
+    """
+    validated_target = _validate_target(target)
+    topology = await topology_service.analyze(session, validated_target)
     return _topology_to_out(topology)
 
 

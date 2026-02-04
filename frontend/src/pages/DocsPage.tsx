@@ -14,6 +14,12 @@ import {
   Server,
   Activity,
   Network,
+  GitCompare,
+  TrendingUp,
+  MousePointerClick,
+  Bell,
+  Sparkles,
+  Terminal,
 } from "lucide-react";
 import { GlassCard } from "../components/ui/GlassCard";
 
@@ -395,6 +401,160 @@ action:
     title: "Slow Internet"
     message: "Speed: {{ states('sensor.gonzales_download_speed') }} Mbps"`}
           </pre>
+        </DocSection>
+
+        <DocSection
+          title="Connection Comparison"
+          icon={<GitCompare className="w-4 h-4" style={{ color: "var(--g-accent)" }} />}
+        >
+          <DocParagraph>
+            Automatically detects and compares performance across different connection types
+            (Ethernet, Wi-Fi, VPN) to help you understand which connection works best.
+          </DocParagraph>
+          <DocHeading>Connection Types</DocHeading>
+          <DocList
+            items={[
+              "Ethernet: Wired connections (eth*, enp* interfaces)",
+              "Wi-Fi: Wireless connections (wlan*, wlp* interfaces)",
+              "VPN: Virtual private network connections (tun*, tap* interfaces)",
+            ]}
+          />
+          <DocHeading>Comparison Metrics</DocHeading>
+          <DocParagraph>
+            The comparison shows average speeds, reliability scores, and recommendations
+            for which connection type is best for downloads, uploads, and latency.
+          </DocParagraph>
+        </DocSection>
+
+        <DocSection
+          title="Predictive Analytics"
+          icon={<TrendingUp className="w-4 h-4" style={{ color: "var(--g-accent)" }} />}
+        >
+          <DocParagraph>
+            Advanced prediction algorithms forecast your future internet speeds
+            based on historical patterns and seasonal factors.
+          </DocParagraph>
+          <DocHeading>Features</DocHeading>
+          <DocList
+            items={[
+              "7-day forecast with confidence intervals",
+              "Day-of-week seasonal factors (e.g., weekends vs weekdays)",
+              "Exponential smoothing for trend analysis",
+              "Data quality score indicates prediction reliability",
+            ]}
+          />
+          <DocHeading>Confidence Levels</DocHeading>
+          <DocParagraph>
+            Predictions include upper and lower bounds showing the expected range.
+            Higher data quality scores mean more reliable predictions.
+          </DocParagraph>
+        </DocSection>
+
+        <DocSection
+          title="Quick Actions"
+          icon={<MousePointerClick className="w-4 h-4" style={{ color: "var(--g-accent)" }} />}
+        >
+          <DocParagraph>
+            The floating action button (FAB) in the bottom-right corner provides
+            quick access to common actions from any page.
+          </DocParagraph>
+          <DocHeading>Available Actions</DocHeading>
+          <DocList
+            items={[
+              "Run Speed Test: Start a manual speed test immediately",
+              "Export Data: Go to the export page",
+              "Settings: Quick access to configuration",
+            ]}
+          />
+          <DocParagraph>
+            Click the + button to expand the menu, then select an action.
+            Click outside or on the backdrop to close.
+          </DocParagraph>
+        </DocSection>
+
+        <DocSection
+          title="Notifications"
+          icon={<Bell className="w-4 h-4" style={{ color: "var(--g-accent)" }} />}
+        >
+          <DocParagraph>
+            Toast notifications appear in the top-right corner to provide feedback
+            about actions and important events.
+          </DocParagraph>
+          <DocHeading>Notification Types</DocHeading>
+          <DocList
+            items={[
+              "Success (green): Action completed successfully",
+              "Error (red): Something went wrong",
+              "Warning (orange): Important notice",
+              "Info (blue): General information",
+            ]}
+          />
+          <DocHeading>Home Assistant Automations</DocHeading>
+          <DocParagraph>
+            Combine Gonzales sensors with Home Assistant to create custom notifications
+            on your phone, smart speakers, or other devices when speeds drop.
+          </DocParagraph>
+        </DocSection>
+
+        <DocSection
+          title="Setup Wizard"
+          icon={<Sparkles className="w-4 h-4" style={{ color: "var(--g-accent)" }} />}
+        >
+          <DocParagraph>
+            First-time users see an onboarding wizard that guides through initial setup.
+          </DocParagraph>
+          <DocHeading>Wizard Steps</DocHeading>
+          <DocList
+            items={[
+              "Welcome: Introduction to Gonzales",
+              "ISP Info: Enter your internet provider name (optional)",
+              "Thresholds: Set download and upload speed expectations",
+              "Interval: Choose how often to run tests",
+              "Finish: Review and save settings",
+            ]}
+          />
+          <DocParagraph>
+            You can skip the wizard and configure settings later. To re-run the wizard,
+            clear your browser's local storage for this site.
+          </DocParagraph>
+        </DocSection>
+
+        <DocSection
+          title="Terminal Interface"
+          icon={<Terminal className="w-4 h-4" style={{ color: "var(--g-accent)" }} />}
+        >
+          <DocParagraph>
+            Gonzales includes a command-line interface (CLI) and text-based user interface (TUI)
+            for terminal-only environments.
+          </DocParagraph>
+          <DocHeading>CLI Commands</DocHeading>
+          <DocTable
+            headers={["Command", "Description"]}
+            rows={[
+              ["gonzales run", "Run a speed test"],
+              ["gonzales status", "Show current status"],
+              ["gonzales history", "View measurement history"],
+              ["gonzales stats", "Show statistics"],
+              ["gonzales export", "Export data to file"],
+              ["gonzales config", "View or modify settings"],
+              ["gonzales server", "Start the web server"],
+            ]}
+          />
+          <DocHeading>TUI Navigation</DocHeading>
+          <DocList
+            items={[
+              "d: Dashboard",
+              "h: History",
+              "a: Analytics/Statistics",
+              "s: Settings",
+              "t: Run speed test",
+              "?: Help screen",
+              "q: Quit",
+            ]}
+          />
+          <DocParagraph>
+            Install CLI with: pip install gonzales[cli]
+          </DocParagraph>
         </DocSection>
 
         <DocSection

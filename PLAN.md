@@ -333,15 +333,15 @@ These phases built the functional foundation. All code exists and works.
 - [x] Backend tests exist and pass for critical services -- 74 tests across 4 modules
 - [x] Code splitting for bundle size optimization -- React.lazy routes + Vite manualChunks (vendor/charts/query)
 - [x] README.md fully up to date -- HA integration section updated (EN + DE), tech stack updated
-- [x] claude.md reflects final architecture -- TUI test screen, insights, code splitting, hooks documented
-- [x] All API endpoints documented and verified -- claude.md endpoint table complete
+- [x] ARCHITECTURE.md reflects final architecture -- TUI test screen, insights, code splitting, hooks documented
+- [x] All API endpoints documented and verified -- ARCHITECTURE.md endpoint table complete
 - [x] Copy built frontend to backend/gonzales/static/ -- 18 files copied
 - [ ] Manual end-to-end test -- requires running server with Speedtest CLI (user to verify)
 
 **Files modified**:
 - `frontend/src/App.tsx` -- React.lazy routes with Suspense + PageLoader
 - `frontend/vite.config.ts` -- manualChunks for vendor/charts/query
-- `claude.md` -- Updated with v2 features, insights, TUI test, code splitting
+- `ARCHITECTURE.md` -- Updated with v2 features, insights, TUI test, code splitting
 - `README.md` -- Updated HA section (EN + DE), added HA to tech stack
 - `backend/gonzales/static/` -- Fresh build copied
 
@@ -405,7 +405,7 @@ These phases built the functional foundation. All code exists and works.
 - `backend/gonzales/__main__.py` -- Yellow console warning for unsafe binding
 - `backend/gonzales/main.py` -- Logger warning for unsafe binding
 - `README.md` -- "prove" -> "monitor and document", expanded security section
-- `claude.md` -- Updated architecture reference with all v2 features
+- `ARCHITECTURE.md` -- Updated architecture reference with all v2 features
 - `.env.example` -- Stronger API_KEY security comment
 - `STATUS.md` -- All 13 phases documented, security audit results
 - `PLAN.md` -- All phases documented with full file lists

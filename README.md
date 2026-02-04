@@ -1,5 +1,11 @@
 # Gonzales - Internet Speed Monitor
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
+[![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2024.12+-41bdf5.svg)](https://www.home-assistant.io/)
+[![React 19](https://img.shields.io/badge/React-19-61dafb.svg)](https://react.dev/)
+
 ```
  ██████╗  ██████╗ ███╗   ██╗███████╗ █████╗ ██╗     ███████╗███████╗
 ██╔════╝ ██╔═══██╗████╗  ██║╚══███╔╝██╔══██╗██║     ██╔════╝██╔════╝
@@ -10,6 +16,8 @@
 ```
 
 Local network speed monitoring tool with a **web dashboard** to monitor and document ISP bandwidth and stability issues. Runs automated speed tests, stores results in SQLite, and visualizes everything in the browser.
+
+**v3.0.0 Highlights:** Clean Architecture with Domain-Driven Design, WCAG 2.1 AA accessibility, enterprise-grade rate limiting, and comprehensive UI improvements.
 
 ---
 
@@ -449,10 +457,12 @@ cp config.json.example config.json  # Runtime settings (optional)
 | Layer | Technology |
 |-------|-----------|
 | Backend | Python, FastAPI, SQLAlchemy 2 (async), APScheduler |
+| Architecture | Clean Architecture, Domain-Driven Design |
 | Speed Engine | Ookla Speedtest CLI |
 | Database | SQLite (WAL mode) |
 | Frontend | React 19, TypeScript, Vite 6, Recharts, Tailwind CSS 4, TanStack Query 5 |
 | Design System | Liquid Glass (CSS custom properties, backdrop-filter) |
+| Accessibility | WCAG 2.1 AA compliant |
 | Terminal UI | Textual + Rich |
 | Export | CSV, PDF (ReportLab) |
 | Home Assistant | [gonzales-ha](https://github.com/akustikrausch/gonzales-ha) (Add-on + HACS Integration) |
@@ -478,6 +488,15 @@ curl -X POST http://localhost:8470/api/v1/speedtest/trigger -H "X-API-Key: your-
 ```
 
 Read-only endpoints (measurements, statistics, status, export) remain open.
+
+### Rate Limiting
+
+Gonzales includes built-in rate limiting to prevent abuse:
+- **Default:** 100 requests per minute per IP address
+- **Algorithm:** Token bucket with configurable burst capacity
+- **Response:** HTTP 429 (Too Many Requests) when limit exceeded
+
+Rate limiting is automatically enabled for all API endpoints.
 
 For production deployments, consider placing Gonzales behind a reverse proxy (nginx, Caddy) for TLS and additional access control.
 

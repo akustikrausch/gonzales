@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { TrendingUp } from "lucide-react";
 import { useEnhancedStatistics, useMeasurements } from "../hooks/useApi";
 import { Spinner } from "../components/ui/Spinner";
@@ -13,6 +13,7 @@ import { TrendChart } from "../components/statistics/TrendChart";
 import { SlaCard } from "../components/statistics/SlaCard";
 import { ReliabilityCard } from "../components/statistics/ReliabilityCard";
 import { ServerComparison } from "../components/statistics/ServerComparison";
+import { ConnectionComparisonSection } from "../components/statistics/ConnectionComparisonSection";
 import { IspScoreCard } from "../components/statistics/IspScoreCard";
 import { PeakAnalysis } from "../components/statistics/PeakAnalysis";
 import { TimePeriodOverview } from "../components/statistics/TimePeriodOverview";
@@ -56,6 +57,30 @@ export function StatisticsPage() {
 
   const stats = enhanced.basic;
 
+  // Keyboard navigation for tabs
+  const handleTabKeyDown = useCallback((e: React.KeyboardEvent, currentIndex: number) => {
+    let newIndex = currentIndex;
+
+    if (e.key === "ArrowRight") {
+      newIndex = (currentIndex + 1) % tabs.length;
+    } else if (e.key === "ArrowLeft") {
+      newIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+    } else if (e.key === "Home") {
+      newIndex = 0;
+    } else if (e.key === "End") {
+      newIndex = tabs.length - 1;
+    } else {
+      return;
+    }
+
+    e.preventDefault();
+    setActiveTab(tabs[newIndex].key);
+
+    // Focus the new tab button
+    const tabButtons = document.querySelectorAll<HTMLButtonElement>('[role="tab"]');
+    tabButtons[newIndex]?.focus();
+  }, []);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between g-animate-in">
@@ -79,13 +104,23 @@ export function StatisticsPage() {
         <DegradationAlertBanner alerts={enhanced.degradation_alerts} />
       )}
 
-      <div className="flex gap-2 g-animate-in g-stagger-1">
-        {tabs.map((tab) => (
+      <div
+        className="flex gap-2 g-animate-in g-stagger-1"
+        role="tablist"
+        aria-label="Statistics sections"
+      >
+        {tabs.map((tab, index) => (
           <GlassButton
             key={tab.key}
             size="sm"
             onClick={() => setActiveTab(tab.key)}
+            onKeyDown={(e) => handleTabKeyDown(e, index)}
             className={activeTab === tab.key ? "glass-btn-primary" : ""}
+            role="tab"
+            aria-selected={activeTab === tab.key}
+            aria-controls={`tabpanel-${tab.key}`}
+            id={`tab-${tab.key}`}
+            tabIndex={activeTab === tab.key ? 0 : -1}
           >
             {tab.label}
           </GlassButton>
@@ -94,7 +129,12 @@ export function StatisticsPage() {
 
       <div className="g-animate-in g-stagger-2">
         {activeTab === "overview" && (
-          <div className="space-y-4">
+          <div
+            className="space-y-4"
+            role="tabpanel"
+            id="tabpanel-overview"
+            aria-labelledby="tab-overview"
+          >
             {enhanced.isp_score && <IspScoreCard score={enhanced.isp_score} />}
             <StatsOverview stats={stats} />
             {stats.download && (
@@ -135,7 +175,12 @@ export function StatisticsPage() {
         )}
 
         {activeTab === "time" && (
-          <div className="space-y-4">
+          <div
+            className="space-y-4"
+            role="tabpanel"
+            id="tabpanel-time"
+            aria-labelledby="tab-time"
+          >
             {enhanced.time_periods && (
               <TimePeriodOverview data={enhanced.time_periods} />
             )}
@@ -155,7 +200,12 @@ export function StatisticsPage() {
         )}
 
         {activeTab === "trends" && (
-          <div className="space-y-4">
+          <div
+            className="space-y-4"
+            role="tabpanel"
+            id="tabpanel-trends"
+            aria-labelledby="tab-trends"
+          >
             <TrendChart
               trend={enhanced.trend}
               predictions={enhanced.predictions}
@@ -170,7 +220,12 @@ export function StatisticsPage() {
         )}
 
         {activeTab === "insights" && (
-          <div className="space-y-4">
+          <div
+            className="space-y-4"
+            role="tabpanel"
+            id="tabpanel-insights"
+            aria-labelledby="tab-insights"
+          >
             {enhanced.isp_score && <IspScoreCard score={enhanced.isp_score} />}
             {enhanced.correlations && (
               <CorrelationMatrixView data={enhanced.correlations} />
@@ -217,14 +272,30 @@ export function StatisticsPage() {
         )}
 
         {activeTab === "servers" && (
-          <ServerComparison servers={enhanced.by_server} />
+          <div
+            className="space-y-4"
+            role="tabpanel"
+            id="tabpanel-servers"
+            aria-labelledby="tab-servers"
+          >
+            {enhanced.connection_comparison && (
+              <ConnectionComparisonSection comparison={enhanced.connection_comparison} />
+            )}
+            <ServerComparison servers={enhanced.by_server} />
+          </div>
         )}
 
         {activeTab === "outages" && (
-          <OutageSection
-            startDate={dateParams.start_date}
-            endDate={dateParams.end_date}
-          />
+          <div
+            role="tabpanel"
+            id="tabpanel-outages"
+            aria-labelledby="tab-outages"
+          >
+            <OutageSection
+              startDate={dateParams.start_date}
+              endDate={dateParams.end_date}
+            />
+          </div>
         )}
       </div>
     </div>

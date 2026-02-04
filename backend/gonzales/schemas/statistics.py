@@ -197,6 +197,75 @@ class PredictiveTrend(BaseModel):
     confidence: str
 
 
+# --- Enhanced Predictive Analytics ---
+
+
+class PredictionInterval(BaseModel):
+    """Confidence interval for a prediction."""
+
+    lower: float
+    upper: float
+    confidence: float  # e.g., 0.95 for 95%
+
+
+class SeasonalFactor(BaseModel):
+    """Day-of-week seasonal adjustment factor."""
+
+    day: int  # 0=Monday, 6=Sunday
+    day_name: str
+    download_factor: float  # 1.0 = average, 1.1 = 10% above average
+    upload_factor: float
+    ping_factor: float
+
+
+class EnhancedPredictionPoint(BaseModel):
+    """Prediction point with confidence intervals and seasonal info."""
+
+    timestamp: str
+    day_of_week: str
+    download_mbps: float
+    download_interval: PredictionInterval
+    upload_mbps: float
+    upload_interval: PredictionInterval
+    ping_ms: float
+    ping_interval: PredictionInterval
+
+
+class EnhancedPredictiveTrend(BaseModel):
+    """Enhanced predictions with exponential smoothing and seasonality."""
+
+    points: list[EnhancedPredictionPoint]
+    seasonal_factors: list[SeasonalFactor]
+    method: str  # "holt_exponential_smoothing" or "linear_regression"
+    confidence_level: str  # "high", "medium", "low"
+    data_quality_score: float  # 0-100
+    smoothing_params: dict  # {"alpha": 0.3, "beta": 0.1}
+
+
+class ConnectionTypeStats(BaseModel):
+    """Statistics for a specific connection type."""
+
+    connection_type: str
+    test_count: int
+    avg_download_mbps: float
+    avg_upload_mbps: float
+    avg_ping_ms: float
+    avg_jitter_ms: float
+    min_download_mbps: float
+    max_download_mbps: float
+    reliability_score: float
+
+
+class ConnectionComparison(BaseModel):
+    """Comparison of performance across connection types."""
+
+    types: list[ConnectionTypeStats]
+    best_for_download: str
+    best_for_upload: str
+    best_for_latency: str
+    recommendation: str
+
+
 class EnhancedStatisticsOut(BaseModel):
     basic: StatisticsOut
     hourly: list[HourlyAverage]
@@ -213,3 +282,5 @@ class EnhancedStatisticsOut(BaseModel):
     correlations: CorrelationMatrix | None = None
     degradation_alerts: list[DegradationAlert] = []
     predictions: PredictiveTrend | None = None
+    enhanced_predictions: EnhancedPredictiveTrend | None = None
+    connection_comparison: ConnectionComparison | None = None

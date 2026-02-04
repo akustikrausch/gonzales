@@ -97,6 +97,8 @@ export interface Config {
   manual_trigger_cooldown_seconds: number;
   theme: string;
   isp_name: string;
+  data_retention_days: number;
+  webhook_url: string;
   host: string;
   port: number;
   log_level: string;
@@ -112,6 +114,8 @@ export interface ConfigUpdate {
   manual_trigger_cooldown_seconds?: number;
   theme?: string;
   isp_name?: string;
+  data_retention_days?: number;
+  webhook_url?: string;
 }
 
 export type SortField = "timestamp" | "download_mbps" | "upload_mbps" | "ping_latency_ms" | "ping_jitter_ms";
@@ -296,6 +300,59 @@ export interface PredictiveTrend {
   confidence: string;
 }
 
+// Connection Comparison Types
+export interface ConnectionTypeStats {
+  connection_type: string;
+  test_count: number;
+  avg_download_mbps: number;
+  avg_upload_mbps: number;
+  avg_ping_ms: number;
+  reliability_score: number;
+}
+
+export interface ConnectionComparison {
+  types: ConnectionTypeStats[];
+  best_for_download: string;
+  best_for_upload: string;
+  best_for_latency: string;
+  recommendation: string;
+}
+
+// Enhanced Predictions Types
+export interface PredictionInterval {
+  lower: number;
+  upper: number;
+  confidence: number;
+}
+
+export interface EnhancedPredictionPoint {
+  timestamp: string;
+  day_of_week: string;
+  download_mbps: number;
+  download_interval: PredictionInterval;
+  upload_mbps: number;
+  upload_interval: PredictionInterval;
+  ping_ms: number;
+  ping_interval: PredictionInterval;
+}
+
+export interface SeasonalFactor {
+  day: number;
+  day_name: string;
+  download_factor: number;
+  upload_factor: number;
+  ping_factor: number;
+}
+
+export interface EnhancedPredictiveTrend {
+  points: EnhancedPredictionPoint[];
+  seasonal_factors: SeasonalFactor[];
+  method: string;
+  confidence_level: string;
+  data_quality_score: number;
+  smoothing_params: Record<string, number>;
+}
+
 export interface EnhancedStatistics {
   basic: Statistics;
   hourly: HourlyAverage[];
@@ -312,6 +369,8 @@ export interface EnhancedStatistics {
   correlations: CorrelationMatrix | null;
   degradation_alerts: DegradationAlert[];
   predictions: PredictiveTrend | null;
+  enhanced_predictions: EnhancedPredictiveTrend | null;
+  connection_comparison: ConnectionComparison | null;
 }
 
 // QoS Types

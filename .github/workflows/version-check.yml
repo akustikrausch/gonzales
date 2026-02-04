@@ -1,0 +1,80 @@
+name: Version Check
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check-versions:
+    name: Verify Version Sync
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check version consistency
+        run: |
+          echo "Checking version consistency across all files..."
+          echo ""
+
+          # Extract versions from all files
+          PYPROJECT=$(grep '^version = ' backend/pyproject.toml | head -1 | sed 's/version = "\(.*\)"/\1/')
+          INIT=$(grep '__version__ = ' backend/gonzales/__init__.py | sed 's/__version__ = "\(.*\)"/\1/')
+          VERSION_PY=$(grep '__version__ = ' backend/gonzales/version.py | sed 's/__version__ = "\(.*\)"/\1/')
+          PACKAGE_JSON=$(grep '"version":' frontend/package.json | head -1 | sed 's/.*"version": "\(.*\)".*/\1/')
+          FRONTEND_TS=$(grep 'FRONTEND_VERSION = ' frontend/src/hooks/useVersionCheck.ts | sed 's/.*FRONTEND_VERSION = "\(.*\)".*/\1/')
+
+          echo "Found versions:"
+          echo "  backend/pyproject.toml:              $PYPROJECT"
+          echo "  backend/gonzales/__init__.py:        $INIT"
+          echo "  backend/gonzales/version.py:         $VERSION_PY"
+          echo "  frontend/package.json:               $PACKAGE_JSON"
+          echo "  frontend/src/hooks/useVersionCheck:  $FRONTEND_TS"
+          echo ""
+
+          # Check if all versions match
+          MISMATCH=0
+
+          if [ "$PYPROJECT" != "$INIT" ]; then
+            echo "ERROR: pyproject.toml ($PYPROJECT) != __init__.py ($INIT)"
+            MISMATCH=1
+          fi
+
+          if [ "$PYPROJECT" != "$VERSION_PY" ]; then
+            echo "ERROR: pyproject.toml ($PYPROJECT) != version.py ($VERSION_PY)"
+            MISMATCH=1
+          fi
+
+          if [ "$PYPROJECT" != "$PACKAGE_JSON" ]; then
+            echo "ERROR: pyproject.toml ($PYPROJECT) != package.json ($PACKAGE_JSON)"
+            MISMATCH=1
+          fi
+
+          if [ "$PYPROJECT" != "$FRONTEND_TS" ]; then
+            echo "ERROR: pyproject.toml ($PYPROJECT) != useVersionCheck.ts ($FRONTEND_TS)"
+            MISMATCH=1
+          fi
+
+          if [ $MISMATCH -eq 1 ]; then
+            echo ""
+            echo "Version mismatch detected! All version files must be in sync."
+            echo "See CLAUDE.md for version update instructions."
+            exit 1
+          fi
+
+          echo "All versions match: $PYPROJECT"
+
+      - name: Validate semantic version
+        run: |
+          VERSION=$(grep '^version = ' backend/pyproject.toml | head -1 | sed 's/version = "\(.*\)"/\1/')
+
+          # Check if version follows semantic versioning (X.Y.Z)
+          if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "ERROR: Version '$VERSION' does not follow semantic versioning (X.Y.Z)"
+            exit 1
+          fi
+
+          echo "Version format valid: $VERSION"

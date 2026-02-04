@@ -1,3 +1,15 @@
+"""Statistics computation service for speed test measurements.
+
+This module provides comprehensive analytics including:
+- Basic statistics (min, max, avg, median, percentiles)
+- Time-based analysis (hourly heatmaps, day-of-week patterns)
+- Trend analysis with predictive forecasting
+- ISP scoring with multi-factor grading (A+ to F)
+- Anomaly detection using z-score analysis
+- SLA compliance and reliability metrics
+- Connection type comparison (Ethernet vs WiFi vs VPN)
+"""
+
 import math
 from collections import defaultdict
 from datetime import datetime, timedelta
@@ -9,10 +21,14 @@ from gonzales.db.repository import MeasurementRepository
 from gonzales.schemas.statistics import (
     AnomalyPoint,
     BestWorstTimes,
+    ConnectionComparison,
+    ConnectionTypeStats,
     CorrelationMatrix,
     CorrelationPair,
     DayOfWeekAverage,
     DegradationAlert,
+    EnhancedPredictionPoint,
+    EnhancedPredictiveTrend,
     EnhancedStatisticsOut,
     HourlyAverage,
     IspScore,
@@ -20,9 +36,11 @@ from gonzales.schemas.statistics import (
     PeakOffPeakAnalysis,
     PercentileValues,
     PeriodStats,
+    PredictionInterval,
     PredictionPoint,
     PredictiveTrend,
     ReliabilityScore,
+    SeasonalFactor,
     ServerStats,
     SlaCompliance,
     SpeedStatistics,
@@ -39,6 +57,15 @@ HOUR_LABELS = [f"{h:02d}:00" for h in range(24)]
 
 
 def _percentile(sorted_values: list[float], p: float) -> float:
+    """Calculate percentile value using linear interpolation.
+
+    Args:
+        sorted_values: Pre-sorted list of values.
+        p: Percentile to calculate (0-100).
+
+    Returns:
+        The interpolated percentile value.
+    """
     if not sorted_values:
         return 0.0
     k = (len(sorted_values) - 1) * (p / 100.0)
@@ -50,6 +77,15 @@ def _percentile(sorted_values: list[float], p: float) -> float:
 
 
 def _stddev(values: list[float], mean: float) -> float:
+    """Calculate sample standard deviation.
+
+    Args:
+        values: List of values.
+        mean: Pre-calculated mean of values.
+
+    Returns:
+        Sample standard deviation (Bessel's correction applied).
+    """
     if len(values) < 2:
         return 0.0
     variance = sum((v - mean) ** 2 for v in values) / (len(values) - 1)
@@ -57,8 +93,15 @@ def _stddev(values: list[float], mean: float) -> float:
 
 
 def _compute_speed_stats(values: list[float]) -> SpeedStatistics | None:
+    """Compute comprehensive statistics for a list of speed values.
+
+    Args:
+        values: List of speed measurements.
+
+    Returns:
+        SpeedStatistics with min, max, avg, median, stddev, and percentiles.
+    """
     if not values:
-        return None
     sorted_vals = sorted(values)
     avg = sum(sorted_vals) / len(sorted_vals)
     return SpeedStatistics(
@@ -653,13 +696,337 @@ def _compute_predictions(measurements: list, days_ahead: int = 7) -> PredictiveT
     return PredictiveTrend(points=points, confidence=confidence)
 
 
+# --- Enhanced Predictive Analytics ---
+
+
+def _exponential_smoothing(values: list[float], alpha: float = 0.3) -> list[float]:
+    """Simple Exponential Smoothing - gives more weight to recent values.
+
+    Args:
+        values: Time series values
+        alpha: Smoothing factor (0 < alpha < 1), higher = more weight on recent
+
+    Returns:
+        Smoothed values
+    """
+    if not values:
+        return []
+
+    smoothed = [values[0]]  # Start with first value
+    for i in range(1, len(values)):
+        # s_t = alpha * x_t + (1 - alpha) * s_{t-1}
+        s = alpha * values[i] + (1 - alpha) * smoothed[-1]
+        smoothed.append(s)
+
+    return smoothed
+
+
+def _holt_linear_smoothing(
+    values: list[float],
+    alpha: float = 0.3,
+    beta: float = 0.1,
+) -> tuple[float, float]:
+    """Holt's Linear Exponential Smoothing - handles trends.
+
+    Args:
+        values: Time series values
+        alpha: Level smoothing factor
+        beta: Trend smoothing factor
+
+    Returns:
+        (level, trend) for forecasting: forecast = level + k * trend
+    """
+    if len(values) < 2:
+        return (values[0] if values else 0, 0)
+
+    # Initialize
+    level = values[0]
+    trend = values[1] - values[0]
+
+    for i in range(1, len(values)):
+        prev_level = level
+        level = alpha * values[i] + (1 - alpha) * (prev_level + trend)
+        trend = beta * (level - prev_level) + (1 - beta) * trend
+
+    return level, trend
+
+
+def _compute_seasonal_factors(measurements: list) -> dict[int, dict[str, float]]:
+    """Compute multiplicative seasonal factors for each day of the week.
+
+    Returns:
+        dict[weekday] -> {download_factor, upload_factor, ping_factor}
+        where 1.0 = average, 1.1 = 10% above average
+    """
+    if len(measurements) < 14:  # Need at least 2 weeks of data
+        return {}
+
+    # Calculate overall means
+    dl_mean = sum(m.download_mbps for m in measurements) / len(measurements)
+    ul_mean = sum(m.upload_mbps for m in measurements) / len(measurements)
+    pg_mean = sum(m.ping_latency_ms for m in measurements) / len(measurements)
+
+    if dl_mean == 0 or ul_mean == 0 or pg_mean == 0:
+        return {}
+
+    # Group by weekday
+    by_day: dict[int, list] = defaultdict(list)
+    for m in measurements:
+        by_day[m.timestamp.weekday()].append(m)
+
+    factors = {}
+    for day in range(7):
+        items = by_day.get(day, [])
+        if len(items) < 2:
+            factors[day] = {"download": 1.0, "upload": 1.0, "ping": 1.0}
+        else:
+            day_dl = sum(m.download_mbps for m in items) / len(items)
+            day_ul = sum(m.upload_mbps for m in items) / len(items)
+            day_pg = sum(m.ping_latency_ms for m in items) / len(items)
+            factors[day] = {
+                "download": day_dl / dl_mean,
+                "upload": day_ul / ul_mean,
+                "ping": day_pg / pg_mean,
+            }
+
+    return factors
+
+
+def _compute_prediction_interval(
+    values: list[float],
+    forecast: float,
+    confidence: float = 0.95,
+) -> tuple[float, float]:
+    """Compute prediction interval based on historical variance.
+
+    Returns:
+        (lower_bound, upper_bound)
+    """
+    if len(values) < 3:
+        return (forecast * 0.7, forecast * 1.3)  # Default 30% range
+
+    mean = sum(values) / len(values)
+    std = _stddev(values, mean)
+
+    # Z-scores for common confidence levels
+    z_scores = {0.80: 1.28, 0.90: 1.645, 0.95: 1.96, 0.99: 2.576}
+    z = z_scores.get(confidence, 1.96)
+
+    margin = z * std
+    return (max(0, forecast - margin), forecast + margin)
+
+
+def _compute_enhanced_predictions(
+    measurements: list,
+    days_ahead: int = 7,
+) -> EnhancedPredictiveTrend | None:
+    """Enhanced prediction using Holt's Exponential Smoothing with seasonal adjustment."""
+    if len(measurements) < 10:
+        return None
+
+    sorted_m = sorted(measurements, key=lambda m: m.timestamp)
+
+    # Extract time series
+    dl_values = [m.download_mbps for m in sorted_m]
+    ul_values = [m.upload_mbps for m in sorted_m]
+    pg_values = [m.ping_latency_ms for m in sorted_m]
+
+    # Compute seasonal factors
+    seasonal = _compute_seasonal_factors(sorted_m)
+
+    # Adaptive alpha based on data variability
+    dl_mean = sum(dl_values) / len(dl_values)
+    dl_cv = _stddev(dl_values, dl_mean) / dl_mean if dl_mean > 0 else 0
+    alpha = min(0.5, max(0.1, 0.3 + dl_cv * 0.2))  # More smoothing for volatile data
+    beta = 0.1
+
+    # Apply Holt's Exponential Smoothing
+    dl_level, dl_trend = _holt_linear_smoothing(dl_values, alpha, beta)
+    ul_level, ul_trend = _holt_linear_smoothing(ul_values, alpha, beta)
+    pg_level, pg_trend = _holt_linear_smoothing(pg_values, alpha, beta)
+
+    last_ts = sorted_m[-1].timestamp
+    points = []
+
+    for d in range(1, days_ahead + 1):
+        future_ts = last_ts + timedelta(days=d)
+        weekday = future_ts.weekday()
+
+        # Base forecast from Holt's method
+        dl_forecast = max(0, dl_level + d * dl_trend)
+        ul_forecast = max(0, ul_level + d * ul_trend)
+        pg_forecast = max(0, pg_level + d * pg_trend)
+
+        # Apply seasonal adjustment if available
+        if seasonal:
+            factors = seasonal.get(weekday, {"download": 1.0, "upload": 1.0, "ping": 1.0})
+            dl_forecast *= factors["download"]
+            ul_forecast *= factors["upload"]
+            pg_forecast *= factors["ping"]
+
+        # Compute confidence intervals
+        dl_lower, dl_upper = _compute_prediction_interval(dl_values, dl_forecast, 0.95)
+        ul_lower, ul_upper = _compute_prediction_interval(ul_values, ul_forecast, 0.95)
+        pg_lower, pg_upper = _compute_prediction_interval(pg_values, pg_forecast, 0.95)
+
+        points.append(EnhancedPredictionPoint(
+            timestamp=future_ts.isoformat(),
+            day_of_week=DAY_NAMES[weekday],
+            download_mbps=round(dl_forecast, 2),
+            download_interval=PredictionInterval(
+                lower=round(dl_lower, 2),
+                upper=round(dl_upper, 2),
+                confidence=0.95,
+            ),
+            upload_mbps=round(ul_forecast, 2),
+            upload_interval=PredictionInterval(
+                lower=round(ul_lower, 2),
+                upper=round(ul_upper, 2),
+                confidence=0.95,
+            ),
+            ping_ms=round(pg_forecast, 2),
+            ping_interval=PredictionInterval(
+                lower=round(pg_lower, 2),
+                upper=round(pg_upper, 2),
+                confidence=0.95,
+            ),
+        ))
+
+    # Build seasonal factors list
+    seasonal_list = []
+    for day in range(7):
+        factors = seasonal.get(day, {"download": 1.0, "upload": 1.0, "ping": 1.0})
+        seasonal_list.append(SeasonalFactor(
+            day=day,
+            day_name=DAY_NAMES[day],
+            download_factor=round(factors["download"], 3),
+            upload_factor=round(factors["upload"], 3),
+            ping_factor=round(factors["ping"], 3),
+        ))
+
+    # Data quality score
+    data_quality = min(100, len(measurements) * 2)  # More data = higher quality
+    if len(set(m.timestamp.weekday() for m in sorted_m)) == 7:
+        data_quality += 20  # Bonus for full week coverage
+    data_quality = min(100, data_quality)
+
+    # Confidence level
+    if len(measurements) >= 50 and data_quality >= 80:
+        confidence_level = "high"
+    elif len(measurements) >= 20:
+        confidence_level = "medium"
+    else:
+        confidence_level = "low"
+
+    return EnhancedPredictiveTrend(
+        points=points,
+        seasonal_factors=seasonal_list,
+        method="holt_exponential_smoothing",
+        confidence_level=confidence_level,
+        data_quality_score=data_quality,
+        smoothing_params={"alpha": round(alpha, 3), "beta": beta},
+    )
+
+
+# --- Connection Comparison ---
+
+
+def _compute_connection_comparison(measurements: list) -> ConnectionComparison | None:
+    """Compare performance across different connection types (Ethernet, WiFi, VPN)."""
+    if not measurements:
+        return None
+
+    # Group by connection_type
+    buckets: dict[str, list] = defaultdict(list)
+    for m in measurements:
+        conn_type = getattr(m, "connection_type", "unknown")
+        buckets[conn_type].append(m)
+
+    # Filter out types with too few measurements
+    MIN_SAMPLES = 3
+    valid_types = {k: v for k, v in buckets.items() if len(v) >= MIN_SAMPLES}
+
+    if not valid_types:
+        return None
+
+    types = []
+    for conn_type, items in valid_types.items():
+        dl = [m.download_mbps for m in items]
+        ul = [m.upload_mbps for m in items]
+        pg = [m.ping_latency_ms for m in items]
+        jt = [m.ping_jitter_ms for m in items]
+
+        # Calculate reliability (inverse of CV)
+        dl_mean = sum(dl) / len(dl)
+        dl_std = _stddev(dl, dl_mean)
+        cv = dl_std / dl_mean if dl_mean > 0 else 1
+        reliability = max(0, min(100, (1 - cv) * 100))
+
+        types.append(ConnectionTypeStats(
+            connection_type=conn_type,
+            test_count=len(items),
+            avg_download_mbps=round(dl_mean, 2),
+            avg_upload_mbps=round(sum(ul) / len(ul), 2),
+            avg_ping_ms=round(sum(pg) / len(pg), 2),
+            avg_jitter_ms=round(sum(jt) / len(jt), 2),
+            min_download_mbps=round(min(dl), 2),
+            max_download_mbps=round(max(dl), 2),
+            reliability_score=round(reliability, 1),
+        ))
+
+    # Determine best types
+    best_dl = max(types, key=lambda t: t.avg_download_mbps).connection_type
+    best_ul = max(types, key=lambda t: t.avg_upload_mbps).connection_type
+    best_ping = min(types, key=lambda t: t.avg_ping_ms).connection_type
+
+    # Generate recommendation
+    if len(types) >= 2:
+        sorted_by_dl = sorted(types, key=lambda t: t.avg_download_mbps, reverse=True)
+        diff_pct = (
+            (sorted_by_dl[0].avg_download_mbps - sorted_by_dl[1].avg_download_mbps)
+            / sorted_by_dl[1].avg_download_mbps
+            * 100
+        ) if sorted_by_dl[1].avg_download_mbps > 0 else 0
+        recommendation = (
+            f"{sorted_by_dl[0].connection_type.title()} provides "
+            f"{diff_pct:.0f}% faster download than {sorted_by_dl[1].connection_type.title()}"
+        )
+    else:
+        recommendation = "Only one connection type detected"
+
+    return ConnectionComparison(
+        types=types,
+        best_for_download=best_dl,
+        best_for_upload=best_ul,
+        best_for_latency=best_ping,
+        recommendation=recommendation,
+    )
+
+
 class StatisticsService:
+    """Service for computing comprehensive statistics from measurements.
+
+    Provides both basic statistics (get_statistics) and enhanced analytics
+    (get_enhanced_statistics) including ISP scoring, trend analysis,
+    anomaly detection, and predictive forecasting.
+    """
+
     async def get_statistics(
         self,
         session: AsyncSession,
         start_date: datetime | None = None,
         end_date: datetime | None = None,
     ) -> StatisticsOut:
+        """Get basic statistics for measurements in date range.
+
+        Args:
+            session: Database session.
+            start_date: Optional start date filter.
+            end_date: Optional end date filter.
+
+        Returns:
+            StatisticsOut with aggregated statistics.
+        """
         repo = MeasurementRepository(session)
         agg = await repo.get_statistics(start_date, end_date)
         measurements = await repo.get_all_in_range(start_date, end_date)
@@ -696,6 +1063,29 @@ class StatisticsService:
         start_date: datetime | None = None,
         end_date: datetime | None = None,
     ) -> EnhancedStatisticsOut:
+        """Get comprehensive analytics including all advanced features.
+
+        Computes extended statistics including:
+        - Basic statistics (min, max, avg, percentiles)
+        - Hourly and daily patterns (heatmaps)
+        - ISP score with breakdown (A+ to F grade)
+        - Trend analysis with predictions
+        - SLA compliance metrics
+        - Reliability score
+        - Peak/off-peak analysis
+        - Server comparison
+        - Connection type comparison
+        - Anomaly detection
+        - Degradation alerts
+
+        Args:
+            session: Database session.
+            start_date: Optional start date filter.
+            end_date: Optional end date filter.
+
+        Returns:
+            EnhancedStatisticsOut with all analytics data.
+        """
         basic = await self.get_statistics(session, start_date, end_date)
 
         repo = MeasurementRepository(session)
@@ -719,6 +1109,8 @@ class StatisticsService:
             correlations=_compute_correlations(measurements),
             degradation_alerts=_detect_degradation(measurements),
             predictions=_compute_predictions(measurements),
+            enhanced_predictions=_compute_enhanced_predictions(measurements),
+            connection_comparison=_compute_connection_comparison(measurements),
         )
 
 

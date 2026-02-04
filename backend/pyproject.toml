@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "gonzales"
-version = "2.2.0"
+version = "3.0.0"
 description = "Open-source internet speed monitor with automated testing, analytics dashboard, and Home Assistant integration"
 license = "MIT"
 authors = [{ name = "akustikrausch" }]
@@ -44,7 +44,13 @@ dependencies = [
     "apscheduler>=3.10.4",
     "reportlab>=4.2.0",
     "icmplib>=3.0.4",
+    "slowapi>=0.1.9",
 ]
+
+[project.scripts]
+gonzales = "gonzales.cli.main:app"
+gonzales-server = "gonzales.__main__:main"
+gonzales-tui = "gonzales.tui.app:main"
 
 [project.urls]
 Homepage = "https://github.com/akustikrausch/gonzales"
@@ -54,6 +60,10 @@ Issues = "https://github.com/akustikrausch/gonzales/issues"
 "Home Assistant Add-on" = "https://github.com/akustikrausch/gonzales-ha"
 
 [project.optional-dependencies]
+cli = [
+    "typer[all]>=0.12.0",
+    "rich>=13.9.0",
+]
 tui = [
     "textual>=0.89.0",
     "rich>=13.9.0",

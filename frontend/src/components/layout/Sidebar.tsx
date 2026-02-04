@@ -13,29 +13,38 @@ interface SidebarProps {
 function NavGroup({
   items,
   collapsed,
+  groupLabel,
 }: {
   items: NavItem[];
   collapsed: boolean;
+  groupLabel?: string;
 }) {
   return (
-    <>
+    <ul role="list" aria-label={groupLabel} className="list-none p-0 m-0">
       {items.map((item) => (
-        <NavLink
-          key={item.to}
-          to={item.to}
-          end={item.to === "/"}
-          title={collapsed ? item.label : undefined}
-          className={({ isActive }) =>
-            `glass-nav-item mb-0.5 ${
-              collapsed ? "justify-center !px-2.5 !gap-0" : ""
-            } ${isActive ? "glass-nav-item-active" : ""}`
-          }
-        >
-          <item.icon className="glass-nav-icon w-4 h-4 shrink-0" />
-          {!collapsed && <span>{item.label}</span>}
-        </NavLink>
+        <li key={item.to}>
+          <NavLink
+            to={item.to}
+            end={item.to === "/"}
+            title={collapsed ? item.label : undefined}
+            aria-label={collapsed ? item.label : undefined}
+            className={({ isActive }) =>
+              `glass-nav-item mb-0.5 ${
+                collapsed ? "justify-center !px-2.5 !gap-0" : ""
+              } ${isActive ? "glass-nav-item-active" : ""}`
+            }
+          >
+            {({ isActive }) => (
+              <>
+                <item.icon className="glass-nav-icon w-4 h-4 shrink-0" aria-hidden="true" />
+                {!collapsed && <span>{item.label}</span>}
+                {isActive && <span className="sr-only">(current page)</span>}
+              </>
+            )}
+          </NavLink>
+        </li>
       ))}
-    </>
+    </ul>
   );
 }
 
@@ -62,6 +71,8 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
   return (
     <aside
       className="glass-sidebar min-h-screen flex flex-col transition-all"
+      role="complementary"
+      aria-label="Main navigation"
       style={{
         width: collapsed
           ? "var(--g-sidebar-collapsed)"
@@ -77,7 +88,7 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
           justifyContent: collapsed ? "center" : "flex-start",
         }}
       >
-        <Logo size={28} />
+        <Logo size={28} aria-hidden="true" />
         {!collapsed && (
           <div>
             <h1
@@ -94,19 +105,23 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto" style={{ padding: "var(--g-space-3)" }}>
-        {/* Main group - no label */}
-        <NavGroup items={mainItems} collapsed={collapsed} />
+      <nav
+        className="flex-1 overflow-y-auto"
+        style={{ padding: "var(--g-space-3)" }}
+        aria-label="Primary navigation"
+      >
+        {/* Main group */}
+        <NavGroup items={mainItems} collapsed={collapsed} groupLabel="Main navigation" />
 
         {/* Tools group */}
         {!collapsed && <GroupDivider label="Tools" />}
-        {collapsed && <div className="my-2" />}
-        <NavGroup items={toolsItems} collapsed={collapsed} />
+        {collapsed && <div className="my-2" aria-hidden="true" />}
+        <NavGroup items={toolsItems} collapsed={collapsed} groupLabel="Tools" />
 
         {/* System group */}
         {!collapsed && <GroupDivider label="System" />}
-        {collapsed && <div className="my-2" />}
-        <NavGroup items={systemItems} collapsed={collapsed} />
+        {collapsed && <div className="my-2" aria-hidden="true" />}
+        <NavGroup items={systemItems} collapsed={collapsed} groupLabel="System settings" />
       </nav>
 
       {/* Footer */}

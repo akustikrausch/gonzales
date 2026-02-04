@@ -1,9 +1,13 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useCallback } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AppShell } from "./components/layout/AppShell";
 import { SpeedTestProvider } from "./context/SpeedTestContext";
+import { ToastProvider } from "./context/ToastContext";
+import { ToastContainer } from "./components/ui/Toast";
+import { OnboardingWizard } from "./components/onboarding";
 import { Spinner } from "./components/ui/Spinner";
 import { useVersionCheck } from "./hooks/useVersionCheck";
+import { useOnboarding } from "./hooks/useOnboarding";
 
 /**
  * Checks frontend/backend version match and auto-reloads on mismatch.
@@ -57,26 +61,53 @@ function PageLoader() {
   );
 }
 
+function AppContent() {
+  const { showOnboarding, completeOnboarding, skipOnboarding } = useOnboarding();
+
+  const handleOnboardingComplete = useCallback(() => {
+    completeOnboarding();
+  }, [completeOnboarding]);
+
+  const handleOnboardingSkip = useCallback(() => {
+    skipOnboarding();
+  }, [skipOnboarding]);
+
+  return (
+    <>
+      <ToastContainer />
+      {showOnboarding && (
+        <OnboardingWizard
+          onComplete={handleOnboardingComplete}
+          onSkip={handleOnboardingSkip}
+        />
+      )}
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route element={<AppShell />}>
+            <Route index element={<DashboardPage />} />
+            <Route path="history" element={<HistoryPage />} />
+            <Route path="statistics" element={<StatisticsPage />} />
+            <Route path="qos" element={<QosPage />} />
+            <Route path="topology" element={<TopologyPage />} />
+            <Route path="export" element={<ExportPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+            <Route path="docs" element={<DocsPage />} />
+          </Route>
+        </Routes>
+      </Suspense>
+    </>
+  );
+}
+
 export default function App() {
   return (
     <VersionGuard>
       <BrowserRouter basename={getBasename()}>
-        <SpeedTestProvider>
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-              <Route element={<AppShell />}>
-                <Route index element={<DashboardPage />} />
-                <Route path="history" element={<HistoryPage />} />
-                <Route path="statistics" element={<StatisticsPage />} />
-                <Route path="qos" element={<QosPage />} />
-                <Route path="topology" element={<TopologyPage />} />
-                <Route path="export" element={<ExportPage />} />
-                <Route path="settings" element={<SettingsPage />} />
-                <Route path="docs" element={<DocsPage />} />
-              </Route>
-            </Routes>
-          </Suspense>
-        </SpeedTestProvider>
+        <ToastProvider>
+          <SpeedTestProvider>
+            <AppContent />
+          </SpeedTestProvider>
+        </ToastProvider>
       </BrowserRouter>
     </VersionGuard>
   );

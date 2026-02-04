@@ -10,6 +10,7 @@ from gonzales.config import settings
 from gonzales.core.logging import logger
 from gonzales.core.security import configure_security
 from gonzales.db.engine import dispose_engine, init_db
+from gonzales.middleware.rate_limit import RateLimitMiddleware
 from gonzales.services.scheduler_service import scheduler_service
 from gonzales.services.speedtest_runner import speedtest_runner
 from gonzales.version import __version__
@@ -76,6 +77,19 @@ def create_app() -> FastAPI:
 
     configure_security(app)
     app.add_middleware(NoCacheIndexMiddleware)
+
+    # Rate limiting middleware - protect API from abuse
+    # Disabled for local development (127.0.0.1) or when explicitly disabled
+    enable_rate_limit = settings.host != "127.0.0.1" and not settings.debug
+    app.add_middleware(
+        RateLimitMiddleware,
+        requests_per_minute=120,  # 2 requests/second sustained
+        burst_size=20,  # Allow bursts of 20 requests
+        strict_requests_per_minute=6,  # Resource-intensive endpoints: 1 per 10 seconds
+        strict_burst_size=2,
+        enabled=enable_rate_limit,
+    )
+
     app.include_router(api_router)
 
     static_dir = Path(__file__).parent / "static"

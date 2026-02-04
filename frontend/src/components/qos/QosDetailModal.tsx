@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { X, CheckCircle, XCircle, Tv, Video, Gamepad2, Briefcase, Upload, Radio, Home, PlayCircle, Users, Swords } from "lucide-react";
 import type { QosTestResult, QosCheck } from "../../api/types";
 import { GlassButton } from "../ui/GlassButton";
@@ -66,16 +67,66 @@ function CheckBar({ check }: { check: QosCheck }) {
 export function QosDetailModal({ result, onClose }: QosDetailModalProps) {
   const Icon = iconMap[result.icon] || Tv;
   const statusColor = result.passed ? "var(--g-green)" : "var(--g-red)";
+  const modalRef = useRef<HTMLDivElement>(null);
+  const previousActiveElement = useRef<HTMLElement | null>(null);
+
+  // Focus trap and escape key handler
+  useEffect(() => {
+    // Store the previously focused element
+    previousActiveElement.current = document.activeElement as HTMLElement;
+
+    // Handle escape key and focus trap
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+
+      // Focus trap
+      if (e.key === "Tab" && modalRef.current) {
+        const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey && document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement?.focus();
+        } else if (!e.shiftKey && document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement?.focus();
+        }
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    // Focus the first focusable element
+    const firstFocusable = modalRef.current?.querySelector<HTMLElement>("button");
+    firstFocusable?.focus();
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      // Restore focus when modal closes
+      previousActiveElement.current?.focus();
+    };
+  }, [onClose]);
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
       style={{ backgroundColor: "rgba(0, 0, 0, 0.6)" }}
       onClick={onClose}
+      role="presentation"
     >
       <div
+        ref={modalRef}
         className="glass-card p-6 w-full max-w-md"
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="qos-modal-title"
       >
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
@@ -86,7 +137,7 @@ export function QosDetailModal({ result, onClose }: QosDetailModalProps) {
               <Icon className="w-6 h-6" style={{ color: statusColor }} />
             </div>
             <div>
-              <h3 className="font-bold" style={{ color: "var(--g-text)" }}>
+              <h3 id="qos-modal-title" className="font-bold" style={{ color: "var(--g-text)" }}>
                 {result.profile_name}
               </h3>
               <p className="text-sm" style={{ color: statusColor }}>
@@ -97,8 +148,9 @@ export function QosDetailModal({ result, onClose }: QosDetailModalProps) {
           <button
             onClick={onClose}
             className="p-1 rounded hover:bg-white/10"
+            aria-label="Close dialog"
           >
-            <X className="w-5 h-5" style={{ color: "var(--g-text-secondary)" }} />
+            <X className="w-5 h-5" style={{ color: "var(--g-text-secondary)" }} aria-hidden="true" />
           </button>
         </div>
 

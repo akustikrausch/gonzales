@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Timer, Activity, Server, Save, Palette, FileText } from "lucide-react";
+import { Timer, Activity, Server, Save, Palette, FileText, Bell } from "lucide-react";
 import { useConfig, useStatus, useUpdateConfig, useStatistics } from "../hooks/useApi";
 import { GlassCard } from "../components/ui/GlassCard";
 import { GlassInput } from "../components/ui/GlassInput";
@@ -21,6 +21,8 @@ export function SettingsPage() {
   const [tolerance, setTolerance] = useState(15);
   const [serverId, setServerId] = useState(0);
   const [ispName, setIspName] = useState("");
+  const [webhookUrl, setWebhookUrl] = useState("");
+  const [retentionDays, setRetentionDays] = useState("0");
 
   useEffect(() => {
     if (config) {
@@ -30,6 +32,8 @@ export function SettingsPage() {
       setTolerance(config.tolerance_percent);
       setServerId(config.preferred_server_id);
       setIspName(config.isp_name || "");
+      setWebhookUrl(config.webhook_url || "");
+      setRetentionDays(String(config.data_retention_days || 0));
     }
   }, [config]);
 
@@ -212,8 +216,62 @@ export function SettingsPage() {
         </div>
       </GlassCard>
 
+      <GlassCard className="g-animate-in g-stagger-5">
+        <h3
+          className="text-sm font-semibold mb-4 flex items-center gap-2"
+          style={{ color: "var(--g-text)" }}
+        >
+          <Bell className="w-4 h-4" style={{ color: "var(--g-text-secondary)" }} />
+          Notifications & Data
+        </h3>
+        <div className="space-y-4 max-w-md">
+          <div>
+            <GlassInput
+              label="Webhook URL"
+              type="url"
+              placeholder="https://your-webhook.example.com/endpoint"
+              value={webhookUrl}
+              onChange={(e) => setWebhookUrl(e.target.value)}
+            />
+            <p className="text-xs mt-2" style={{ color: "var(--g-text-secondary)" }}>
+              Receive notifications for speed test results, outages, and threshold violations.
+              Leave empty to disable webhooks.
+            </p>
+          </div>
+          <div>
+            <GlassInput
+              label="Data Retention (days)"
+              type="number"
+              min={0}
+              max={3650}
+              placeholder="0"
+              value={retentionDays}
+              onChange={(e) => setRetentionDays(e.target.value)}
+            />
+            <p className="text-xs mt-2" style={{ color: "var(--g-text-secondary)" }}>
+              {Number(retentionDays) === 0
+                ? "Unlimited - data is kept forever"
+                : `Measurements older than ${retentionDays} days will be automatically deleted`}
+            </p>
+          </div>
+          <GlassButton
+            variant="primary"
+            onClick={() => {
+              updateConfig.mutate({
+                webhook_url: webhookUrl,
+                data_retention_days: Number(retentionDays),
+              });
+            }}
+            disabled={updateConfig.isPending}
+          >
+            <Save className="w-4 h-4" />
+            {updateConfig.isPending ? "Saving..." : "Save Advanced Settings"}
+          </GlassButton>
+        </div>
+      </GlassCard>
+
       {status && (
-        <GlassCard className="g-animate-in g-stagger-5">
+        <GlassCard className="g-animate-in g-stagger-6">
           <h3
             className="text-sm font-semibold mb-4 flex items-center gap-2"
             style={{ color: "var(--g-text)" }}
@@ -263,7 +321,7 @@ export function SettingsPage() {
       )}
 
       {config && (
-        <GlassCard className="g-animate-in g-stagger-6">
+        <GlassCard className="g-animate-in g-stagger-7">
           <h3
             className="text-sm font-semibold mb-4 flex items-center gap-2"
             style={{ color: "var(--g-text)" }}

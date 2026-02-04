@@ -58,3 +58,9 @@ htmlcov/
 *.bak
 *.tmp
 *.orig
+
+# Audit reports (private, not to be committed)
+.audits/
+audits/
+*_audit.md
+*_audit.txt

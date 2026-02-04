@@ -10,6 +10,8 @@ class ConfigOut(BaseModel):
     manual_trigger_cooldown_seconds: int
     theme: str
     isp_name: str
+    data_retention_days: int
+    webhook_url: str
     host: str
     port: int
     log_level: str
@@ -25,3 +27,5 @@ class ConfigUpdate(BaseModel):
     manual_trigger_cooldown_seconds: int | None = Field(default=None, ge=0, le=3600)
     theme: str | None = Field(default=None, pattern=r"^(auto|light|dark)$")
     isp_name: str | None = Field(default=None, max_length=255)
+    data_retention_days: int | None = Field(default=None, ge=0, le=3650)
+    webhook_url: str | None = Field(default=None, max_length=2048)

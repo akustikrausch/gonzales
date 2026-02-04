@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 
 from gonzales.api.dependencies import require_api_key
 from gonzales.config import settings
+from gonzales.core.rate_limit import RATE_LIMITS, limiter
 from gonzales.schemas.config import ConfigOut, ConfigUpdate
 from gonzales.services.scheduler_service import scheduler_service
 
@@ -9,7 +10,8 @@ router = APIRouter(prefix="/config", tags=["config"])
 
 
 @router.get("", response_model=ConfigOut)
-async def get_config():
+@limiter.limit(RATE_LIMITS["read"])
+async def get_config(request: Request):
     return ConfigOut(
         test_interval_minutes=settings.test_interval_minutes,
         download_threshold_mbps=settings.download_threshold_mbps,
@@ -27,7 +29,8 @@ async def get_config():
 
 
 @router.put("", response_model=ConfigOut, dependencies=[Depends(require_api_key)])
-async def update_config(update: ConfigUpdate):
+@limiter.limit(RATE_LIMITS["config_update"])
+async def update_config(request: Request, update: ConfigUpdate):
     if update.test_interval_minutes is not None:
         settings.test_interval_minutes = update.test_interval_minutes
         scheduler_service.reschedule(update.test_interval_minutes)

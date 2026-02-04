@@ -1,10 +1,11 @@
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from gonzales.api.dependencies import get_db
+from gonzales.core.rate_limit import RATE_LIMITS, limiter
 from gonzales.db.repository import MeasurementRepository
 from gonzales.services.export_service import export_service
 from gonzales.services.statistics_service import statistics_service
@@ -13,7 +14,9 @@ router = APIRouter(prefix="/export", tags=["export"])
 
 
 @router.get("/csv")
+@limiter.limit(RATE_LIMITS["export"])
 async def export_csv(
+    request: Request,
     start_date: datetime | None = Query(default=None),
     end_date: datetime | None = Query(default=None),
     session: AsyncSession = Depends(get_db),
@@ -29,7 +32,9 @@ async def export_csv(
 
 
 @router.get("/pdf")
+@limiter.limit(RATE_LIMITS["export"])
 async def export_pdf(
+    request: Request,
     start_date: datetime | None = Query(default=None),
     end_date: datetime | None = Query(default=None),
     session: AsyncSession = Depends(get_db),
@@ -60,7 +65,9 @@ async def export_pdf(
 
 
 @router.get("/report/professional")
+@limiter.limit(RATE_LIMITS["export"])
 async def export_professional_report(
+    request: Request,
     start_date: datetime | None = Query(default=None),
     end_date: datetime | None = Query(default=None),
     session: AsyncSession = Depends(get_db),

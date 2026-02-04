@@ -30,17 +30,19 @@ export function Header() {
   return (
     <header
       className="glass-header flex items-center justify-between"
+      role="banner"
       style={{
         height: "var(--g-header-height)",
         padding: "0 var(--g-space-6)",
       }}
     >
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3" role="status" aria-live="polite">
         {status && (
           <>
             <GlassBadge color={status.scheduler.running ? "var(--g-green)" : "var(--g-red)"}>
               <span
                 className="w-1.5 h-1.5 rounded-full"
+                aria-hidden="true"
                 style={{
                   background: status.scheduler.running ? "var(--g-green)" : "var(--g-red)",
                 }}
@@ -51,6 +53,8 @@ export function Header() {
               <span
                 className="text-xs font-medium animate-pulse"
                 style={{ color: "var(--g-blue)" }}
+                role="status"
+                aria-live="assertive"
               >
                 Test running...
               </span>
@@ -58,19 +62,25 @@ export function Header() {
           </>
         )}
       </div>
-      <div className="flex items-center gap-2">
-        <GlassButton onClick={cycleTheme} size="sm" title={`Theme: ${theme}`}>
-          <ThemeIcon className="w-4 h-4" />
+      <div className="flex items-center gap-2" role="toolbar" aria-label="Quick actions">
+        <GlassButton
+          onClick={cycleTheme}
+          size="sm"
+          title={`Theme: ${theme}`}
+          aria-label={`Change theme, current: ${theme}`}
+        >
+          <ThemeIcon className="w-4 h-4" aria-hidden="true" />
         </GlassButton>
         <GlassButton
           variant="primary"
           onClick={runTest}
           disabled={!!isRunning}
+          aria-label={isRunning ? "Speed test in progress" : "Run speed test now"}
         >
           {isRunning ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
           ) : (
-            <Play className="w-4 h-4" />
+            <Play className="w-4 h-4" aria-hidden="true" />
           )}
           {isRunning ? "Testing..." : "Run Test"}
         </GlassButton>

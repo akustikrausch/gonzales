@@ -228,6 +228,15 @@
   color: var(--g-text-tertiary);
 }
 
+.glass-input-error {
+  border-color: var(--g-red);
+}
+
+.glass-input-error:focus {
+  border-color: var(--g-red);
+  box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.15);
+}
+
 
 /* ==========================================================================
    GLASS BADGE
@@ -508,4 +517,373 @@
 .glass-focus-ring:focus-visible {
   outline: none;
   box-shadow: var(--g-focus-ring);
+}
+
+
+/* ==========================================================================
+   GLASS TOAST -- Notification toasts with glass morphism
+   ========================================================================== */
+
+.glass-toast-container {
+  position: fixed;
+  top: var(--g-space-4);
+  right: var(--g-space-4);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: var(--g-space-3);
+  max-width: 400px;
+  pointer-events: none;
+}
+
+.glass-toast {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--g-space-3);
+  padding: var(--g-space-3) var(--g-space-4);
+  background: var(--g-card-bg);
+  backdrop-filter: var(--g-glass-blur);
+  -webkit-backdrop-filter: var(--g-glass-blur);
+  border: 1px solid var(--g-card-border);
+  border-left: 3px solid var(--toast-color, var(--g-blue));
+  border-radius: var(--g-radius-md);
+  box-shadow: var(--g-shadow-elevated);
+  pointer-events: auto;
+  animation: g-toast-in var(--g-duration-normal) var(--g-spring);
+}
+
+.glass-toast-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.glass-toast-message {
+  flex: 1;
+  font-size: var(--g-text-sm);
+  color: var(--g-text);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.glass-toast-dismiss {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--g-space-1);
+  background: transparent;
+  border: none;
+  border-radius: var(--g-radius-sm);
+  color: var(--g-text-tertiary);
+  cursor: pointer;
+  transition: color var(--g-duration-fast) var(--g-ease-out),
+    background var(--g-duration-fast) var(--g-ease-out);
+}
+
+.glass-toast-dismiss:hover {
+  color: var(--g-text);
+  background: var(--g-glass-bg);
+}
+
+@keyframes g-toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(100%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+
+/* ==========================================================================
+   GLASS FAB -- Floating Action Button
+   ========================================================================== */
+
+.glass-fab-container {
+  position: fixed;
+  bottom: var(--g-space-6);
+  right: var(--g-space-6);
+  z-index: 50;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-end;
+  gap: var(--g-space-3);
+}
+
+.glass-fab {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--g-blue);
+  border: none;
+  border-radius: var(--g-radius-full);
+  color: white;
+  cursor: pointer;
+  box-shadow: var(--g-shadow-floating);
+  transition:
+    transform var(--g-duration-fast) var(--g-spring),
+    box-shadow var(--g-duration-fast) var(--g-ease-out),
+    background var(--g-duration-fast) var(--g-ease-out);
+}
+
+.glass-fab:hover {
+  background: #0066D6;
+  box-shadow: 0 8px 32px rgba(0, 122, 255, 0.4);
+  transform: scale(1.05);
+}
+
+.glass-fab:active {
+  transform: scale(0.95);
+}
+
+.glass-fab-expanded {
+  transform: rotate(45deg);
+}
+
+.glass-fab-expanded:hover {
+  transform: rotate(45deg) scale(1.05);
+}
+
+.glass-fab-actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--g-space-2);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition:
+    opacity var(--g-duration-fast) var(--g-ease-out),
+    transform var(--g-duration-fast) var(--g-spring);
+}
+
+.glass-fab-actions-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.glass-fab-action {
+  display: flex;
+  align-items: center;
+  gap: var(--g-space-3);
+  padding: var(--g-space-2) var(--g-space-4);
+  background: var(--g-card-bg);
+  backdrop-filter: var(--g-glass-blur);
+  -webkit-backdrop-filter: var(--g-glass-blur);
+  border: 1px solid var(--g-card-border);
+  border-radius: var(--g-radius-full);
+  color: var(--g-text);
+  font-size: var(--g-text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: var(--g-shadow-elevated);
+  transition:
+    transform var(--g-duration-fast) var(--g-spring),
+    box-shadow var(--g-duration-fast) var(--g-ease-out),
+    background var(--g-duration-fast) var(--g-ease-out);
+  white-space: nowrap;
+}
+
+.glass-fab-action:hover {
+  background: var(--g-glass-bg-strong);
+  box-shadow: var(--g-shadow-floating);
+  transform: translateX(-4px);
+}
+
+.glass-fab-action-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--g-radius-full);
+  flex-shrink: 0;
+}
+
+.glass-fab-action-primary .glass-fab-action-icon {
+  background: var(--g-blue);
+  color: white;
+}
+
+.glass-fab-action-secondary .glass-fab-action-icon {
+  background: var(--g-glass-bg);
+  color: var(--g-text);
+}
+
+.glass-fab-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 49;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--g-duration-normal) var(--g-ease-out);
+}
+
+.glass-fab-backdrop-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .glass-fab-container {
+    bottom: calc(var(--g-space-6) + 60px); /* Above mobile nav */
+    right: var(--g-space-4);
+  }
+
+  .glass-toast-container {
+    left: var(--g-space-4);
+    right: var(--g-space-4);
+    max-width: none;
+  }
+}
+
+
+/* ==========================================================================
+   SKIP TO CONTENT -- Accessibility link for keyboard navigation
+   ========================================================================== */
+
+.skip-to-content {
+  position: absolute;
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  padding: var(--g-space-3) var(--g-space-6);
+  background: var(--g-blue);
+  color: white;
+  font-size: var(--g-text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0 0 var(--g-radius-md) var(--g-radius-md);
+  box-shadow: var(--g-shadow-elevated);
+  transition: top var(--g-duration-fast) var(--g-ease-out);
+}
+
+.skip-to-content:focus {
+  top: 0;
+  outline: none;
+}
+
+
+/* ==========================================================================
+   ACCESSIBILITY UTILITIES
+   ========================================================================== */
+
+/* Screen reader only content - visually hidden but accessible */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Allow element to be focusable when navigated to */
+.sr-only-focusable:active,
+.sr-only-focusable:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* Live region announcements for screen readers */
+.sr-live-polite {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* High contrast mode adjustments */
+@media (prefers-contrast: high) {
+  .glass-card,
+  .glass-btn,
+  .glass-input,
+  .glass-select {
+    border-width: 2px;
+  }
+
+  .glass-btn:focus-visible,
+  .glass-input:focus-visible,
+  .glass-select:focus-visible {
+    outline: 3px solid currentColor;
+    outline-offset: 2px;
+  }
+}
+
+/* Focus within - for focus inside containers */
+.glass-card:focus-within {
+  box-shadow: var(--g-focus-ring);
+}
+
+/* Interactive card focus styles */
+.glass-card-interactive {
+  cursor: pointer;
+}
+
+.glass-card-interactive:focus-visible {
+  outline: none;
+  box-shadow: var(--g-focus-ring);
+}
+
+.glass-card-interactive:focus-visible::before {
+  opacity: 0.5;
+}
+
+/* Nav item focus styles */
+.glass-nav-item:focus-visible {
+  outline: none;
+  box-shadow: var(--g-focus-ring);
+  background: var(--g-glass-bg-subtle);
+}
+
+/* Table row focus for keyboard navigation */
+.glass-table tbody tr:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--g-blue);
+  background: var(--g-blue-tint);
+}
+
+/* Ensure focus is visible on all interactive elements */
+a:focus-visible,
+button:focus-visible,
+[tabindex="0"]:focus-visible {
+  outline: 2px solid var(--g-blue);
+  outline-offset: 2px;
 }

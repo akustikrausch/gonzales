@@ -13,6 +13,13 @@ interface SortableHeaderProps {
 
 function SortableHeader({ label, field, sortBy, sortOrder, onSort, align = "right" }: SortableHeaderProps) {
   const active = sortBy === field;
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onSort?.(field);
+    }
+  };
+
   return (
     <th
       className={`py-3 px-3 font-medium cursor-pointer select-none transition-colors ${
@@ -20,17 +27,21 @@ function SortableHeader({ label, field, sortBy, sortOrder, onSort, align = "righ
       }`}
       style={{ color: "var(--g-text-secondary)", fontSize: "var(--g-text-xs)" }}
       onClick={() => onSort?.(field)}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      role="columnheader"
+      aria-sort={active ? (sortOrder === "asc" ? "ascending" : "descending") : "none"}
     >
       <span className="inline-flex items-center gap-1">
         {label}
         {active ? (
           sortOrder === "asc" ? (
-            <ArrowUp className="w-3 h-3" />
+            <ArrowUp className="w-3 h-3" aria-hidden="true" />
           ) : (
-            <ArrowDown className="w-3 h-3" />
+            <ArrowDown className="w-3 h-3" aria-hidden="true" />
           )
         ) : (
-          <ArrowUpDown className="w-3 h-3 opacity-40" />
+          <ArrowUpDown className="w-3 h-3 opacity-40" aria-hidden="true" />
         )}
       </span>
     </th>
@@ -118,11 +129,12 @@ export function MeasurementTable({ measurements, onDelete, sortBy, sortOrder, on
                       onClick={() => onDelete(m.id)}
                       className="glass-focus-ring rounded transition-colors"
                       style={{ color: "var(--g-text-secondary)" }}
-                      title="Delete"
+                      title="Delete measurement"
+                      aria-label={`Delete measurement from ${formatDate(m.timestamp)}`}
                       onMouseEnter={(e) => (e.currentTarget.style.color = "var(--g-red)")}
                       onMouseLeave={(e) => (e.currentTarget.style.color = "var(--g-text-secondary)")}
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-4 h-4" aria-hidden="true" />
                     </button>
                   )}
                 </td>

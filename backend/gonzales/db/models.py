@@ -38,6 +38,8 @@ class Measurement(Base):
     external_ip: Mapped[str] = mapped_column(String(45), nullable=False, default="")
     interface_name: Mapped[str] = mapped_column(String(100), nullable=False, default="")
     is_vpn: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    connection_type: Mapped[str] = mapped_column(String(20), nullable=False, default="unknown")
+    mac_address: Mapped[str] = mapped_column(String(17), nullable=False, default="")
 
     result_id: Mapped[str] = mapped_column(String(255), nullable=False, default="")
     result_url: Mapped[str] = mapped_column(String(512), nullable=False, default="")

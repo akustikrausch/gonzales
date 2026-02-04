@@ -212,7 +212,7 @@ and innovative. Every pixel, every animation, every interaction must be intentio
 - Home Assistant integration guide
 - Verification commands
 
-### R7.2 Architecture Documentation (claude.md)
+### R7.2 Architecture Documentation (ARCHITECTURE.md)
 - High-level architecture overview
 - Component descriptions and responsibilities
 - Key patterns and design decisions

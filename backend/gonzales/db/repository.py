@@ -92,6 +92,21 @@ class MeasurementRepository:
         result = await self.session.execute(select(func.count(Measurement.id)))
         return result.scalar_one()
 
+    async def delete_older_than(self, cutoff_date: datetime) -> int:
+        """Delete all measurements older than the given date.
+
+        Args:
+            cutoff_date: Delete measurements with timestamp before this date.
+
+        Returns:
+            Number of deleted measurements.
+        """
+        result = await self.session.execute(
+            delete(Measurement).where(Measurement.timestamp < cutoff_date)
+        )
+        await self.session.commit()
+        return result.rowcount
+
     async def get_statistics(
         self,
         start_date: datetime | None = None,

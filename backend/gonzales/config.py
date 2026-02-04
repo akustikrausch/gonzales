@@ -12,6 +12,8 @@ MUTABLE_KEYS = {
     "manual_trigger_cooldown_seconds",
     "theme",
     "isp_name",
+    "data_retention_days",
+    "webhook_url",
 }
 
 
@@ -38,6 +40,8 @@ class Settings(BaseSettings):
     api_key: str = ""
     ha_addon: bool = False
     isp_name: str = ""  # Provider name for reports
+    data_retention_days: int = 0  # 0 = unlimited, otherwise delete data older than N days
+    webhook_url: str = ""  # Webhook URL for notifications (empty = disabled)
 
     @property
     def database_url(self) -> str:

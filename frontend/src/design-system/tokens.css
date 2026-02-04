@@ -7,6 +7,10 @@
   --g-purple: #AF52DE;
   --g-teal: #5AC8FA;
 
+  /* Accent (alias for primary color) */
+  --g-accent: var(--g-blue);
+  --g-accent-dim: rgba(0, 122, 255, 0.6);
+
   /* Color tints (10% opacity) */
   --g-blue-tint: rgba(0, 122, 255, 0.10);
   --g-green-tint: rgba(52, 199, 89, 0.10);
@@ -17,8 +21,10 @@
 
   /* Surfaces */
   --g-bg: #F2F2F7;
+  --g-surface: rgba(255, 255, 255, 0.70);
   --g-card-bg: rgba(255, 255, 255, 0.60);
   --g-card-border: rgba(255, 255, 255, 0.80);
+  --g-input-bg: rgba(255, 255, 255, 0.50);
 
   /* Shadow scale (4 levels) */
   --g-shadow-subtle: 0 1px 4px rgba(0, 0, 0, 0.04), 0 0 1px rgba(0, 0, 0, 0.06);
@@ -115,8 +121,10 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --g-bg: #1C1C1E;
+    --g-surface: rgba(44, 44, 46, 0.70);
     --g-card-bg: rgba(44, 44, 46, 0.60);
     --g-card-border: rgba(255, 255, 255, 0.08);
+    --g-input-bg: rgba(44, 44, 46, 0.50);
     --g-shadow-subtle: 0 1px 4px rgba(0, 0, 0, 0.2), 0 0 1px rgba(0, 0, 0, 0.3);
     --g-shadow-medium: 0 2px 16px rgba(0, 0, 0, 0.3), 0 0 1px rgba(0, 0, 0, 0.4);
     --g-shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -146,8 +154,10 @@
 
 [data-theme="dark"] {
   --g-bg: #1C1C1E;
+  --g-surface: rgba(44, 44, 46, 0.70);
   --g-card-bg: rgba(44, 44, 46, 0.60);
   --g-card-border: rgba(255, 255, 255, 0.08);
+  --g-input-bg: rgba(44, 44, 46, 0.50);
   --g-shadow-subtle: 0 1px 4px rgba(0, 0, 0, 0.2), 0 0 1px rgba(0, 0, 0, 0.3);
   --g-shadow-medium: 0 2px 16px rgba(0, 0, 0, 0.3), 0 0 1px rgba(0, 0, 0, 0.4);
   --g-shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);

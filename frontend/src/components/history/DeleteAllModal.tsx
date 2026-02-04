@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AlertTriangle, Trash2, X } from "lucide-react";
 import { GlassButton } from "../ui/GlassButton";
 
@@ -19,6 +19,49 @@ export function DeleteAllModal({
 }: DeleteAllModalProps) {
   const [confirmText, setConfirmText] = useState("");
   const CONFIRM_WORD = "DELETE";
+  const modalRef = useRef<HTMLDivElement>(null);
+  const previousActiveElement = useRef<HTMLElement | null>(null);
+
+  // Focus trap and escape key handler
+  useEffect(() => {
+    if (!isOpen) return;
+
+    // Store the previously focused element
+    previousActiveElement.current = document.activeElement as HTMLElement;
+
+    // Handle escape key
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+
+      // Focus trap
+      if (e.key === "Tab" && modalRef.current) {
+        const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey && document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement?.focus();
+        } else if (!e.shiftKey && document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement?.focus();
+        }
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      // Restore focus when modal closes
+      previousActiveElement.current?.focus();
+    };
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -41,14 +84,20 @@ export function DeleteAllModal({
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
       style={{ background: "rgba(0, 0, 0, 0.5)", backdropFilter: "blur(4px)" }}
       onClick={handleClose}
+      role="presentation"
     >
       <div
+        ref={modalRef}
         className="w-full max-w-md rounded-xl p-6 shadow-xl"
         style={{
           background: "var(--g-glass)",
           border: "1px solid var(--g-border)",
         }}
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="delete-modal-title"
+        aria-describedby="delete-modal-description"
       >
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
@@ -58,7 +107,7 @@ export function DeleteAllModal({
             >
               <AlertTriangle className="w-5 h-5" style={{ color: "var(--g-red)" }} />
             </div>
-            <h3 className="text-lg font-semibold" style={{ color: "var(--g-text)" }}>
+            <h3 id="delete-modal-title" className="text-lg font-semibold" style={{ color: "var(--g-text)" }}>
               Delete All Measurements
             </h3>
           </div>
@@ -68,13 +117,14 @@ export function DeleteAllModal({
             style={{ color: "var(--g-text-secondary)" }}
             onMouseEnter={(e) => (e.currentTarget.style.background = "var(--g-border)")}
             onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+            aria-label="Close dialog"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
 
         <div className="space-y-4">
-          <p style={{ color: "var(--g-text-secondary)" }}>
+          <p id="delete-modal-description" style={{ color: "var(--g-text-secondary)" }}>
             You are about to permanently delete <strong style={{ color: "var(--g-text)" }}>{totalCount}</strong> measurements.
             This action cannot be undone.
           </p>

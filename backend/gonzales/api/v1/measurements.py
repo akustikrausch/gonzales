@@ -1,10 +1,11 @@
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from gonzales.api.dependencies import get_db, require_api_key
 from gonzales.core.exceptions import MeasurementNotFoundError
+from gonzales.core.rate_limit import RATE_LIMITS, limiter
 from gonzales.schemas.measurement import MeasurementOut, MeasurementPage, SortField, SortOrder
 from gonzales.services.measurement_service import measurement_service
 
@@ -51,7 +52,9 @@ async def get_measurement(measurement_id: int, session: AsyncSession = Depends(g
 
 
 @router.delete("/all", dependencies=[Depends(require_api_key)])
+@limiter.limit(RATE_LIMITS["delete"])
 async def delete_all_measurements(
+    request: Request,
     confirm: bool = Query(..., description="Must be true to confirm deletion"),
     session: AsyncSession = Depends(get_db),
 ):
@@ -62,7 +65,10 @@ async def delete_all_measurements(
 
 
 @router.delete("/{measurement_id}", dependencies=[Depends(require_api_key)])
-async def delete_measurement(measurement_id: int, session: AsyncSession = Depends(get_db)):
+@limiter.limit(RATE_LIMITS["delete"])
+async def delete_measurement(
+    request: Request, measurement_id: int, session: AsyncSession = Depends(get_db)
+):
     deleted = await measurement_service.delete_by_id(session, measurement_id)
     if not deleted:
         raise MeasurementNotFoundError(measurement_id)
