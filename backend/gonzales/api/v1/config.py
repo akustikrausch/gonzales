@@ -21,6 +21,8 @@ async def get_config(request: Request):
         manual_trigger_cooldown_seconds=settings.manual_trigger_cooldown_seconds,
         theme=settings.theme,
         isp_name=settings.isp_name,
+        data_retention_days=settings.data_retention_days,
+        webhook_url=settings.webhook_url,
         host=settings.host,
         port=settings.port,
         log_level=settings.log_level,
@@ -48,6 +50,10 @@ async def update_config(request: Request, update: ConfigUpdate):
         settings.theme = update.theme
     if update.isp_name is not None:
         settings.isp_name = update.isp_name
+    if update.data_retention_days is not None:
+        settings.data_retention_days = update.data_retention_days
+    if update.webhook_url is not None:
+        settings.webhook_url = update.webhook_url
 
     settings.save_config()
 
@@ -60,6 +66,8 @@ async def update_config(request: Request, update: ConfigUpdate):
         manual_trigger_cooldown_seconds=settings.manual_trigger_cooldown_seconds,
         theme=settings.theme,
         isp_name=settings.isp_name,
+        data_retention_days=settings.data_retention_days,
+        webhook_url=settings.webhook_url,
         host=settings.host,
         port=settings.port,
         log_level=settings.log_level,
