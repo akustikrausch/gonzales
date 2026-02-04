@@ -15,8 +15,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from gonzales.api.dependencies import get_db
 from gonzales.config import settings
 from gonzales.core.rate_limit import RATE_LIMITS, limiter
+from gonzales.db.repository import OutageRepository
 from gonzales.services.measurement_service import measurement_service
-from gonzales.services.outage_service import outage_service
 from gonzales.services.statistics_service import statistics_service
 
 router = APIRouter(prefix="/summary", tags=["summary"])
@@ -317,11 +317,8 @@ async def get_summary(
     )
 
     # Get outages
-    outages = await outage_service.detect_outages(
-        session,
-        start_date=start_date,
-        end_date=end_date
-    )
+    outage_repo = OutageRepository(session)
+    outages = await outage_repo.get_in_range(start_date, end_date)
 
     # Calculate effective thresholds
     tolerance = settings.tolerance_percent / 100
