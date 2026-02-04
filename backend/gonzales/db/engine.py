@@ -28,6 +28,8 @@ async def run_migrations(conn) -> None:
     migrations = [
         ("download_bytes", "ALTER TABLE measurements ADD COLUMN download_bytes INTEGER NOT NULL DEFAULT 0"),
         ("upload_bytes", "ALTER TABLE measurements ADD COLUMN upload_bytes INTEGER NOT NULL DEFAULT 0"),
+        ("connection_type", "ALTER TABLE measurements ADD COLUMN connection_type VARCHAR(20) NOT NULL DEFAULT 'unknown'"),
+        ("mac_address", "ALTER TABLE measurements ADD COLUMN mac_address VARCHAR(17) NOT NULL DEFAULT ''"),
     ]
 
     for column_name, sql in migrations:
