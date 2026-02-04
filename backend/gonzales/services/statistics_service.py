@@ -102,6 +102,7 @@ def _compute_speed_stats(values: list[float]) -> SpeedStatistics | None:
         SpeedStatistics with min, max, avg, median, stddev, and percentiles.
     """
     if not values:
+        return None
     sorted_vals = sorted(values)
     avg = sum(sorted_vals) / len(sorted_vals)
     return SpeedStatistics(
