@@ -1,35 +1,13 @@
-import { useEffect } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { Header } from "./Header";
 import { Sidebar } from "./Sidebar";
 import { MobileNav } from "./MobileNav";
 import { PageTransition } from "../common/PageTransition";
-import { QuickActionsFAB } from "../ui/FAB";
 import { useIsMobile, useIsTablet } from "../../hooks/useMediaQuery";
-import { useSpeedTest } from "../../context/SpeedTestContext";
 
 export function AppShell() {
   const isMobile = useIsMobile();
   const isTablet = useIsTablet();
-  const navigate = useNavigate();
-  const { runTest } = useSpeedTest();
-
-  // Handle FAB custom events
-  useEffect(() => {
-    const handleRunTest = () => runTest();
-    const handleExport = () => navigate("/export");
-    const handleSettings = () => navigate("/settings");
-
-    document.addEventListener("gonzales:run-test", handleRunTest);
-    document.addEventListener("gonzales:export", handleExport);
-    document.addEventListener("gonzales:settings", handleSettings);
-
-    return () => {
-      document.removeEventListener("gonzales:run-test", handleRunTest);
-      document.removeEventListener("gonzales:export", handleExport);
-      document.removeEventListener("gonzales:settings", handleSettings);
-    };
-  }, [runTest, navigate]);
 
   return (
     <div className="flex min-h-screen" style={{ background: "var(--g-bg)" }}>
@@ -67,7 +45,6 @@ export function AppShell() {
         </main>
       </div>
       {isMobile && <MobileNav />}
-      <QuickActionsFAB />
     </div>
   );
 }

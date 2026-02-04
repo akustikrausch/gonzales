@@ -46,18 +46,7 @@ export function StatisticsPage() {
   const { data: enhanced, isLoading } = useEnhancedStatistics(dateParams);
   const { data: page } = useMeasurements({ page_size: 100, ...dateParams });
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center p-12">
-        <Spinner size={32} />
-      </div>
-    );
-  }
-  if (!enhanced) return null;
-
-  const stats = enhanced.basic;
-
-  // Keyboard navigation for tabs
+  // Keyboard navigation for tabs - must be before conditional returns
   const handleTabKeyDown = useCallback((e: React.KeyboardEvent, currentIndex: number) => {
     let newIndex = currentIndex;
 
@@ -80,6 +69,17 @@ export function StatisticsPage() {
     const tabButtons = document.querySelectorAll<HTMLButtonElement>('[role="tab"]');
     tabButtons[newIndex]?.focus();
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-12">
+        <Spinner size={32} />
+      </div>
+    );
+  }
+  if (!enhanced) return null;
+
+  const stats = enhanced.basic;
 
   return (
     <div className="space-y-6">
