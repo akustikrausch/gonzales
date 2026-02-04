@@ -38,6 +38,8 @@ All outputs MUST show the same version number!
 | `frontend/package.json` | `"version": "X.Y.Z"` | `"version": "2.1.2"` |
 | `frontend/src/hooks/useVersionCheck.ts` | `FRONTEND_VERSION = "X.Y.Z"` | `const FRONTEND_VERSION = "2.1.2"` |
 
+**Note:** The TUI (`gonzales-tui`) automatically displays the version from `backend/gonzales/version.py` - no manual update needed for TUI.
+
 ### Files to Update (gonzales-ha repo)
 
 | File | Field | Example |

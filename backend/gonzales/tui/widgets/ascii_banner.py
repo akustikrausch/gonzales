@@ -1,5 +1,7 @@
 from textual.widgets import Static
 
+from gonzales.version import __version__
+
 BANNER = r"""
  ██████╗  ██████╗ ███╗   ██╗███████╗ █████╗ ██╗     ███████╗███████╗
 ██╔════╝ ██╔═══██╗████╗  ██║╚══███╔╝██╔══██╗██║     ██╔════╝██╔════╝
@@ -9,7 +11,7 @@ BANNER = r"""
  ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝
 """
 
-SUBTITLE = "  ▸ Internet Speed Monitor ◂  "
+SUBTITLE = f"  ▸ Internet Speed Monitor v{__version__} ◂  "
 
 
 class AsciiBanner(Static):
