@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "gonzales"
-version = "3.0.1"
+version = "3.5.0"
 description = "Open-source internet speed monitor with automated testing, analytics dashboard, and Home Assistant integration"
 license = "MIT"
 authors = [{ name = "akustikrausch" }]
@@ -52,6 +52,7 @@ dependencies = [
 gonzales = "gonzales.cli.main:app"
 gonzales-server = "gonzales.__main__:main"
 gonzales-tui = "gonzales.tui.app:main"
+gonzales-mcp = "gonzales.mcp.server:main"
 
 [project.urls]
 Homepage = "https://github.com/akustikrausch/gonzales"
@@ -69,11 +70,18 @@ tui = [
     "textual>=0.89.0",
     "rich>=13.9.0",
 ]
+mcp = [
+    # MCP uses JSON-RPC over stdio, no external dependencies needed
+    # aiohttp is already included in main dependencies
+]
 dev = [
     "pytest>=8.0",
     "pytest-asyncio>=0.24",
     "httpx>=0.27",
     "ruff>=0.8",
+]
+all = [
+    "gonzales[cli,tui,mcp]",
 ]
 
 [tool.ruff]

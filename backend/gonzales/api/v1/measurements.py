@@ -12,14 +12,37 @@ from gonzales.services.measurement_service import measurement_service
 router = APIRouter(prefix="/measurements", tags=["measurements"])
 
 
-@router.get("", response_model=MeasurementPage)
+@router.get(
+    "",
+    response_model=MeasurementPage,
+    summary="List Speed Test Measurements",
+    description="""
+    Retrieve paginated speed test history with optional filtering and sorting.
+
+    **Use Cases:**
+    - Display measurement history in a dashboard
+    - Export data for analysis
+    - Filter by date range for specific periods
+
+    **Sorting Options:**
+    - `timestamp` (default): Sort by test time
+    - `download_mbps`: Sort by download speed
+    - `upload_mbps`: Sort by upload speed
+    - `ping_latency_ms`: Sort by latency
+
+    **Example:**
+    ```
+    GET /measurements?page=1&page_size=50&sort_by=download_mbps&sort_order=desc
+    ```
+    """
+)
 async def list_measurements(
-    page: int = Query(default=1, ge=1),
-    page_size: int = Query(default=20, ge=1, le=100),
-    start_date: datetime | None = Query(default=None),
-    end_date: datetime | None = Query(default=None),
-    sort_by: SortField = Query(default=SortField.timestamp),
-    sort_order: SortOrder = Query(default=SortOrder.desc),
+    page: int = Query(default=1, ge=1, description="Page number (1-indexed)"),
+    page_size: int = Query(default=20, ge=1, le=100, description="Items per page (max 100)"),
+    start_date: datetime | None = Query(default=None, description="Filter: start date (ISO format)"),
+    end_date: datetime | None = Query(default=None, description="Filter: end date (ISO format)"),
+    sort_by: SortField = Query(default=SortField.timestamp, description="Field to sort by"),
+    sort_order: SortOrder = Query(default=SortOrder.desc, description="Sort direction"),
     session: AsyncSession = Depends(get_db),
 ):
     items, total = await measurement_service.get_paginated(
@@ -35,7 +58,30 @@ async def list_measurements(
     )
 
 
-@router.get("/latest", response_model=MeasurementOut | None)
+@router.get(
+    "/latest",
+    response_model=MeasurementOut | None,
+    summary="Get Latest Speed Test",
+    description="""
+    Returns the most recent speed test measurement.
+
+    **Use Cases:**
+    - Quick status check of current internet speed
+    - Dashboard widgets showing latest result
+    - AI agents checking connection quality
+
+    **Returns:**
+    - Full measurement data if tests exist
+    - `null` if no tests have been run yet
+
+    **Response includes:**
+    - Download/upload speeds (Mbps and bps)
+    - Ping latency and jitter
+    - Server information
+    - Threshold compliance status
+    """,
+    response_description="Latest measurement or null if no tests exist"
+)
 async def get_latest_measurement(session: AsyncSession = Depends(get_db)):
     m = await measurement_service.get_latest(session)
     if m is None:

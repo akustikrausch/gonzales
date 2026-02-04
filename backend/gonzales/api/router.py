@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from gonzales.api.v1 import config, export, measurements, outages, qos, servers, speedtest, statistics, status, topology
+from gonzales.api.v1 import config, export, measurements, outages, qos, servers, speedtest, statistics, status, summary, topology
 
 api_router = APIRouter(prefix="/api/v1")
 
@@ -14,3 +14,4 @@ api_router.include_router(servers.router)
 api_router.include_router(qos.router)
 api_router.include_router(topology.router)
 api_router.include_router(outages.router)
+api_router.include_router(summary.router)

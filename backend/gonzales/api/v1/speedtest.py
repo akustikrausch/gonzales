@@ -13,7 +13,35 @@ from gonzales.services.measurement_service import measurement_service
 router = APIRouter(prefix="/speedtest", tags=["speedtest"])
 
 
-@router.post("/trigger", response_model=MeasurementOut, dependencies=[Depends(require_api_key)])
+@router.post(
+    "/trigger",
+    response_model=MeasurementOut,
+    dependencies=[Depends(require_api_key)],
+    summary="Run Speed Test",
+    description="""
+    Trigger a new speed test and return the results.
+
+    **Important Notes:**
+    - Takes 30-60 seconds to complete
+    - Rate limited to prevent abuse (1 per minute)
+    - Requires API key authentication
+
+    **Use Cases:**
+    - Manual speed check from dashboard
+    - AI agent triggering test on demand
+    - Scheduled external triggers
+
+    **Response:**
+    Returns full measurement data including download/upload speeds,
+    latency, server info, and threshold compliance.
+
+    **Errors:**
+    - `429 Too Many Requests`: Rate limited, wait before retrying
+    - `503 Service Unavailable`: Another test is already running
+    - `401 Unauthorized`: Missing or invalid API key
+    """,
+    response_description="Completed speed test measurement"
+)
 @limiter.limit(RATE_LIMITS["speedtest_trigger"])
 async def trigger_speedtest(request: Request, session: AsyncSession = Depends(get_db)):
     m = await measurement_service.run_test(session, manual=True)

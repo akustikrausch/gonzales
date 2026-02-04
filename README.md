@@ -17,7 +17,7 @@
 
 Local network speed monitoring tool with a **web dashboard** to monitor and document ISP bandwidth and stability issues. Runs automated speed tests, stores results in SQLite, and visualizes everything in the browser.
 
-**v3.0.0 Highlights:** Clean Architecture with Domain-Driven Design, WCAG 2.1 AA accessibility, enterprise-grade rate limiting, and comprehensive UI improvements.
+**v3.5.0 Highlights:** AI Agent Integration with MCP (Model Context Protocol) server for Claude Desktop, new Summary API for LLMs, and machine-readable AGENTS.md documentation.
 
 ---
 
@@ -198,6 +198,7 @@ All under `/api/v1`:
 | DELETE | `/measurements/all` | Delete all measurements (requires `?confirm=true`) |
 | GET | `/statistics` | Aggregates and percentiles |
 | GET | `/statistics/enhanced` | Enhanced stats (hourly, daily, trend, SLA, reliability, per-server) |
+| GET | `/summary` | AI-friendly status summary (supports `?format=markdown`) |
 | GET | `/status` | Scheduler state, uptime |
 | GET | `/export/csv` | Download CSV |
 | GET | `/export/pdf` | Download PDF report |
@@ -206,6 +207,38 @@ All under `/api/v1`:
 | GET | `/config` | Current config |
 | PUT | `/config` | Update config |
 | GET | `/servers` | List available speedtest servers |
+
+#### AI Agent Integration
+
+Gonzales supports integration with AI assistants like Claude Desktop via the Model Context Protocol (MCP).
+
+**MCP Server (for Claude Desktop)**
+
+Add to `~/.config/claude/claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "gonzales": {
+      "command": "gonzales-mcp"
+    }
+  }
+}
+```
+
+Available tools: `get_latest_speedtest`, `run_speedtest`, `get_statistics`, `get_connection_status`, `get_outages`, `get_isp_score`, `get_summary`
+
+**Summary API (for LLMs)**
+
+```bash
+# JSON format
+curl http://localhost:8470/api/v1/summary
+
+# Markdown format (ideal for LLM context)
+curl "http://localhost:8470/api/v1/summary?format=markdown"
+```
+
+See [AGENTS.md](AGENTS.md) for complete AI agent documentation.
 
 #### Real-time Test Streaming
 
@@ -464,6 +497,8 @@ cp config.json.example config.json  # Runtime settings (optional)
 | Design System | Liquid Glass (CSS custom properties, backdrop-filter) |
 | Accessibility | WCAG 2.1 AA compliant |
 | Terminal UI | Textual + Rich |
+| CLI | Typer + Rich |
+| AI Integration | MCP Server (Model Context Protocol) |
 | Export | CSV, PDF (ReportLab) |
 | Home Assistant | [gonzales-ha](https://github.com/akustikrausch/gonzales-ha) (Add-on + HACS Integration) |
 
