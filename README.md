@@ -15,9 +15,36 @@
  ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝
 ```
 
-Local network speed monitoring tool with a **web dashboard** to monitor and document ISP bandwidth and stability issues. Runs automated speed tests, stores results in SQLite, and visualizes everything in the browser.
+**The professional-grade internet monitoring solution for your home network.** Gonzales runs automated speed tests 24/7, builds a comprehensive database of your ISP's performance, and gives you the hard evidence you need when your provider isn't delivering what you pay for.
 
-**v3.5.0 Highlights:** AI Agent Integration with MCP (Model Context Protocol) server for Claude Desktop, new Summary API for LLMs, and machine-readable AGENTS.md documentation.
+## Why Gonzales?
+
+🚀 **Document ISP Problems** — Collect months of speed test data to prove your ISP isn't meeting contractual obligations. Export professional PDF reports for customer service disputes.
+
+📊 **Beautiful Analytics** — Real-time dashboard with historical trends, hourly patterns, server comparisons, and predictive analytics. See exactly when and why your internet slows down.
+
+🏠 **Home Assistant Native** — One-click add-on installation with full sensor integration. Automate your smart home based on internet quality — restart routers, switch backup connections, send alerts.
+
+🔒 **100% Local & Private** — All data stays on your hardware. No cloud accounts, no subscriptions, no data harvesting. Your network statistics are nobody's business.
+
+🤖 **AI-Ready** — MCP server for Claude Desktop, Summary API for LLMs. Ask your AI assistant about your network health in natural language.
+
+## Key Features
+
+| Feature | Description |
+|---------|-------------|
+| **Automated Testing** | Scheduled speed tests every 15-240 minutes (configurable) |
+| **Multi-Server Support** | Test against 10,000+ Ookla servers worldwide, pin your preferred server |
+| **Outage Detection** | Smart retry logic confirms outages after 3 consecutive failures |
+| **QoS Analysis** | Gaming, streaming, video calls — see if your connection meets application requirements |
+| **Network Topology** | Analyze router hops and identify bottlenecks between you and test servers |
+| **ISP Grading** | A+ to F rating based on consistency, speed delivery, and stability |
+| **Trend Prediction** | 7-day forecast of expected performance based on historical patterns |
+| **Export Options** | CSV for spreadsheets, PDF reports for ISP complaints |
+| **Terminal UI** | Demoscene-style TUI for headless servers and SSH sessions |
+| **CLI Tools** | Full command-line interface with JSON output for scripting |
+| **REST API** | Complete API with OpenAPI docs, SSE streaming, rate limiting |
+| **Accessibility** | WCAG 2.1 AA compliant — keyboard navigation, screen readers, focus management |
 
 ---
 
@@ -310,6 +337,36 @@ Run Gonzales on a separate machine (e.g. Raspberry Pi) and install the HACS inte
 ---
 
 ## Deutsch
+
+**Die professionelle Internet-Überwachungslösung für dein Heimnetzwerk.** Gonzales führt rund um die Uhr automatisierte Speedtests durch, baut eine umfassende Datenbank über die Leistung deines ISPs auf und liefert dir handfeste Beweise, wenn dein Anbieter nicht das liefert, wofür du bezahlst.
+
+### Warum Gonzales?
+
+🚀 **ISP-Probleme dokumentieren** — Sammle monatelange Speedtest-Daten, um zu beweisen, dass dein ISP vertragliche Verpflichtungen nicht erfüllt. Exportiere professionelle PDF-Berichte für Reklamationen beim Kundenservice.
+
+📊 **Schöne Analysen** — Echtzeit-Dashboard mit Verlaufstrends, stündlichen Mustern, Server-Vergleichen und prädiktiver Analyse. Sieh genau, wann und warum dein Internet langsamer wird.
+
+🏠 **Home Assistant Native** — Ein-Klick-Add-on-Installation mit voller Sensor-Integration. Automatisiere dein Smart Home basierend auf der Internetqualität — Router neustarten, Backup-Verbindungen umschalten, Benachrichtigungen senden.
+
+🔒 **100% Lokal & Privat** — Alle Daten bleiben auf deiner Hardware. Keine Cloud-Konten, keine Abos, keine Datensammlung. Deine Netzwerkstatistiken gehen niemanden etwas an.
+
+### Funktionen
+
+| Funktion | Beschreibung |
+|----------|--------------|
+| **Automatische Tests** | Geplante Speedtests alle 15-240 Minuten (konfigurierbar) |
+| **Multi-Server-Support** | Test gegen 10.000+ Ookla-Server weltweit, bevorzugten Server festlegen |
+| **Ausfallerkennung** | Intelligente Retry-Logik bestätigt Ausfälle nach 3 aufeinanderfolgenden Fehlern |
+| **QoS-Analyse** | Gaming, Streaming, Videoanrufe — prüft ob deine Verbindung die Anforderungen erfüllt |
+| **Netzwerk-Topologie** | Analysiere Router-Hops und identifiziere Engpässe zwischen dir und Testservern |
+| **ISP-Bewertung** | A+ bis F Bewertung basierend auf Konsistenz, Geschwindigkeitslieferung und Stabilität |
+| **Trend-Vorhersage** | 7-Tage-Prognose der erwarteten Leistung basierend auf historischen Mustern |
+| **Export-Optionen** | CSV für Tabellenkalkulation, PDF-Berichte für ISP-Beschwerden |
+| **Terminal UI** | Demoszene-Style TUI für Headless-Server und SSH-Sitzungen |
+| **REST API** | Vollständige API mit OpenAPI-Docs, SSE-Streaming, Rate-Limiting |
+| **Barrierefreiheit** | WCAG 2.1 AA konform — Tastaturnavigation, Screenreader, Fokus-Management |
+
+---
 
 ### Schnellstart
 
