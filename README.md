@@ -15,36 +15,34 @@
  ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝
 ```
 
-**The professional-grade internet monitoring solution for your home network.** Gonzales runs automated speed tests 24/7, builds a comprehensive database of your ISP's performance, and gives you the hard evidence you need when your provider isn't delivering what you pay for.
+**Professional internet monitoring for full transparency.** Gonzales runs automated speed tests 24/7 and builds a comprehensive performance database. Know exactly what your connection delivers — with objective data, historical trends, and detailed analytics.
 
 ## Why Gonzales?
 
-🚀 **Document ISP Problems** — Collect months of speed test data to prove your ISP isn't meeting contractual obligations. Export professional PDF reports for customer service disputes.
+**Transparency & Documentation** — Continuous monitoring creates an objective record of your internet performance. Understand patterns, identify issues early, and have data-backed documentation when you need it.
 
-📊 **Beautiful Analytics** — Real-time dashboard with historical trends, hourly patterns, server comparisons, and predictive analytics. See exactly when and why your internet slows down.
+**Comprehensive Analytics** — Real-time dashboard with historical trends, hourly/daily/weekly breakdowns, per-server comparisons, SLA compliance tracking, and 7-day predictive forecasts.
 
-🏠 **Home Assistant Native** — One-click add-on installation with full sensor integration. Automate your smart home based on internet quality — restart routers, switch backup connections, send alerts.
+**Home Assistant Integration** — One-click add-on installation with 10+ sensors. Build automations based on connection quality — notifications, smart device control, multi-WAN failover.
 
-🔒 **100% Local & Private** — All data stays on your hardware. No cloud accounts, no subscriptions, no data harvesting. Your network statistics are nobody's business.
+**100% Local & Private** — All data stays on your hardware. No cloud accounts, no subscriptions, no external dependencies. Self-hosted and fully offline-capable.
 
-🤖 **AI-Ready** — MCP server for Claude Desktop, Summary API for LLMs. Ask your AI assistant about your network health in natural language.
+**Developer-Friendly** — REST API with OpenAPI docs, SSE streaming for real-time updates, MCP server for AI assistants, CLI with JSON output for scripting.
 
-## Key Features
+## Core Features
 
-| Feature | Description |
-|---------|-------------|
-| **Automated Testing** | Scheduled speed tests every 15-240 minutes (configurable) |
-| **Multi-Server Support** | Test against 10,000+ Ookla servers worldwide, pin your preferred server |
-| **Outage Detection** | Smart retry logic confirms outages after 3 consecutive failures |
-| **QoS Analysis** | Gaming, streaming, video calls — see if your connection meets application requirements |
-| **Network Topology** | Analyze router hops and identify bottlenecks between you and test servers |
-| **ISP Grading** | A+ to F rating based on consistency, speed delivery, and stability |
-| **Trend Prediction** | 7-day forecast of expected performance based on historical patterns |
-| **Export Options** | CSV for spreadsheets, PDF reports for ISP complaints |
-| **Terminal UI** | Demoscene-style TUI for headless servers and SSH sessions |
-| **CLI Tools** | Full command-line interface with JSON output for scripting |
-| **REST API** | Complete API with OpenAPI docs, SSE streaming, rate limiting |
-| **Accessibility** | WCAG 2.1 AA compliant — keyboard navigation, screen readers, focus management |
+| Category | Features |
+|----------|----------|
+| **Monitoring** | Scheduled tests (15-240 min), 10,000+ Ookla servers, preferred server pinning, real-time SSE streaming |
+| **Analytics** | Hourly/daily/weekly stats, per-server comparison, SLA compliance, reliability metrics, trend prediction |
+| **Quality Analysis** | ISP grading (A+ to F), QoS profiles (gaming/streaming/video calls), network topology, latency analysis |
+| **Detection** | Outage detection (3-strike retry), jitter monitoring, packet loss tracking, performance degradation alerts |
+| **Export** | CSV export, PDF reports with charts, API access, data retention controls |
+| **Interfaces** | Web dashboard (React 19), Terminal UI (Textual), CLI (Typer), REST API, MCP server |
+| **Integration** | Home Assistant add-on, HACS integration, 10+ sensors, binary sensors, diagnostic entities |
+| **Security** | API key protection, rate limiting (100 req/min), CORS configuration, localhost-only by default |
+| **Accessibility** | WCAG 2.1 AA compliant, keyboard navigation, screen reader support, focus management |
+| **Architecture** | Clean Architecture, Domain-Driven Design, async SQLAlchemy, SQLite with WAL mode |
 
 ---
 
@@ -338,33 +336,34 @@ Run Gonzales on a separate machine (e.g. Raspberry Pi) and install the HACS inte
 
 ## Deutsch
 
-**Die professionelle Internet-Überwachungslösung für dein Heimnetzwerk.** Gonzales führt rund um die Uhr automatisierte Speedtests durch, baut eine umfassende Datenbank über die Leistung deines ISPs auf und liefert dir handfeste Beweise, wenn dein Anbieter nicht das liefert, wofür du bezahlst.
+**Professionelle Internet-Überwachung für volle Transparenz.** Gonzales führt rund um die Uhr automatisierte Speedtests durch und baut eine umfassende Performance-Datenbank auf. Wisse genau, was deine Verbindung leistet — mit objektiven Daten, historischen Trends und detaillierten Analysen.
 
 ### Warum Gonzales?
 
-🚀 **ISP-Probleme dokumentieren** — Sammle monatelange Speedtest-Daten, um zu beweisen, dass dein ISP vertragliche Verpflichtungen nicht erfüllt. Exportiere professionelle PDF-Berichte für Reklamationen beim Kundenservice.
+**Transparenz & Dokumentation** — Kontinuierliches Monitoring erstellt eine objektive Aufzeichnung deiner Internet-Performance. Verstehe Muster, erkenne Probleme frühzeitig und habe datengestützte Dokumentation, wenn du sie brauchst.
 
-📊 **Schöne Analysen** — Echtzeit-Dashboard mit Verlaufstrends, stündlichen Mustern, Server-Vergleichen und prädiktiver Analyse. Sieh genau, wann und warum dein Internet langsamer wird.
+**Umfassende Analysen** — Echtzeit-Dashboard mit historischen Trends, stündlichen/täglichen/wöchentlichen Aufschlüsselungen, Server-Vergleichen, SLA-Compliance-Tracking und 7-Tage-Vorhersagen.
 
-🏠 **Home Assistant Native** — Ein-Klick-Add-on-Installation mit voller Sensor-Integration. Automatisiere dein Smart Home basierend auf der Internetqualität — Router neustarten, Backup-Verbindungen umschalten, Benachrichtigungen senden.
+**Home Assistant Integration** — Ein-Klick-Add-on-Installation mit 10+ Sensoren. Erstelle Automationen basierend auf Verbindungsqualität — Benachrichtigungen, Smart-Device-Steuerung, Multi-WAN-Failover.
 
-🔒 **100% Lokal & Privat** — Alle Daten bleiben auf deiner Hardware. Keine Cloud-Konten, keine Abos, keine Datensammlung. Deine Netzwerkstatistiken gehen niemanden etwas an.
+**100% Lokal & Privat** — Alle Daten bleiben auf deiner Hardware. Keine Cloud-Konten, keine Abos, keine externen Abhängigkeiten. Selbst gehostet und vollständig offline-fähig.
 
-### Funktionen
+**Entwicklerfreundlich** — REST API mit OpenAPI-Docs, SSE-Streaming für Echtzeit-Updates, MCP-Server für KI-Assistenten, CLI mit JSON-Ausgabe für Scripting.
 
-| Funktion | Beschreibung |
-|----------|--------------|
-| **Automatische Tests** | Geplante Speedtests alle 15-240 Minuten (konfigurierbar) |
-| **Multi-Server-Support** | Test gegen 10.000+ Ookla-Server weltweit, bevorzugten Server festlegen |
-| **Ausfallerkennung** | Intelligente Retry-Logik bestätigt Ausfälle nach 3 aufeinanderfolgenden Fehlern |
-| **QoS-Analyse** | Gaming, Streaming, Videoanrufe — prüft ob deine Verbindung die Anforderungen erfüllt |
-| **Netzwerk-Topologie** | Analysiere Router-Hops und identifiziere Engpässe zwischen dir und Testservern |
-| **ISP-Bewertung** | A+ bis F Bewertung basierend auf Konsistenz, Geschwindigkeitslieferung und Stabilität |
-| **Trend-Vorhersage** | 7-Tage-Prognose der erwarteten Leistung basierend auf historischen Mustern |
-| **Export-Optionen** | CSV für Tabellenkalkulation, PDF-Berichte für ISP-Beschwerden |
-| **Terminal UI** | Demoszene-Style TUI für Headless-Server und SSH-Sitzungen |
-| **REST API** | Vollständige API mit OpenAPI-Docs, SSE-Streaming, Rate-Limiting |
-| **Barrierefreiheit** | WCAG 2.1 AA konform — Tastaturnavigation, Screenreader, Fokus-Management |
+### Kernfunktionen
+
+| Kategorie | Funktionen |
+|-----------|------------|
+| **Monitoring** | Geplante Tests (15-240 Min), 10.000+ Ookla-Server, Server-Pinning, Echtzeit-SSE-Streaming |
+| **Analysen** | Stündliche/tägliche/wöchentliche Stats, Server-Vergleich, SLA-Compliance, Zuverlässigkeitsmetriken, Trend-Vorhersage |
+| **Qualitätsanalyse** | ISP-Bewertung (A+ bis F), QoS-Profile (Gaming/Streaming/Videoanrufe), Netzwerk-Topologie, Latenzanalyse |
+| **Erkennung** | Ausfallerkennung (3-Strike-Retry), Jitter-Monitoring, Paketverlust-Tracking, Performance-Degradation-Alerts |
+| **Export** | CSV-Export, PDF-Berichte mit Diagrammen, API-Zugriff, Datenaufbewahrungskontrolle |
+| **Oberflächen** | Web-Dashboard (React 19), Terminal UI (Textual), CLI (Typer), REST API, MCP-Server |
+| **Integration** | Home Assistant Add-on, HACS-Integration, 10+ Sensoren, Binary Sensors, Diagnose-Entities |
+| **Sicherheit** | API-Key-Schutz, Rate-Limiting (100 Req/Min), CORS-Konfiguration, standardmäßig nur localhost |
+| **Barrierefreiheit** | WCAG 2.1 AA konform, Tastaturnavigation, Screenreader-Unterstützung, Fokus-Management |
+| **Architektur** | Clean Architecture, Domain-Driven Design, async SQLAlchemy, SQLite mit WAL-Modus |
 
 ---
 
