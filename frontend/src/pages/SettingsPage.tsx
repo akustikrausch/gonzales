@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Timer, Activity, Server, Save, Palette, FileText, Bell } from "lucide-react";
-import { useConfig, useStatus, useUpdateConfig, useStatistics } from "../hooks/useApi";
+import { Timer, Activity, Server, Save, Palette, FileText, Bell, Play, Pause } from "lucide-react";
+import { useConfig, useStatus, useUpdateConfig, useStatistics, useSetSchedulerEnabled } from "../hooks/useApi";
 import { GlassCard } from "../components/ui/GlassCard";
 import { GlassInput } from "../components/ui/GlassInput";
 import { GlassButton } from "../components/ui/GlassButton";
@@ -14,6 +14,7 @@ export function SettingsPage() {
   const { data: status } = useStatus();
   const { data: stats } = useStatistics();
   const updateConfig = useUpdateConfig();
+  const { mutate: setSchedulerEnabled, isPending: isTogglingScheduler } = useSetSchedulerEnabled();
 
   const [interval, setInterval_] = useState("");
   const [dlThreshold, setDlThreshold] = useState("");
@@ -82,7 +83,58 @@ export function SettingsPage() {
         Settings
       </h2>
 
-      <GlassCard className="g-animate-in g-stagger-1">
+      {status && (
+        <GlassCard className="g-animate-in g-stagger-1">
+          <h3
+            className="text-sm font-semibold mb-4 flex items-center gap-2"
+            style={{ color: "var(--g-text)" }}
+          >
+            <Timer className="w-4 h-4" style={{ color: "var(--g-text-secondary)" }} />
+            Scheduler Control
+          </h3>
+          <div className="space-y-4 max-w-md">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium" style={{ color: "var(--g-text)" }}>
+                  Automatic Speed Tests
+                </p>
+                <p className="text-xs mt-1" style={{ color: "var(--g-text-secondary)" }}>
+                  {status.scheduler.enabled
+                    ? `Running every ${status.scheduler.interval_minutes} minutes`
+                    : "Paused - only manual tests will run"}
+                </p>
+              </div>
+              <GlassButton
+                variant={status.scheduler.enabled ? "default" : "primary"}
+                onClick={() => setSchedulerEnabled(!status.scheduler.enabled)}
+                disabled={isTogglingScheduler}
+                aria-label={status.scheduler.enabled ? "Pause scheduler" : "Resume scheduler"}
+              >
+                {isTogglingScheduler ? (
+                  <Spinner size={16} />
+                ) : status.scheduler.enabled ? (
+                  <Pause className="w-4 h-4" />
+                ) : (
+                  <Play className="w-4 h-4" />
+                )}
+                {isTogglingScheduler
+                  ? "Updating..."
+                  : status.scheduler.enabled
+                    ? "Pause"
+                    : "Resume"}
+              </GlassButton>
+            </div>
+            {status.scheduler.paused && (
+              <p className="text-xs p-2 rounded" style={{ background: "var(--g-yellow-tint)", color: "var(--g-yellow)" }}>
+                Scheduler is paused. Automatic speed tests are not running.
+                Click "Resume" to restart automatic testing.
+              </p>
+            )}
+          </div>
+        </GlassCard>
+      )}
+
+      <GlassCard className="g-animate-in g-stagger-2">
         <h3
           className="text-sm font-semibold mb-4 flex items-center gap-2"
           style={{ color: "var(--g-text)" }}
@@ -159,7 +211,7 @@ export function SettingsPage() {
         </div>
       </GlassCard>
 
-      <GlassCard className="g-animate-in g-stagger-2">
+      <GlassCard className="g-animate-in g-stagger-3">
         <h3
           className="text-sm font-semibold mb-4 flex items-center gap-2"
           style={{ color: "var(--g-text)" }}
@@ -190,7 +242,7 @@ export function SettingsPage() {
         </div>
       </GlassCard>
 
-      <GlassCard className="g-animate-in g-stagger-3">
+      <GlassCard className="g-animate-in g-stagger-4">
         <h3
           className="text-sm font-semibold mb-4 flex items-center gap-2"
           style={{ color: "var(--g-text)" }}
@@ -203,7 +255,7 @@ export function SettingsPage() {
         </div>
       </GlassCard>
 
-      <GlassCard className="g-animate-in g-stagger-4">
+      <GlassCard className="g-animate-in g-stagger-5">
         <h3
           className="text-sm font-semibold mb-4 flex items-center gap-2"
           style={{ color: "var(--g-text)" }}
@@ -216,7 +268,7 @@ export function SettingsPage() {
         </div>
       </GlassCard>
 
-      <GlassCard className="g-animate-in g-stagger-5">
+      <GlassCard className="g-animate-in g-stagger-6">
         <h3
           className="text-sm font-semibold mb-4 flex items-center gap-2"
           style={{ color: "var(--g-text)" }}
@@ -271,7 +323,7 @@ export function SettingsPage() {
       </GlassCard>
 
       {status && (
-        <GlassCard className="g-animate-in g-stagger-6">
+        <GlassCard className="g-animate-in g-stagger-7">
           <h3
             className="text-sm font-semibold mb-4 flex items-center gap-2"
             style={{ color: "var(--g-text)" }}
@@ -321,7 +373,7 @@ export function SettingsPage() {
       )}
 
       {config && (
-        <GlassCard className="g-animate-in g-stagger-7">
+        <GlassCard className="g-animate-in g-stagger-8">
           <h3
             className="text-sm font-semibold mb-4 flex items-center gap-2"
             style={{ color: "var(--g-text)" }}

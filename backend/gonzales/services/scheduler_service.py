@@ -22,6 +22,7 @@ class SchedulerService:
     def __init__(self) -> None:
         self._scheduler: AsyncIOScheduler | None = None
         self._test_in_progress: bool = False
+        self._paused: bool = False  # Manual pause state
         # Outage detection state
         self._consecutive_failures: int = 0
         self._outage_active: bool = False
@@ -37,6 +38,15 @@ class SchedulerService:
     @property
     def running(self) -> bool:
         return self._scheduler is not None and self._scheduler.running
+
+    @property
+    def paused(self) -> bool:
+        return self._paused
+
+    @property
+    def enabled(self) -> bool:
+        """Returns True if scheduler is running and not paused."""
+        return self.running and not self._paused
 
     @property
     def test_in_progress(self) -> bool:
@@ -218,6 +228,10 @@ class SchedulerService:
 
     async def _run_scheduled_test(self) -> None:
         """Entry point for scheduled tests."""
+        # Skip if scheduler is paused
+        if self._paused:
+            logger.debug("Scheduler paused, skipping scheduled test")
+            return
         # Skip if a retry is pending (let the retry handle it)
         if self._retry_pending:
             logger.debug("Retry pending, skipping scheduled test")
@@ -264,6 +278,29 @@ class SchedulerService:
                 minutes=interval_minutes,
             )
             logger.info("Scheduler rescheduled: every %d minutes", interval_minutes)
+
+    def pause(self) -> bool:
+        """Pause the scheduler (tests will be skipped until resumed)."""
+        if not self._paused:
+            self._paused = True
+            logger.info("Scheduler paused by user")
+            return True
+        return False
+
+    def resume(self) -> bool:
+        """Resume the scheduler."""
+        if self._paused:
+            self._paused = False
+            logger.info("Scheduler resumed by user")
+            return True
+        return False
+
+    def set_enabled(self, enabled: bool) -> bool:
+        """Set scheduler enabled state. Returns True if state changed."""
+        if enabled:
+            return self.resume()
+        else:
+            return self.pause()
 
 
 scheduler_service = SchedulerService()

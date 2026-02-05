@@ -11,6 +11,7 @@ import type {
   QosHistory,
   QosOverview,
   QosProfile,
+  SchedulerControlResponse,
   ServerListResponse,
   SortField,
   SortOrder,
@@ -193,5 +194,14 @@ export const api = {
     if (params?.end_date) search.set("end_date", params.end_date);
     const qs = search.toString();
     return fetchJSON(`${BASE}/outages/statistics${qs ? `?${qs}` : ""}`);
+  },
+
+  // Scheduler API
+  setSchedulerEnabled(enabled: boolean): Promise<SchedulerControlResponse> {
+    return fetchJSON(`${BASE}/status/scheduler`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ enabled }),
+    });
   },
 };

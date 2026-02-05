@@ -5,9 +5,23 @@ from pydantic import BaseModel
 
 class SchedulerStatus(BaseModel):
     running: bool
+    enabled: bool  # True if running and not paused
+    paused: bool  # True if manually paused by user
     next_run_time: datetime | None = None
     interval_minutes: int
     test_in_progress: bool
+
+
+class SchedulerControlRequest(BaseModel):
+    """Request to control scheduler state."""
+    enabled: bool
+
+
+class SchedulerControlResponse(BaseModel):
+    """Response after controlling scheduler state."""
+    enabled: bool
+    paused: bool
+    message: str
 
 
 class OutageStatus(BaseModel):

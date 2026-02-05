@@ -65,9 +65,17 @@ export interface Statistics {
 
 export interface SchedulerStatus {
   running: boolean;
+  enabled: boolean;
+  paused: boolean;
   next_run_time: string | null;
   interval_minutes: number;
   test_in_progress: boolean;
+}
+
+export interface SchedulerControlResponse {
+  enabled: boolean;
+  paused: boolean;
+  message: string;
 }
 
 export interface OutageStatus {

@@ -384,3 +384,29 @@ export function useOutageStatistics(params?: {
     queryFn: () => api.getOutageStatistics(params),
   });
 }
+
+// =============================================================================
+// Scheduler Control Hooks
+// =============================================================================
+
+/**
+ * Mutation to enable or disable the scheduler.
+ *
+ * When disabled (paused), scheduled speed tests will be skipped.
+ * Manual tests can still be triggered via the Run Test button.
+ *
+ * @returns TanStack Mutation with mutate function accepting enabled boolean
+ *
+ * @example
+ * const { mutate: setSchedulerEnabled } = useSetSchedulerEnabled();
+ * <button onClick={() => setSchedulerEnabled(false)}>Pause Scheduler</button>
+ */
+export function useSetSchedulerEnabled() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (enabled: boolean) => api.setSchedulerEnabled(enabled),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["status"] });
+    },
+  });
+}

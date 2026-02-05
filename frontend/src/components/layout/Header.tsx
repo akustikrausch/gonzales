@@ -1,5 +1,5 @@
-import { Play, Loader2, Sun, Moon, Monitor, Clock } from "lucide-react";
-import { useStatus } from "../../hooks/useApi";
+import { Play, Loader2, Sun, Moon, Monitor, Clock, Pause } from "lucide-react";
+import { useStatus, useSetSchedulerEnabled } from "../../hooks/useApi";
 import { useTheme } from "../../hooks/useTheme";
 import { useSpeedTest } from "../../context/SpeedTestContext";
 import { GlassBadge } from "../ui/GlassBadge";
@@ -35,6 +35,7 @@ export function Header() {
   const { data: status } = useStatus();
   const { runTest, isStreaming, progress } = useSpeedTest();
   const { theme, setTheme } = useTheme();
+  const { mutate: setSchedulerEnabled, isPending: isTogglingScheduler } = useSetSchedulerEnabled();
 
   const isRunning = isStreaming || status?.scheduler.test_in_progress ||
     (progress.phase !== "idle" && progress.phase !== "complete" && progress.phase !== "error");
@@ -44,6 +45,25 @@ export function Header() {
     const idx = themeOrder.indexOf(theme);
     setTheme(themeOrder[(idx + 1) % themeOrder.length]);
   };
+
+  const toggleScheduler = () => {
+    if (status && !isTogglingScheduler) {
+      setSchedulerEnabled(!status.scheduler.enabled);
+    }
+  };
+
+  const getSchedulerStatus = () => {
+    if (!status) return { color: "var(--g-text-secondary)", text: "Loading...", enabled: false };
+    if (status.scheduler.paused) {
+      return { color: "var(--g-yellow)", text: "Scheduler Paused", enabled: false };
+    }
+    if (status.scheduler.running) {
+      return { color: "var(--g-green)", text: "Scheduler Active", enabled: true };
+    }
+    return { color: "var(--g-red)", text: "Scheduler Stopped", enabled: false };
+  };
+
+  const schedulerStatus = getSchedulerStatus();
 
   return (
     <header
@@ -57,17 +77,27 @@ export function Header() {
       <div className="flex items-center gap-3" role="status" aria-live="polite">
         {status && (
           <>
-            <GlassBadge color={status.scheduler.running ? "var(--g-green)" : "var(--g-red)"}>
-              <span
-                className="w-1.5 h-1.5 rounded-full"
-                aria-hidden="true"
-                style={{
-                  background: status.scheduler.running ? "var(--g-green)" : "var(--g-red)",
-                }}
-              />
-              {status.scheduler.running ? "Scheduler Active" : "Scheduler Stopped"}
-            </GlassBadge>
-            {status.scheduler.running && !status.scheduler.test_in_progress && formatNextRun(status.scheduler.next_run_time) && (
+            <button
+              onClick={toggleScheduler}
+              disabled={isTogglingScheduler}
+              className="glass-badge-button"
+              title={schedulerStatus.enabled ? "Click to pause scheduler" : "Click to resume scheduler"}
+              aria-label={schedulerStatus.enabled ? "Pause automatic speed tests" : "Resume automatic speed tests"}
+            >
+              <GlassBadge color={schedulerStatus.color}>
+                {status.scheduler.paused ? (
+                  <Pause className="w-3 h-3" aria-hidden="true" />
+                ) : (
+                  <span
+                    className="w-1.5 h-1.5 rounded-full"
+                    aria-hidden="true"
+                    style={{ background: schedulerStatus.color }}
+                  />
+                )}
+                {isTogglingScheduler ? "Updating..." : schedulerStatus.text}
+              </GlassBadge>
+            </button>
+            {schedulerStatus.enabled && !status.scheduler.test_in_progress && formatNextRun(status.scheduler.next_run_time) && (
               <span
                 className="flex items-center gap-1 text-xs"
                 style={{ color: "var(--g-text-secondary)" }}

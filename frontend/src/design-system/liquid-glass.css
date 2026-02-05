@@ -257,6 +257,45 @@
   transition: background var(--g-duration-fast) var(--g-ease-out);
 }
 
+/* Clickable badge wrapper */
+.glass-badge-button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  transition: transform var(--g-duration-fast) var(--g-spring);
+}
+
+.glass-badge-button:hover .glass-badge {
+  background: var(--g-glass-bg-strong);
+}
+
+.glass-badge-button:active {
+  transform: scale(0.95);
+}
+
+.glass-badge-button:focus-visible {
+  outline: none;
+}
+
+.glass-badge-button:focus-visible .glass-badge {
+  box-shadow: var(--g-focus-ring);
+}
+
+.glass-badge-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.glass-badge-button:disabled:hover .glass-badge {
+  background: var(--g-glass-bg);
+}
+
+.glass-badge-button:disabled:active {
+  transform: none;
+}
+
 
 /* ==========================================================================
    GLASS PROGRESS -- With inner glow

@@ -8,7 +8,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from gonzales.api.dependencies import get_db
 from gonzales.config import settings
 from gonzales.db.models import TestFailure
-from gonzales.schemas.status import OutageStatus, SchedulerStatus, StatusOut
+from gonzales.schemas.status import (
+    OutageStatus,
+    SchedulerControlRequest,
+    SchedulerControlResponse,
+    SchedulerStatus,
+    StatusOut,
+)
 from gonzales.services.measurement_service import measurement_service
 from gonzales.services.scheduler_service import scheduler_service
 from gonzales.version import __version__
@@ -39,7 +45,9 @@ async def get_status(session: AsyncSession = Depends(get_db)):
         version=__version__,
         scheduler=SchedulerStatus(
             running=scheduler_service.running,
-            next_run_time=scheduler_service.next_run_time,
+            enabled=scheduler_service.enabled,
+            paused=scheduler_service.paused,
+            next_run_time=scheduler_service.next_run_time if scheduler_service.enabled else None,
             interval_minutes=settings.test_interval_minutes,
             test_in_progress=scheduler_service.test_in_progress,
         ),
@@ -54,4 +62,22 @@ async def get_status(session: AsyncSession = Depends(get_db)):
         total_failures=total_failures,
         uptime_seconds=round(time.time() - _start_time, 1),
         db_size_bytes=db_size,
+    )
+
+
+@router.put("/scheduler", response_model=SchedulerControlResponse)
+async def set_scheduler_enabled(request: SchedulerControlRequest):
+    """Enable or disable the scheduler.
+
+    When disabled (paused), scheduled speed tests will be skipped.
+    Manual tests can still be triggered via the /speedtest/trigger endpoint.
+    """
+    changed = scheduler_service.set_enabled(request.enabled)
+    action = "enabled" if request.enabled else "disabled"
+    message = f"Scheduler {action}" if changed else f"Scheduler already {action}"
+
+    return SchedulerControlResponse(
+        enabled=scheduler_service.enabled,
+        paused=scheduler_service.paused,
+        message=message,
     )
