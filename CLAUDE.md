@@ -6,9 +6,10 @@
 
 1. **ALL version files MUST be in sync** - Never release with mismatched versions
 2. **CHANGELOG MUST be updated** before any release
-3. **GitHub releases MUST match** the version in code
+3. **GitHub releases MUST be created** for BOTH repos after every version bump - use `gh release create`
 4. **Frontend version constant MUST match** backend version (prevents infinite reload loop)
 5. **Verify versions BEFORE pushing** - Always run the verification command below
+6. **ALWAYS create GitHub releases immediately after pushing** - Never leave releases out of sync with code
 
 ### Version Verification Command
 
@@ -57,9 +58,17 @@ All outputs MUST show the same version number!
 5. [ ] Copy to static: `rm -rf backend/gonzales/static/* && cp -r frontend/dist/* backend/gonzales/static/`
 6. [ ] Commit and push gonzales repo
 7. [ ] Commit and push gonzales-ha repo
-8. [ ] Create GitHub release for gonzales repo with tag `vX.Y.Z`
-9. [ ] Create GitHub release for gonzales-ha repo with tag `vX.Y.Z`
+8. [ ] **Create GitHub release for gonzales repo** (MANDATORY):
+   ```bash
+   gh release create vX.Y.Z --title "vX.Y.Z: Title" --notes "Release notes here"
+   ```
+9. [ ] **Create GitHub release for gonzales-ha repo** (MANDATORY):
+   ```bash
+   cd ../gonzales-ha && gh release create vX.Y.Z --title "vX.Y.Z: Title" --notes "Release notes here"
+   ```
 10. [ ] Verify releases show correct versions in GitHub UI
+
+**IMPORTANT:** GitHub releases MUST be created immediately after pushing. The "Latest" release tag in GitHub must always match the current version in the code.
 
 ## Commit Guidelines
 
