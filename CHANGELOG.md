@@ -2,6 +2,14 @@
 
 All notable changes to Gonzales will be documented in this file.
 
+## [3.7.5] - 2026-02-06
+
+### Bug Fixes
+
+- **Fix HA integration speedtest trigger**: Handle 202 response from async endpoint
+
+---
+
 ## [3.7.4] - 2026-02-06
 
 ### Bug Fixes
