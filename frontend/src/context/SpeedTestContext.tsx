@@ -181,9 +181,10 @@ export function SpeedTestProvider({ children }: { children: ReactNode }) {
     sseWorking,
   } = usePollingFallback(sseProgress, isSSEStreaming, invalidateQueries);
 
-  // Use SSE progress if SSE is working, otherwise use polling progress
-  const progress = sseWorking === false ? pollingProgress : sseProgress;
-  const isStreaming = sseWorking === false ? isPolling : isSSEStreaming;
+  // Use SSE progress only if SSE is confirmed working
+  // Otherwise use polling progress (which shows "started" immediately)
+  const progress = sseWorking === true ? sseProgress : pollingProgress;
+  const isStreaming = sseWorking === true ? isSSEStreaming : (isPolling || pollingProgress.phase !== "idle");
 
   // Auto-connect to SSE when a test is detected via status polling
   useEffect(() => {

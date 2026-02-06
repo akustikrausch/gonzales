@@ -2,6 +2,15 @@
 
 All notable changes to Gonzales will be documented in this file.
 
+## [3.7.2] - 2026-02-06
+
+### Bug Fixes
+
+- **Fix live test view in Home Assistant**: Test progress now displays correctly during backend-initiated tests (fixes "Ready" badge showing during active tests)
+- **Fix HA integration install**: Addon now cleans up `__pycache__` when installing integration, preventing "Invalid handler specified" errors on upgrade
+
+---
+
 ## [3.7.1] - 2026-02-06
 
 ### Bug Fixes
