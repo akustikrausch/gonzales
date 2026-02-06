@@ -2,6 +2,14 @@
 
 All notable changes to Gonzales will be documented in this file.
 
+## [3.7.1] - 2026-02-06
+
+### Bug Fixes
+
+- **Fix startup crash**: Correct import path in root_cause.py (`db.session` → `db.engine`)
+
+---
+
 ## [3.7.0] - 2026-02-05
 
 ### New Features
