@@ -57,12 +57,18 @@ async def _run_test_background(manual: bool = True) -> None:
 )
 @limiter.limit(RATE_LIMITS["speedtest_trigger"])
 async def trigger_speedtest(request: Request):
-    # Check if test already running
-    if measurement_service.test_in_progress:
+    # Mark test as starting immediately (also checks if already in progress)
+    if not measurement_service.mark_test_starting():
         return JSONResponse(
             status_code=503,
             content={"detail": "A speed test is already in progress"}
         )
+
+    # Publish "started" event immediately so frontend can show progress
+    event_bus.publish({
+        "event": "started",
+        "data": {"phase": "started"},
+    })
 
     # Start test in background (fire-and-forget)
     asyncio.create_task(_run_test_background(manual=True))

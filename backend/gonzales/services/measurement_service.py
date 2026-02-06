@@ -49,6 +49,20 @@ class MeasurementService:
         """Return whether a speed test is currently in progress."""
         return self._test_in_progress
 
+    def mark_test_starting(self) -> bool:
+        """Mark that a test is about to start.
+
+        This is used by the async trigger endpoint to immediately flag
+        that a test is starting, before the background task begins.
+
+        Returns:
+            True if marked successfully, False if test already in progress.
+        """
+        if self._test_in_progress or self._lock.locked():
+            return False
+        self._test_in_progress = True
+        return True
+
     def _check_cooldown(self) -> None:
         """Check if the cooldown period has elapsed since last manual trigger.
 

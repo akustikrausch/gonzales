@@ -2,6 +2,14 @@
 
 All notable changes to Gonzales will be documented in this file.
 
+## [3.7.6] - 2026-02-06
+
+### Bug Fixes
+
+- **Fix live progress display**: Mark test as started immediately and publish SSE event, so status polling shows progress right away
+
+---
+
 ## [3.7.5] - 2026-02-06
 
 ### Bug Fixes
