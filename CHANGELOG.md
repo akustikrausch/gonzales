@@ -2,6 +2,14 @@
 
 All notable changes to Gonzales will be documented in this file.
 
+## [3.7.4] - 2026-02-06
+
+### Bug Fixes
+
+- **Fix startup crash**: Correct import name in speedtest.py
+
+---
+
 ## [3.7.3] - 2026-02-06
 
 ### Bug Fixes

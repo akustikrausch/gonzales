@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 
 from gonzales.api.dependencies import require_api_key
 from gonzales.core.rate_limit import RATE_LIMITS, limiter
-from gonzales.db.engine import async_session_factory
+from gonzales.db.engine import async_session
 from gonzales.services.event_bus import event_bus
 from gonzales.services.measurement_service import measurement_service
 
@@ -15,7 +15,7 @@ router = APIRouter(prefix="/speedtest", tags=["speedtest"])
 
 async def _run_test_background(manual: bool = True) -> None:
     """Run speedtest in background with its own database session."""
-    async with async_session_factory() as session:
+    async with async_session() as session:
         try:
             await measurement_service.run_test(session, manual=manual)
         except Exception:
