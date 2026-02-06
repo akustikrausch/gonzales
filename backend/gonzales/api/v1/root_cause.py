@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from gonzales.db.session import get_session
+from gonzales.db.engine import get_session
 from gonzales.schemas.root_cause import (
     RootCauseAnalysis,
     RootCauseRequest,
