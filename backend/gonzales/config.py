@@ -14,6 +14,10 @@ MUTABLE_KEYS = {
     "isp_name",
     "data_retention_days",
     "webhook_url",
+    # Smart scheduler settings
+    "smart_scheduler_enabled",
+    "smart_scheduler_burst_interval",
+    "smart_scheduler_daily_budget_mb",
 }
 
 

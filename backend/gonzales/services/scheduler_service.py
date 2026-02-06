@@ -30,6 +30,8 @@ class SchedulerService:
         self._last_failure_message: str = ""
         self._retry_pending: bool = False
         self._current_outage_id: int | None = None  # DB outage record ID
+        # Callback for smart scheduler integration
+        self._on_test_complete_callback = None
 
     @property
     def scheduler(self) -> AsyncIOScheduler | None:
@@ -162,6 +164,21 @@ class SchedulerService:
             # Reset failure tracking
             self._consecutive_failures = 0
             self._last_failure_message = ""
+
+            # Notify smart scheduler of completed test
+            if self._on_test_complete_callback:
+                try:
+                    # Get the last measurement for smart scheduler
+                    async with async_session() as db_session:
+                        from gonzales.db.repository import MeasurementRepository
+                        repo = MeasurementRepository(db_session)
+                        last_measurement = await repo.get_latest()
+                        if last_measurement:
+                            asyncio.create_task(
+                                self._on_test_complete_callback(last_measurement)
+                            )
+                except Exception as callback_err:
+                    logger.debug("Smart scheduler callback failed: %s", callback_err)
 
         except Exception as e:
             self._consecutive_failures += 1

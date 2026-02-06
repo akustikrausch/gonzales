@@ -18,6 +18,8 @@ import {
   RefreshCw,
   FileText,
   Home,
+  Brain,
+  Search,
 } from "lucide-react";
 import { GlassCard } from "../components/ui/GlassCard";
 
@@ -368,6 +370,160 @@ export function DocsPage() {
         </DocSection>
 
         <DocSection
+          title="Smart Test Scheduling"
+          icon={<Brain className="w-4 h-4" style={{ color: "var(--g-accent)" }} />}
+        >
+          <DocParagraph>
+            Smart Test Scheduling automatically adjusts test frequency based on your network
+            conditions. When problems are detected, it tests more frequently to gather data.
+            When stable, it returns to normal intervals to save bandwidth.
+          </DocParagraph>
+          <DocHeading>Three-Phase Model</DocHeading>
+          <DocTable
+            headers={["Phase", "Interval", "When Active"]}
+            rows={[
+              ["Normal", "Your configured interval (e.g., 60 min)", "Network is stable"],
+              ["Burst", "10 minutes", "Anomaly detected - gathering diagnostic data"],
+              ["Recovery", "15 → 30 → 45 → Normal", "After burst, gradually returning to normal"],
+            ]}
+          />
+          <DocHeading>Stability Detection</DocHeading>
+          <DocParagraph>
+            The scheduler analyzes your recent test results to calculate a stability score (0-100%):
+          </DocParagraph>
+          <DocList
+            items={[
+              "Coefficient of Variation (CV): Measures how consistent your speeds are",
+              "Z-Score Analysis: Detects anomalies that deviate significantly from your baseline",
+              "Weighted Score: Download (50%), Upload (30%), Ping (20%)",
+              "Score above 85% = Stable, below triggers burst mode",
+            ]}
+          />
+          <DocHeading>Safety Mechanisms</DocHeading>
+          <DocTable
+            headers={["Mechanism", "Default", "Purpose"]}
+            rows={[
+              ["Min Interval", "5 minutes", "Prevents excessive testing"],
+              ["Max Interval", "240 minutes", "Ensures regular monitoring"],
+              ["Circuit Breaker", "10 tests / 30 min", "Stops runaway burst mode"],
+              ["Daily Data Budget", "2 GB", "Limits total bandwidth used for tests"],
+              ["Burst Max Tests", "6 tests", "Limits burst mode duration"],
+              ["Burst Cooldown", "60 minutes", "Prevents immediate re-entry into burst"],
+            ]}
+          />
+          <DocHeading>Data Budget</DocHeading>
+          <DocParagraph>
+            Each speed test uses approximately 100-200 MB. The 2 GB daily budget allows
+            10-20 tests per day in worst case. When 80% of budget is used, a warning appears.
+            At 100%, testing pauses until midnight reset.
+          </DocParagraph>
+          <DocHeading>Enabling Smart Scheduling</DocHeading>
+          <DocList
+            items={[
+              "Go to Settings → Smart Scheduler section",
+              "Toggle 'Enable Smart Scheduling' on",
+              "Configure burst interval and data budget as needed",
+              "Monitor the phase indicator and stability score",
+            ]}
+          />
+        </DocSection>
+
+        <DocSection
+          title="Root-Cause Analysis"
+          icon={<Search className="w-4 h-4" style={{ color: "var(--g-accent)" }} />}
+        >
+          <DocParagraph>
+            Root-Cause Analysis correlates data from speed tests, network topology, and
+            historical patterns to identify WHERE and WHY your connection has problems.
+          </DocParagraph>
+          <DocHeading>Network Health Score</DocHeading>
+          <DocParagraph>
+            A composite 0-100 score based on all network layers. This gives you a quick
+            overview of your overall connection quality:
+          </DocParagraph>
+          <DocTable
+            headers={["Score", "Rating", "Interpretation"]}
+            rows={[
+              ["90-100", "Excellent", "All layers performing well"],
+              ["70-89", "Good", "Minor issues, generally stable"],
+              ["50-69", "Fair", "Noticeable problems worth investigating"],
+              ["Below 50", "Poor", "Significant issues affecting performance"],
+            ]}
+          />
+          <DocHeading>Layer Health Breakdown</DocHeading>
+          <DocParagraph>
+            Each network layer is scored individually to pinpoint problems:
+          </DocParagraph>
+          <DocTable
+            headers={["Layer", "What It Measures", "Common Issues"]}
+            rows={[
+              ["DNS", "First-hop latency to DNS servers", "High latency = DNS misconfiguration"],
+              ["Local Network", "Your router and home network", "High latency = router/WiFi issues"],
+              ["ISP Backbone", "ISP internal infrastructure (hops 4-10)", "Congestion = ISP capacity problems"],
+              ["ISP Last-Mile", "Connection to your home", "Peak-hour drops = neighborhood congestion"],
+              ["Server", "Speedtest server performance", "Inconsistent = server overload"],
+            ]}
+          />
+          <DocHeading>Problem Fingerprints</DocHeading>
+          <DocParagraph>
+            The system automatically detects and classifies problems with confidence levels:
+          </DocParagraph>
+          <DocList
+            items={[
+              "Severity: Critical (red), Warning (yellow), Info (blue)",
+              "Confidence: How certain the system is about the diagnosis (0-100%)",
+              "Evidence: Specific data points supporting the diagnosis",
+              "Occurrence: How often and when the problem appears",
+            ]}
+          />
+          <DocHeading>Hop-Speed Correlation</DocHeading>
+          <DocParagraph>
+            Uses Pearson correlation to find which network hops affect your speed:
+          </DocParagraph>
+          <DocList
+            items={[
+              "Each traceroute hop is correlated with download speed",
+              "Negative correlation (red) = this hop may be a bottleneck",
+              "When latency at a specific hop increases, your speed decreases",
+              "Helps identify exactly where in the network path problems occur",
+            ]}
+          />
+          <DocHeading>Time-Based Patterns</DocHeading>
+          <DocParagraph>
+            Detects recurring patterns based on time:
+          </DocParagraph>
+          <DocList
+            items={[
+              "Peak-hour degradation: Slower speeds during evening hours (17-23h)",
+              "Off-peak performance: Better speeds during night/early morning",
+              "Weekday vs weekend patterns: Different usage patterns",
+              "Helpful for ISP complaints - proves consistent issues at specific times",
+            ]}
+          />
+          <DocHeading>Recommendations</DocHeading>
+          <DocParagraph>
+            Based on detected issues, the system generates prioritized action items:
+          </DocParagraph>
+          <DocList
+            items={[
+              "Priority 1: Critical actions for immediate improvement",
+              "Priority 2: Recommended optimizations",
+              "Priority 3: Nice-to-have improvements",
+              "Each recommendation includes expected impact and difficulty level",
+            ]}
+          />
+          <DocHeading>Accessing Root-Cause Analysis</DocHeading>
+          <DocList
+            items={[
+              "Click 'Root-Cause' in the navigation menu",
+              "Analysis requires at least 10 speed tests for accuracy",
+              "Topology data (traceroute) improves hop correlation analysis",
+              "More historical data = better pattern detection",
+            ]}
+          />
+        </DocSection>
+
+        <DocSection
           title="QoS Tests"
           icon={<Activity className="w-4 h-4" style={{ color: "var(--g-accent)" }} />}
         >
@@ -629,6 +785,35 @@ export function DocsPage() {
               ["Last Test Time", "sensor.gonzales_last_test_time", "timestamp", "When last test ran"],
             ]}
           />
+          <DocHeading>Smart Scheduler Sensors (v3.7.0+)</DocHeading>
+          <DocTable
+            headers={["Sensor", "Entity ID", "Description"]}
+            rows={[
+              ["Scheduler Phase", "sensor.gonzales_scheduler_phase", "Current phase: normal, burst, or recovery"],
+              ["Stability Score", "sensor.gonzales_stability_score", "Network stability 0-100%"],
+              ["Current Interval", "sensor.gonzales_scheduler_interval", "Current test interval in minutes"],
+              ["Daily Data Used", "sensor.gonzales_daily_data_used", "Bandwidth used today in MB"],
+            ]}
+          />
+          <DocHeading>Root-Cause Sensors (v3.7.0+)</DocHeading>
+          <DocTable
+            headers={["Sensor", "Entity ID", "Description"]}
+            rows={[
+              ["Network Health", "sensor.gonzales_network_health", "Overall network health score 0-100"],
+              ["Primary Issue", "sensor.gonzales_primary_issue", "Current primary network issue (if any)"],
+              ["DNS Health", "sensor.gonzales_dns_health", "DNS layer health score"],
+              ["Local Network Health", "sensor.gonzales_local_network_health", "Local network health score"],
+              ["ISP Backbone Health", "sensor.gonzales_isp_backbone_health", "ISP backbone health score"],
+              ["ISP Last-Mile Health", "sensor.gonzales_isp_lastmile_health", "Last-mile connection health"],
+            ]}
+          />
+          <DocHeading>Button Entity (v3.7.0+)</DocHeading>
+          <DocTable
+            headers={["Entity", "Entity ID", "Description"]}
+            rows={[
+              ["Run Speed Test", "button.gonzales_run_speedtest", "Trigger a manual speed test"],
+            ]}
+          />
           <DocHeading>Binary Sensors</DocHeading>
           <DocTable
             headers={["Sensor", "Entity ID", "ON When"]}
@@ -869,16 +1054,36 @@ python -m gonzales`}</CodeBlock>
             items={[
               "GET /api/v1/status - Current status and scheduler state",
               "GET /api/v1/measurements - List all measurements",
-              "POST /api/v1/speedtest/run - Start a speed test",
+              "POST /api/v1/speedtest/trigger - Start a speed test",
               "GET /api/v1/statistics - Get calculated statistics",
               "GET /api/v1/config - Get/update configuration",
+            ]}
+          />
+          <DocHeading>Smart Scheduler API (v3.7.0+)</DocHeading>
+          <DocList
+            items={[
+              "GET /api/v1/smart-scheduler/status - Phase, stability score, data budget",
+              "GET /api/v1/smart-scheduler/config - Configuration settings",
+              "PUT /api/v1/smart-scheduler/config - Update configuration",
+              "POST /api/v1/smart-scheduler/enable - Enable smart scheduling",
+              "POST /api/v1/smart-scheduler/disable - Disable smart scheduling",
+              "GET /api/v1/smart-scheduler/decisions - Decision history",
+            ]}
+          />
+          <DocHeading>Root-Cause API (v3.7.0+)</DocHeading>
+          <DocList
+            items={[
+              "GET /api/v1/root-cause/analysis - Full root-cause analysis",
+              "GET /api/v1/root-cause/fingerprints - Detected problem patterns",
+              "GET /api/v1/root-cause/recommendations - Actionable recommendations",
+              "GET /api/v1/root-cause/hop-correlations - Hop-speed correlations",
             ]}
           />
           <DocHeading>Security</DocHeading>
           <DocList
             items={[
               "API key authentication (auto-generated)",
-              "Rate limiting: 100 requests/minute per IP",
+              "Rate limiting: 120 requests/minute standard, 6/min for resource-intensive endpoints",
               "No external data transmission",
               "AppArmor profile for Home Assistant addon",
             ]}
@@ -897,7 +1102,20 @@ python -m gonzales`}</CodeBlock>
               "After major updates, restart Home Assistant",
             ]}
           />
-          <DocHeading>What's New</DocHeading>
+          <DocHeading>What's New in v3.7.0</DocHeading>
+          <DocList
+            items={[
+              "Smart Test Scheduling: Adaptive intervals based on network stability",
+              "Root-Cause Analysis: Network diagnostics with layer health scores",
+              "Hop-Speed Correlation: Identify bottlenecks in your network path",
+              "Problem Fingerprints: Automatic detection of recurring issues",
+              "New HA Sensors: Scheduler phase, stability, network health, layer scores",
+              "Button Entity: Trigger speed tests from Home Assistant",
+              "CLI Commands: gonzales smart-scheduler and gonzales root-cause",
+              "Settings UX Redesign: Consolidated from 9 cards to 4 sections",
+              "SSE Fallback: Polling fallback for Home Assistant Ingress compatibility",
+            ]}
+          />
           <DocParagraph>
             See the GitHub repository for full changelog and release notes.
           </DocParagraph>

@@ -516,3 +516,134 @@ export interface OutageStatistics {
   longest_outage_seconds: number;
   uptime_pct: number;
 }
+
+// Smart Scheduler Types
+export interface SmartSchedulerConfig {
+  enabled: boolean;
+  min_interval_minutes: number;
+  max_interval_minutes: number;
+  stability_threshold: number;
+  stability_window_tests: number;
+  burst_interval_minutes: number;
+  burst_max_tests: number;
+  burst_cooldown_minutes: number;
+  daily_data_budget_mb: number;
+  data_budget_warning_pct: number;
+  peak_hours_start: number;
+  peak_hours_end: number;
+  offpeak_interval_multiplier: number;
+  circuit_breaker_tests: number;
+  circuit_breaker_window_minutes: number;
+}
+
+export interface SmartSchedulerConfigUpdate {
+  enabled?: boolean;
+  min_interval_minutes?: number;
+  max_interval_minutes?: number;
+  stability_threshold?: number;
+  burst_interval_minutes?: number;
+  burst_max_tests?: number;
+  burst_cooldown_minutes?: number;
+  daily_data_budget_mb?: number;
+  peak_hours_start?: number;
+  peak_hours_end?: number;
+  offpeak_interval_multiplier?: number;
+  circuit_breaker_tests?: number;
+  circuit_breaker_window_minutes?: number;
+}
+
+export interface SmartSchedulerStatus {
+  enabled: boolean;
+  phase: "normal" | "burst" | "recovery";
+  current_interval_minutes: number;
+  base_interval_minutes: number;
+  burst_test_count: number;
+  recovery_step: number;
+  consecutive_stable: number;
+  stability_score: number;
+  daily_data_used_mb: number;
+  daily_data_budget_mb: number;
+  data_budget_remaining_pct: number;
+  data_budget_warning: boolean;
+  last_decision_reason: string | null;
+  last_decision_time: string | null;
+  circuit_breaker_active: boolean;
+  tests_in_window: number;
+}
+
+export interface SmartSchedulerEnableResponse {
+  message: string;
+  enabled: boolean;
+}
+
+// Root-Cause Analysis Types
+export interface ProblemFingerprint {
+  category: string;
+  severity: "critical" | "warning" | "info";
+  confidence: number;
+  description: string;
+  evidence: string[];
+  first_detected: string | null;
+  last_seen: string | null;
+  occurrence_count: number;
+}
+
+export interface HopCorrelation {
+  hop_number: number;
+  ip_address: string | null;
+  hostname: string | null;
+  avg_latency_ms: number;
+  latency_correlation: number;
+  packet_loss_pct: number;
+  is_bottleneck: boolean;
+  is_local: boolean;
+}
+
+export interface LayerScores {
+  dns_score: number;
+  local_network_score: number;
+  isp_backbone_score: number;
+  isp_lastmile_score: number;
+  server_score: number;
+}
+
+export interface TimePattern {
+  pattern_type: string;
+  peak_hours: number[];
+  peak_avg_download_mbps: number;
+  offpeak_avg_download_mbps: number;
+  degradation_pct: number;
+  confidence: number;
+}
+
+export interface ConnectionImpact {
+  has_significant_difference: boolean;
+  best_connection: string;
+  worst_connection: string;
+  download_gap_pct: number;
+  recommendation: string;
+}
+
+export interface Recommendation {
+  priority: number;
+  category: string;
+  title: string;
+  description: string;
+  expected_impact: string;
+  difficulty: "easy" | "moderate" | "advanced";
+}
+
+export interface RootCauseAnalysis {
+  analysis_timestamp: string;
+  data_window_days: number;
+  measurement_count: number;
+  topology_count: number;
+  primary_cause: ProblemFingerprint | null;
+  secondary_causes: ProblemFingerprint[];
+  layer_scores: LayerScores;
+  hop_correlations: HopCorrelation[];
+  time_pattern: TimePattern | null;
+  connection_impact: ConnectionImpact | null;
+  recommendations: Recommendation[];
+  network_health_score: number;
+}

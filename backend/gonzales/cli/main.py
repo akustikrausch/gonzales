@@ -46,6 +46,8 @@ from gonzales.cli.commands.history import history_cmd
 from gonzales.cli.commands.run import run_cmd, server_cmd
 from gonzales.cli.commands.stats import stats_cmd
 from gonzales.cli.commands.status import status_cmd
+from gonzales.cli.commands.smart_scheduler import app as smart_scheduler_app
+from gonzales.cli.commands.root_cause import app as root_cause_app
 
 app.command(name="run")(run_cmd)
 app.command(name="status")(status_cmd)
@@ -54,6 +56,10 @@ app.command(name="stats")(stats_cmd)
 app.command(name="export")(export_cmd)
 app.command(name="config")(config_cmd)
 app.command(name="server")(server_cmd)
+
+# Add subcommand groups
+app.add_typer(smart_scheduler_app, name="smart-scheduler")
+app.add_typer(root_cause_app, name="root-cause")
 
 
 if __name__ == "__main__":

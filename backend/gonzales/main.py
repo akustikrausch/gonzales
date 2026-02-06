@@ -12,6 +12,7 @@ from gonzales.core.security import configure_security
 from gonzales.db.engine import dispose_engine, init_db
 from gonzales.middleware.rate_limit import RateLimitMiddleware
 from gonzales.services.scheduler_service import scheduler_service
+from gonzales.services.smart_scheduler_service import smart_scheduler_service
 from gonzales.services.speedtest_runner import speedtest_runner
 from gonzales.version import __version__
 
@@ -55,6 +56,9 @@ async def lifespan(app: FastAPI):
 
     await init_db()
     logger.info("Database initialized")
+
+    # Initialize smart scheduler with reschedule callback
+    smart_scheduler_service.set_reschedule_callback(scheduler_service.reschedule)
 
     scheduler_service.start()
 

@@ -7,6 +7,7 @@ import {
   Download,
   Settings,
   BookOpen,
+  Search,
   type LucideIcon,
 } from "lucide-react";
 
@@ -29,6 +30,7 @@ export const navigationItems: NavItem[] = [
   // Tools
   { to: "/qos", label: "QoS Tests", shortLabel: "QoS", icon: Activity, group: "tools" },
   { to: "/topology", label: "Network", shortLabel: "Network", icon: Network, group: "tools" },
+  { to: "/root-cause", label: "Root-Cause", shortLabel: "Diagnosis", icon: Search, group: "tools" },
   { to: "/export", label: "Export", shortLabel: "Export", icon: Download, group: "tools" },
 
   // System

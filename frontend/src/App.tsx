@@ -52,6 +52,9 @@ const TopologyPage = lazy(() =>
 const DocsPage = lazy(() =>
   import("./pages/DocsPage").then((m) => ({ default: m.DocsPage }))
 );
+const RootCausePage = lazy(() =>
+  import("./pages/RootCausePage").then((m) => ({ default: m.RootCausePage }))
+);
 
 function PageLoader() {
   return (
@@ -89,6 +92,7 @@ function AppContent() {
             <Route path="statistics" element={<StatisticsPage />} />
             <Route path="qos" element={<QosPage />} />
             <Route path="topology" element={<TopologyPage />} />
+            <Route path="root-cause" element={<RootCausePage />} />
             <Route path="export" element={<ExportPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="docs" element={<DocsPage />} />

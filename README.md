@@ -34,13 +34,15 @@
 | Category | Features |
 |----------|----------|
 | **Monitoring** | Scheduled tests (15-240 min), 10,000+ Ookla servers, preferred server pinning, real-time SSE streaming |
+| **Smart Scheduling** | Adaptive intervals, anomaly detection with burst mode, stability analysis, daily data budget (2 GB default) |
 | **Analytics** | Hourly/daily/weekly stats, per-server comparison, SLA compliance, reliability metrics, trend prediction |
+| **Root-Cause Analysis** | Network health scoring, multi-layer diagnostics (DNS/Local/ISP), hop-speed correlation, actionable recommendations |
 | **Quality Analysis** | ISP grading (A+ to F), QoS profiles (gaming/streaming/video calls), network topology, latency analysis |
 | **Detection** | Outage detection (3-strike retry), jitter monitoring, packet loss tracking, performance degradation alerts |
 | **Export** | CSV export, PDF reports with charts, API access, data retention controls |
 | **Interfaces** | Web dashboard (React 19), Terminal UI (Textual), CLI (Typer), REST API, MCP server |
-| **Integration** | Home Assistant add-on, HACS integration, 10+ sensors, binary sensors, diagnostic entities |
-| **Security** | API key protection, rate limiting (100 req/min), CORS configuration, localhost-only by default |
+| **Integration** | Home Assistant add-on, HACS integration, 15+ sensors, binary sensors, diagnostic entities |
+| **Security** | API key protection, rate limiting (120 req/min), CORS configuration, localhost-only by default |
 | **Accessibility** | WCAG 2.1 AA compliant, keyboard navigation, screen reader support, focus management |
 | **Architecture** | Clean Architecture, Domain-Driven Design, async SQLAlchemy, SQLite with WAL mode |
 
@@ -232,6 +234,13 @@ All under `/api/v1`:
 | GET | `/config` | Current config |
 | PUT | `/config` | Update config |
 | GET | `/servers` | List available speedtest servers |
+| GET | `/smart-scheduler/status` | Smart scheduler status (phase, stability, data usage) |
+| GET/PUT | `/smart-scheduler/config` | Smart scheduler configuration |
+| POST | `/smart-scheduler/enable` | Enable smart scheduling |
+| POST | `/smart-scheduler/disable` | Disable smart scheduling |
+| GET | `/root-cause/analysis` | Full root-cause analysis with recommendations |
+| GET | `/root-cause/fingerprints` | Detected problem patterns |
+| GET | `/root-cause/recommendations` | Actionable recommendations |
 
 #### AI Agent Integration
 
@@ -280,6 +289,30 @@ event: complete
 data: {"phase": "complete", "download_mbps": 500.2, "upload_mbps": 250.1, "ping_ms": 12.3}
 ```
 
+#### CLI Commands
+
+Gonzales includes a comprehensive CLI for scripting and automation:
+
+```bash
+# Run a speed test
+gonzales test
+
+# View statistics
+gonzales stats
+
+# Smart Scheduler commands
+gonzales smart-scheduler status    # View scheduler phase, stability, data usage
+gonzales smart-scheduler enable    # Enable adaptive scheduling
+gonzales smart-scheduler disable   # Disable adaptive scheduling
+gonzales smart-scheduler config    # View/update scheduler configuration
+
+# Root-Cause Analysis commands
+gonzales root-cause analyze        # Full network health analysis
+gonzales root-cause fingerprints   # View detected problem patterns
+gonzales root-cause recommendations # Get actionable recommendations
+gonzales root-cause hops           # View hop-speed correlations
+```
+
 #### Verification
 
 ```bash
@@ -300,6 +333,12 @@ curl http://localhost:8470/api/v1/export/csv > results.csv
 
 # System status
 curl http://localhost:8470/api/v1/status
+
+# Smart scheduler status
+curl http://localhost:8470/api/v1/smart-scheduler/status
+
+# Root-cause analysis
+curl http://localhost:8470/api/v1/root-cause/analysis
 ```
 
 #### Home Assistant
@@ -330,7 +369,13 @@ Run Gonzales on a separate machine (e.g. Raspberry Pi) and install the HACS inte
 - `sensor.gonzales_packet_loss` -- latest packet loss (%)
 - `sensor.gonzales_last_test_time` -- timestamp of last test
 - `sensor.gonzales_isp_score` -- ISP performance score (0-100)
+- `sensor.gonzales_network_health` -- root-cause network health score (0-100)
+- `sensor.gonzales_smart_scheduler_phase` -- current scheduler phase (normal/burst/recovery)
+- `sensor.gonzales_stability_score` -- network stability score (0-100%)
 - Diagnostic: scheduler status, test in progress, uptime, total measurements, DB size
+
+**Button** (both options):
+- `button.gonzales_run_speed_test` -- manually trigger a speed test from HA
 
 ---
 
@@ -355,13 +400,15 @@ Run Gonzales on a separate machine (e.g. Raspberry Pi) and install the HACS inte
 | Kategorie | Funktionen |
 |-----------|------------|
 | **Monitoring** | Geplante Tests (15-240 Min), 10.000+ Ookla-Server, Server-Pinning, Echtzeit-SSE-Streaming |
+| **Smart Scheduling** | Adaptive Intervalle, Anomalie-Erkennung mit Burst-Modus, Stabilitätsanalyse, tägliches Datenbudget (2 GB Standard) |
 | **Analysen** | Stündliche/tägliche/wöchentliche Stats, Server-Vergleich, SLA-Compliance, Zuverlässigkeitsmetriken, Trend-Vorhersage |
+| **Ursachenanalyse** | Netzwerk-Gesundheitsbewertung, Multi-Layer-Diagnose (DNS/Lokal/ISP), Hop-Korrelation, umsetzbare Empfehlungen |
 | **Qualitätsanalyse** | ISP-Bewertung (A+ bis F), QoS-Profile (Gaming/Streaming/Videoanrufe), Netzwerk-Topologie, Latenzanalyse |
 | **Erkennung** | Ausfallerkennung (3-Strike-Retry), Jitter-Monitoring, Paketverlust-Tracking, Performance-Degradation-Alerts |
 | **Export** | CSV-Export, PDF-Berichte mit Diagrammen, API-Zugriff, Datenaufbewahrungskontrolle |
 | **Oberflächen** | Web-Dashboard (React 19), Terminal UI (Textual), CLI (Typer), REST API, MCP-Server |
-| **Integration** | Home Assistant Add-on, HACS-Integration, 10+ Sensoren, Binary Sensors, Diagnose-Entities |
-| **Sicherheit** | API-Key-Schutz, Rate-Limiting (100 Req/Min), CORS-Konfiguration, standardmäßig nur localhost |
+| **Integration** | Home Assistant Add-on, HACS-Integration, 15+ Sensoren, Binary Sensors, Diagnose-Entities |
+| **Sicherheit** | API-Key-Schutz, Rate-Limiting (120 Req/Min), CORS-Konfiguration, standardmäßig nur localhost |
 | **Barrierefreiheit** | WCAG 2.1 AA konform, Tastaturnavigation, Screenreader-Unterstützung, Fokus-Management |
 | **Architektur** | Clean Architecture, Domain-Driven Design, async SQLAlchemy, SQLite mit WAL-Modus |
 
@@ -494,7 +541,31 @@ Gonzales auf einem separaten Geraet laufen lassen (z.B. Raspberry Pi) und die HA
 1. Installation ueber HACS (Custom Repository) oder manuell `custom_components/gonzales/` ins HA Config-Verzeichnis kopieren
 2. Integration hinzufuegen und Host/Port der Gonzales-Instanz eingeben
 
-Sensoren (beide Optionen): Download-Geschwindigkeit, Upload-Geschwindigkeit, Ping-Latenz, Ping-Jitter, Paketverlust, Letzter Test, ISP-Score. Zusaetzlich Diagnose-Sensoren fuer Scheduler-Status, laufende Tests, Uptime, Gesamtmessungen und Datenbankgroesse.
+**Sensoren** (beide Optionen): Download-Geschwindigkeit, Upload-Geschwindigkeit, Ping-Latenz, Ping-Jitter, Paketverlust, Letzter Test, ISP-Score, Netzwerk-Gesundheit, Smart-Scheduler-Phase, Stabilitaets-Score. Zusaetzlich Diagnose-Sensoren fuer Scheduler-Status, laufende Tests, Uptime, Gesamtmessungen und Datenbankgroesse.
+
+**Button** (beide Optionen): `button.gonzales_run_speed_test` -- manuell einen Speedtest aus HA starten.
+
+#### CLI-Befehle
+
+Gonzales enthaelt eine umfassende CLI fuer Scripting und Automatisierung:
+
+```bash
+# Speedtest starten
+gonzales test
+
+# Statistiken anzeigen
+gonzales stats
+
+# Smart Scheduler Befehle
+gonzales smart-scheduler status    # Phase, Stabilitaet, Datenverbrauch
+gonzales smart-scheduler enable    # Adaptives Scheduling aktivieren
+gonzales smart-scheduler disable   # Adaptives Scheduling deaktivieren
+
+# Ursachenanalyse Befehle
+gonzales root-cause analyze        # Vollstaendige Netzwerk-Gesundheitsanalyse
+gonzales root-cause fingerprints   # Erkannte Problemmuster
+gonzales root-cause recommendations # Umsetzbare Empfehlungen
+```
 
 #### Ueberpruefen
 
@@ -516,6 +587,12 @@ curl http://localhost:8470/api/v1/export/csv > ergebnisse.csv
 
 # Systemstatus
 curl http://localhost:8470/api/v1/status
+
+# Smart Scheduler Status
+curl http://localhost:8470/api/v1/smart-scheduler/status
+
+# Ursachenanalyse
+curl http://localhost:8470/api/v1/root-cause/analysis
 ```
 
 ---

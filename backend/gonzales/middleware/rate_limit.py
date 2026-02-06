@@ -80,9 +80,16 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
     # Endpoints with stricter limits (resource-intensive)
     STRICT_PATHS = {
-        "/api/v1/measurements/trigger",
+        "/api/v1/speedtest/trigger",
         "/api/v1/topology/analyze",
-        "/api/v1/export",
+        "/api/v1/export/csv",
+        "/api/v1/export/pdf",
+        "/api/v1/root-cause/analysis",
+    }
+
+    # Prefix patterns for strict limits (checked with startswith)
+    STRICT_PREFIXES = {
+        "/api/v1/measurements/all",  # DELETE all endpoint
     }
 
     def __init__(
@@ -179,7 +186,12 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
     def _is_strict(self, path: str) -> bool:
         """Check if path needs stricter rate limits."""
-        return path in self.STRICT_PATHS
+        if path in self.STRICT_PATHS:
+            return True
+        for prefix in self.STRICT_PREFIXES:
+            if path.startswith(prefix):
+                return True
+        return False
 
     async def dispatch(
         self, request: Request, call_next: Callable

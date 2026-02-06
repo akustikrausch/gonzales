@@ -11,8 +11,13 @@ import type {
   QosHistory,
   QosOverview,
   QosProfile,
+  RootCauseAnalysis,
   SchedulerControlResponse,
   ServerListResponse,
+  SmartSchedulerConfig,
+  SmartSchedulerConfigUpdate,
+  SmartSchedulerEnableResponse,
+  SmartSchedulerStatus,
   SortField,
   SortOrder,
   Statistics,
@@ -203,5 +208,42 @@ export const api = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ enabled }),
     });
+  },
+
+  // Smart Scheduler API
+  getSmartSchedulerStatus(): Promise<SmartSchedulerStatus> {
+    return fetchJSON(`${BASE}/smart-scheduler/status`);
+  },
+
+  getSmartSchedulerConfig(): Promise<SmartSchedulerConfig> {
+    return fetchJSON(`${BASE}/smart-scheduler/config`);
+  },
+
+  updateSmartSchedulerConfig(update: SmartSchedulerConfigUpdate): Promise<SmartSchedulerConfig> {
+    return fetchJSON(`${BASE}/smart-scheduler/config`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(update),
+    });
+  },
+
+  enableSmartScheduler(): Promise<SmartSchedulerEnableResponse> {
+    return fetchJSON(`${BASE}/smart-scheduler/enable`, { method: "POST" });
+  },
+
+  disableSmartScheduler(): Promise<SmartSchedulerEnableResponse> {
+    return fetchJSON(`${BASE}/smart-scheduler/disable`, { method: "POST" });
+  },
+
+  // Root-Cause Analysis API
+  getRootCauseAnalysis(params?: {
+    days?: number;
+    min_confidence?: number;
+  }): Promise<RootCauseAnalysis> {
+    const search = new URLSearchParams();
+    if (params?.days) search.set("days", String(params.days));
+    if (params?.min_confidence) search.set("min_confidence", String(params.min_confidence));
+    const qs = search.toString();
+    return fetchJSON(`${BASE}/root-cause/analysis${qs ? `?${qs}` : ""}`);
   },
 };

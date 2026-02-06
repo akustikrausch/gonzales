@@ -60,9 +60,14 @@ async def stream_speedtest():
         event_generator(),
         media_type="text/event-stream",
         headers={
-            "Cache-Control": "no-cache",
+            # Standard SSE headers
+            "Cache-Control": "no-cache, no-store, must-revalidate",
             "Connection": "keep-alive",
             "Content-Encoding": "identity",
-            "X-Accel-Buffering": "no",
+            # Disable buffering in reverse proxies
+            "X-Accel-Buffering": "no",  # nginx
+            "X-Content-Type-Options": "nosniff",
+            # Home Assistant Ingress specific
+            "Transfer-Encoding": "chunked",
         },
     )

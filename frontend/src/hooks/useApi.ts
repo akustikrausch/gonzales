@@ -9,7 +9,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../api/client";
-import type { ConfigUpdate, SortField, SortOrder } from "../api/types";
+import type { ConfigUpdate, SmartSchedulerConfigUpdate, SortField, SortOrder } from "../api/types";
 
 /**
  * Fetch the most recent speed test measurement.
@@ -408,5 +408,120 @@ export function useSetSchedulerEnabled() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["status"] });
     },
+  });
+}
+
+// =============================================================================
+// Smart Scheduler Hooks
+// =============================================================================
+
+/**
+ * Fetch current smart scheduler status.
+ *
+ * Includes phase (normal/burst/recovery), stability score, data budget, etc.
+ * Automatically refetches every 10 seconds.
+ *
+ * @returns TanStack Query result with SmartSchedulerStatus data
+ */
+export function useSmartSchedulerStatus() {
+  return useQuery({
+    queryKey: ["smart-scheduler", "status"],
+    queryFn: () => api.getSmartSchedulerStatus(),
+    refetchInterval: 10000,
+  });
+}
+
+/**
+ * Fetch smart scheduler configuration.
+ *
+ * @returns TanStack Query result with SmartSchedulerConfig data
+ */
+export function useSmartSchedulerConfig() {
+  return useQuery({
+    queryKey: ["smart-scheduler", "config"],
+    queryFn: () => api.getSmartSchedulerConfig(),
+  });
+}
+
+/**
+ * Mutation to update smart scheduler configuration.
+ *
+ * @returns TanStack Mutation with mutate function accepting SmartSchedulerConfigUpdate
+ */
+export function useUpdateSmartSchedulerConfig() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (update: SmartSchedulerConfigUpdate) => api.updateSmartSchedulerConfig(update),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["smart-scheduler"] });
+    },
+  });
+}
+
+/**
+ * Mutation to enable smart scheduling.
+ *
+ * When enabled, the scheduler will automatically adjust test intervals
+ * based on network conditions (burst mode for anomalies, recovery backoff).
+ *
+ * @returns TanStack Mutation with mutate function
+ */
+export function useEnableSmartScheduler() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => api.enableSmartScheduler(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["smart-scheduler"] });
+    },
+  });
+}
+
+/**
+ * Mutation to disable smart scheduling.
+ *
+ * When disabled, the scheduler uses fixed intervals.
+ *
+ * @returns TanStack Mutation with mutate function
+ */
+export function useDisableSmartScheduler() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => api.disableSmartScheduler(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["smart-scheduler"] });
+    },
+  });
+}
+
+// =============================================================================
+// Root-Cause Analysis Hooks
+// =============================================================================
+
+/**
+ * Fetch comprehensive root-cause analysis.
+ *
+ * Analyzes measurements, topologies, and outages to identify:
+ * - Primary and secondary causes of network issues
+ * - Layer-by-layer health scores (DNS, Local, ISP, Server)
+ * - Hop-speed correlations for bottleneck detection
+ * - Time-based patterns (peak hour degradation)
+ * - Actionable recommendations
+ *
+ * @param params.days - Analysis window in days (default: 30, range: 7-90)
+ * @param params.min_confidence - Minimum confidence for fingerprints (default: 0.5)
+ * @returns TanStack Query result with RootCauseAnalysis data
+ *
+ * @example
+ * const { data: analysis } = useRootCauseAnalysis({ days: 14 });
+ * console.log(`Health Score: ${analysis?.network_health_score}`);
+ */
+export function useRootCauseAnalysis(params?: {
+  days?: number;
+  min_confidence?: number;
+}) {
+  return useQuery({
+    queryKey: ["root-cause", "analysis", params],
+    queryFn: () => api.getRootCauseAnalysis(params),
+    staleTime: 60000, // Cache for 1 minute
   });
 }

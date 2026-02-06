@@ -11,7 +11,9 @@ Gonzales is a self-hosted internet speed monitoring tool. This document provides
 | Get latest result | `GET /api/v1/measurements/latest` |
 | Get statistics | `GET /api/v1/statistics/enhanced` |
 | Check for outages | `GET /api/v1/outages` |
-| Export data | `GET /api/v1/export?format=csv` |
+| Network health analysis | `GET /api/v1/root-cause/analysis` |
+| Smart scheduler status | `GET /api/v1/smart-scheduler/status` |
+| Export data | `GET /api/v1/export/csv` |
 
 ## MCP Integration (Recommended)
 
@@ -41,12 +43,13 @@ Add to `~/.config/claude/claude_desktop_config.json`:
 | `get_connection_status` | Check if connection meets thresholds | "Is my internet good enough?" |
 | `get_outages` | List detected outages | "Were there any outages?" |
 | `get_isp_score` | Get ISP quality grade | "Rate my ISP" |
+| `get_summary` | Get AI-friendly status summary | "Give me an overview" |
 
 ## REST API
 
-Base URL: `http://localhost:8765/api/v1`
+Base URL: `http://localhost:8470/api/v1`
 
-### Most Important Endpoints
+### Core Endpoints
 
 #### 1. Summary (Best for AI)
 
@@ -56,28 +59,6 @@ GET /api/v1/summary?format=markdown
 ```
 
 Returns a human-readable summary with status, alerts, and recommendations. **Use this endpoint first** when you need to understand the current state.
-
-Response example:
-```json
-{
-  "status": "healthy",
-  "summary": "Internet connection is performing well. Current speed: 95.2 Mbps down, 42.1 Mbps up, 12ms ping.",
-  "latest_test": {
-    "timestamp": "2024-02-04T10:30:00Z",
-    "download_mbps": 95.2,
-    "upload_mbps": 42.1,
-    "ping_ms": 12,
-    "meets_threshold": true
-  },
-  "statistics_7d": {
-    "avg_download": 92.5,
-    "reliability_percent": 98.5,
-    "outage_count": 0
-  },
-  "alerts": [],
-  "recommendations": ["Your connection is stable. No action needed."]
-}
-```
 
 #### 2. Latest Measurement
 
@@ -104,12 +85,7 @@ GET /api/v1/statistics/enhanced
 GET /api/v1/statistics/enhanced?start_date=2024-01-01&end_date=2024-01-31
 ```
 
-Returns comprehensive analytics including:
-- ISP score (A+ to F grade)
-- Hourly and daily patterns
-- Trend analysis
-- Predictions
-- Anomaly detection
+Returns comprehensive analytics including ISP score, hourly/daily patterns, trend analysis, predictions, and anomaly detection.
 
 #### 5. Outages
 
@@ -120,6 +96,49 @@ GET /api/v1/outages?start_date=2024-01-01&end_date=2024-01-31
 
 Returns detected network outages with duration and impact.
 
+### Smart Scheduler Endpoints (v3.7.0+)
+
+The Smart Scheduler automatically adjusts test frequency based on network stability.
+
+```http
+GET /api/v1/smart-scheduler/status
+```
+
+Returns:
+- `phase`: Current phase (normal, burst, recovery)
+- `stability_score`: Network stability 0-100%
+- `current_interval_minutes`: Active test interval
+- `daily_data_used_mb`: Data consumed today
+- `daily_data_budget_mb`: Daily budget limit
+
+```http
+POST /api/v1/smart-scheduler/enable
+POST /api/v1/smart-scheduler/disable
+GET /api/v1/smart-scheduler/config
+PUT /api/v1/smart-scheduler/config
+```
+
+### Root-Cause Analysis Endpoints (v3.7.0+)
+
+Comprehensive network diagnostics to identify performance issues.
+
+```http
+GET /api/v1/root-cause/analysis?days=30
+```
+
+Returns:
+- `network_health_score`: Overall health 0-100
+- `layer_scores`: Health per network layer (DNS, local, ISP backbone, ISP last-mile, server)
+- `primary_cause`: Main detected issue (if any)
+- `secondary_causes`: Additional issues
+- `hop_correlations`: Traceroute hop impact on speed
+- `recommendations`: Prioritized action items
+
+```http
+GET /api/v1/root-cause/fingerprints
+GET /api/v1/root-cause/recommendations
+```
+
 ## CLI Commands
 
 If CLI access is available:
@@ -129,13 +148,23 @@ If CLI access is available:
 gonzales status
 
 # Run a speed test
-gonzales run
+gonzales test
 
 # Get statistics
 gonzales stats --days 7
 
 # View history
 gonzales history --limit 10
+
+# Smart Scheduler commands
+gonzales smart-scheduler status
+gonzales smart-scheduler enable
+gonzales smart-scheduler disable
+
+# Root-Cause Analysis
+gonzales root-cause analyze
+gonzales root-cause fingerprints
+gonzales root-cause recommendations
 
 # Export data
 gonzales export --format csv --output speedtests.csv
@@ -166,6 +195,24 @@ gonzales status --json
 | D | Below Average | Top 85% |
 | F | Poor | Bottom 15% |
 
+### Network Health Score (Root-Cause)
+
+| Score | Meaning |
+|-------|---------|
+| 90-100 | Excellent - No issues detected |
+| 75-89 | Good - Minor issues |
+| 50-74 | Fair - Some issues affecting performance |
+| 25-49 | Poor - Significant issues |
+| 0-24 | Critical - Major problems |
+
+### Smart Scheduler Phases
+
+| Phase | Meaning | Interval |
+|-------|---------|----------|
+| `normal` | Stable network, fixed interval | User-configured (e.g., 60 min) |
+| `burst` | Anomaly detected, intensive monitoring | 10 min (configurable) |
+| `recovery` | Returning to normal after burst | 15 → 30 → 45 → normal |
+
 ### Connection Status
 
 | Status | Meaning |
@@ -185,32 +232,32 @@ gonzales status --json
 3. Check `status` for overall health
 4. Review `alerts` for any issues
 
+### "What's causing my slow internet?"
+
+1. Call `GET /api/v1/root-cause/analysis`
+2. Check `primary_cause` for the main issue
+3. Review `layer_scores` to see which network segment is problematic
+4. Follow `recommendations` for fixes
+
 ### "Is my internet fast enough for X?"
 
-Use the QoS endpoint to check specific use cases:
+Use the QoS endpoint:
 
 ```http
 GET /api/v1/qos/current
 ```
 
-Returns pass/fail for:
-- Netflix 4K streaming
-- Zoom HD video calls
-- Online gaming
-- Remote work
+Returns pass/fail for Netflix 4K, Zoom HD, online gaming, and remote work.
 
 ### "When is my internet fastest?"
 
-Check the enhanced statistics:
+Check enhanced statistics:
 
 ```http
 GET /api/v1/statistics/enhanced
 ```
 
-Look at:
-- `best_worst_times.best_download` - Hour with highest speeds
-- `peak_offpeak` - Peak vs off-peak comparison
-- `hourly` - Full hourly breakdown
+Look at `best_worst_times.best_download` and `hourly` breakdown.
 
 ### "Has my internet been reliable?"
 
@@ -220,10 +267,7 @@ Check reliability metrics:
 GET /api/v1/statistics/enhanced
 ```
 
-Look at:
-- `reliability.composite_score` - 0-100 reliability score
-- `sla.download_compliance_pct` - % of tests meeting threshold
-- `isp_score.grade` - Overall ISP grade
+Look at `reliability.composite_score` (0-100), `sla.download_compliance_pct`, and `isp_score.grade`.
 
 ## Error Handling
 
@@ -232,19 +276,18 @@ Look at:
 | 200 | Success | Parse response |
 | 401 | Unauthorized | Add API key header |
 | 404 | Not found | Check endpoint path |
-| 429 | Rate limited | Wait 60 seconds |
+| 429 | Rate limited | Wait and retry |
 | 500 | Server error | Check if Gonzales is running |
 | 503 | Test in progress | Wait for current test to complete |
 
 ## Rate Limits
 
-- Read endpoints: 60 requests/minute
-- Write endpoints (trigger test): 1 request/minute
-- Export: 10 requests/minute
-
-## Data Retention
-
-By default, Gonzales keeps 90 days of speed test history. This is configurable via the `data_retention_days` setting.
+- Standard endpoints: 120 requests/minute
+- Resource-intensive endpoints: 6 requests/minute
+  - `/speedtest/trigger`
+  - `/root-cause/analysis`
+  - `/export/csv`, `/export/pdf`
+  - `/topology/analyze`
 
 ## Authentication
 
@@ -260,14 +303,23 @@ If API key authentication is enabled:
 ```python
 import requests
 
+BASE_URL = "http://localhost:8470/api/v1"
+
 # Get summary
-response = requests.get("http://localhost:8765/api/v1/summary")
+response = requests.get(f"{BASE_URL}/summary")
 data = response.json()
 print(f"Status: {data['status']}")
 print(f"Summary: {data['summary']}")
 
+# Get network health
+response = requests.get(f"{BASE_URL}/root-cause/analysis?days=7")
+analysis = response.json()
+print(f"Network Health: {analysis['network_health_score']}/100")
+if analysis.get('primary_cause'):
+    print(f"Issue: {analysis['primary_cause']['description']}")
+
 # Run speed test
-response = requests.post("http://localhost:8765/api/v1/speedtest/trigger")
+response = requests.post(f"{BASE_URL}/speedtest/trigger")
 result = response.json()
 print(f"Download: {result['download_mbps']} Mbps")
 ```
@@ -276,13 +328,19 @@ print(f"Download: {result['download_mbps']} Mbps")
 
 ```bash
 # Get summary as markdown
-curl -s "http://localhost:8765/api/v1/summary?format=markdown"
+curl -s "http://localhost:8470/api/v1/summary?format=markdown"
+
+# Get network health analysis
+curl -s "http://localhost:8470/api/v1/root-cause/analysis?days=7"
 
 # Run speed test
-curl -X POST "http://localhost:8765/api/v1/speedtest/trigger"
+curl -X POST "http://localhost:8470/api/v1/speedtest/trigger"
+
+# Get smart scheduler status
+curl -s "http://localhost:8470/api/v1/smart-scheduler/status"
 ```
 
 ## Support
 
-- GitHub: https://github.com/yourusername/gonzales
-- Issues: https://github.com/yourusername/gonzales/issues
+- GitHub: https://github.com/akustikrausch/gonzales
+- Issues: https://github.com/akustikrausch/gonzales/issues
