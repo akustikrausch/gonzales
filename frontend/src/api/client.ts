@@ -104,7 +104,7 @@ export const api = {
     return fetchJSON(`${BASE}/status`);
   },
 
-  triggerSpeedtest(): Promise<Measurement> {
+  triggerSpeedtest(): Promise<{ status: string; message: string }> {
     return fetchJSON(`${BASE}/speedtest/trigger`, { method: "POST" });
   },
 

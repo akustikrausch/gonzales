@@ -2,6 +2,14 @@
 
 All notable changes to Gonzales will be documented in this file.
 
+## [3.7.3] - 2026-02-06
+
+### Bug Fixes
+
+- **Fix 502 Bad Gateway on speedtest trigger**: Speedtest trigger endpoint now returns immediately (202 Accepted) and runs test in background, preventing Ingress proxy timeout
+
+---
+
 ## [3.7.2] - 2026-02-06
 
 ### Bug Fixes
