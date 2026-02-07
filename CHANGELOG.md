@@ -2,6 +2,15 @@
 
 All notable changes to Gonzales will be documented in this file.
 
+## [3.9.7] - 2026-02-07
+
+### Bug Fixes
+
+- **Fix infinite reload loop on version mismatch**: When HA Ingress proxy caches old frontend assets after an update, the version check no longer loops endlessly. Uses `sessionStorage` to attempt reload only once; on second mismatch, logs a warning and continues normally.
+- **Fix console.log format strings**: Replace `%s`/`%d` format specifiers with template literals for reliable output in all environments.
+
+---
+
 ## [3.9.6] - 2026-02-07
 
 ### Bug Fixes

@@ -134,7 +134,7 @@ function usePollingFallback(
           if (tp && tp.phase !== "started") {
             const phase = tp.phase as SSEProgress["phase"];
             setLastPollResult(`${phase} (${Math.round(elapsed)}s) bw=${tp.bandwidth_mbps ?? "-"}`);
-            console.log("[gonzales] poll: real data phase=%s bw=%s elapsed=%ds", phase, tp.bandwidth_mbps, Math.round(elapsed));
+            console.log(`[gonzales] poll: real data phase=${phase} bw=${tp.bandwidth_mbps} elapsed=${Math.round(elapsed)}s`);
             setPollingProgress({
               phase,
               bandwidth_mbps: tp.bandwidth_mbps,
@@ -164,7 +164,7 @@ function usePollingFallback(
               progress = 0.95;
             }
 
-            console.log("[gonzales] poll: estimated phase=%s elapsed=%ds", phase, Math.round(elapsed));
+            console.log(`[gonzales] poll: estimated phase=${phase} elapsed=${Math.round(elapsed)}s`);
             setPollingProgress({
               phase,
               progress: Math.min(progress, 0.99),
@@ -177,12 +177,12 @@ function usePollingFallback(
           // The trigger POST may still be in transit through HA Ingress proxy.
           if (!sawTestInProgressRef.current && elapsed < GRACE_PERIOD_S) {
             setLastPollResult(`false, grace (${Math.round(elapsed)}s/${GRACE_PERIOD_S}s)`);
-            console.log("[gonzales] poll: waiting for test to start (elapsed=%ds/%ds)", Math.round(elapsed), GRACE_PERIOD_S);
+            console.log(`[gonzales] poll: waiting for test to start (elapsed=${Math.round(elapsed)}s/${GRACE_PERIOD_S}s)`);
             return; // Keep polling, test probably hasn't started yet
           }
 
           setLastPollResult(`completed (${Math.round(elapsed)}s)`);
-          console.log("[gonzales] poll: test completed (sawInProgress=%s elapsed=%ds)", sawTestInProgressRef.current, Math.round(elapsed));
+          console.log(`[gonzales] poll: test completed (sawInProgress=${sawTestInProgressRef.current} elapsed=${Math.round(elapsed)}s)`);
 
           // Stop the interval FIRST to prevent duplicate completion
           stopPollingInterval();

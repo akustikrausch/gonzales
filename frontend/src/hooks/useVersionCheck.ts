@@ -6,7 +6,7 @@ import { useStatus } from "./useApi";
  * When the backend returns a different version, we trigger a hard reload
  * to ensure the browser fetches fresh assets.
  */
-const FRONTEND_VERSION = "3.9.6";
+const FRONTEND_VERSION = "3.9.7";
 
 /**
  * Hook that checks if the frontend version matches the backend version.
@@ -23,9 +23,25 @@ export function useVersionCheck() {
     hasChecked.current = true;
 
     if (status.version !== FRONTEND_VERSION) {
+      // Use sessionStorage to prevent infinite reload loops.
+      // HA Ingress proxy or Nabu Casa service worker may cache old assets
+      // even after reload, causing the mismatch to persist.
+      const reloadKey = `gonzales_reload_${status.version}`;
+
+      if (sessionStorage.getItem(reloadKey)) {
+        // Already tried reloading for this version - proxy cache is stale
+        console.warn(
+          `[Gonzales] Version mismatch persists: frontend=${FRONTEND_VERSION}, backend=${status.version}. Proxy cache may be stale - try a hard refresh (Ctrl+Shift+R).`
+        );
+        return;
+      }
+
       console.log(
         `[Gonzales] Version mismatch: frontend=${FRONTEND_VERSION}, backend=${status.version}. Reloading...`
       );
+
+      sessionStorage.setItem(reloadKey, "1");
+
       // Clear service worker caches if any
       if ("caches" in window) {
         caches.keys().then((names) => {
