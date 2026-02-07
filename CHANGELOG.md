@@ -2,6 +2,41 @@
 
 All notable changes to Gonzales will be documented in this file.
 
+## [3.7.7] - 2026-02-07
+
+### Bug Fixes
+
+- **TUI**: Fix indistinguishable digits 2/3 and 6/8 in big speed display
+- **TUI**: Fix event listener leak on screen remount, handle CancelledError
+- **TUI**: Fix help screen showing undocumented keybindings
+- **TUI**: Add consistent "t" keybinding on settings and statistics screens
+- **MCP**: Add API key authentication to all requests
+- **MCP**: Fix speedtest returning no results (add polling loop)
+- **MCP**: Add timeouts on all HTTP requests
+- **Backend**: Consolidate threshold logic into ThresholdConfig value object
+- **Backend**: Extract shared math utils (pearson_correlation, coefficient_of_variation)
+- **Backend**: Only trust X-Forwarded-For when running as HA addon
+- **Frontend**: Add ErrorBoundary with glass-styled fallback UI
+- **Frontend**: Fix accessibility gaps in Spinner, GlassSelect, Nav components
+- **Frontend**: Fix Statistics tab styling (use variant prop instead of className)
+- **Frontend**: Use unique SVG filter IDs via useId() to prevent conflicts
+
+### Performance
+
+- **Frontend**: Add React.memo on SpeedChart, MeasurementTable, NavGroup
+- **Frontend**: Memoize data transforms in SpeedChart with useMemo
+- **Frontend**: Optimize DataFlowCanvas (solid circles instead of per-particle gradients)
+- **Frontend**: Skip rAF when document is hidden in useAnimatedNumber
+
+### Documentation
+
+- Fix CLI command references ("run" not "test")
+- Add 14 missing API endpoints to README
+- Fix config defaults (TEST_INTERVAL_MINUTES: 60, not 30)
+- Update ARCHITECTURE.md with missing services and pages
+
+---
+
 ## [3.7.6] - 2026-02-06
 
 ### Bug Fixes
