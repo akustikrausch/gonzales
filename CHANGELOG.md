@@ -2,6 +2,15 @@
 
 All notable changes to Gonzales will be documented in this file.
 
+## [3.9.5] - 2026-02-07
+
+### Bug Fixes
+
+- **Fix speed meter showing 0 Mbps during test in HA Ingress**: Backend status endpoint now exposes live test progress data (phase, bandwidth, progress) from the event bus. Polling fallback uses real bandwidth values instead of time-based estimates.
+- **Fix dashboard stuck on 3 gauges after test completion**: `isStreaming` was permanently true after test completion because `pollingProgress.phase` stayed "complete". Fixed by excluding terminal states from streaming check and auto-resetting after 5-second result display.
+
+---
+
 ## [3.9.4] - 2026-02-07
 
 ### Bug Fixes

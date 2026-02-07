@@ -128,34 +128,49 @@ function usePollingFallback(
 
         if (status.scheduler.test_in_progress) {
           sawTestInProgressRef.current = true;
-          setLastPollResult(`in_progress (${Math.round(elapsed)}s)`);
 
-          // Estimate phase based on elapsed time
-          // Typical test: 0-5s ping, 5-20s download, 20-35s upload
-          let phase: SSEProgress["phase"] = "started";
-          let progress = 0;
-
-          if (elapsed < 5) {
-            phase = "ping";
-            progress = elapsed / 5;
-          } else if (elapsed < 20) {
-            phase = "download";
-            progress = (elapsed - 5) / 15;
-          } else if (elapsed < 35) {
-            phase = "upload";
-            progress = (elapsed - 20) / 15;
+          // Use real progress data from backend if available
+          const tp = status.test_progress;
+          if (tp && tp.phase !== "started") {
+            const phase = tp.phase as SSEProgress["phase"];
+            setLastPollResult(`${phase} (${Math.round(elapsed)}s) bw=${tp.bandwidth_mbps ?? "-"}`);
+            console.log("[gonzales] poll: real data phase=%s bw=%s elapsed=%ds", phase, tp.bandwidth_mbps, Math.round(elapsed));
+            setPollingProgress({
+              phase,
+              bandwidth_mbps: tp.bandwidth_mbps,
+              progress: tp.progress,
+              ping_ms: tp.ping_ms,
+              elapsed: tp.elapsed ?? elapsed,
+            });
           } else {
-            phase = "upload";
-            progress = 0.95;
+            setLastPollResult(`in_progress (${Math.round(elapsed)}s)`);
+
+            // Estimate phase based on elapsed time
+            // Typical test: 0-5s ping, 5-20s download, 20-35s upload
+            let phase: SSEProgress["phase"] = "started";
+            let progress = 0;
+
+            if (elapsed < 5) {
+              phase = "ping";
+              progress = elapsed / 5;
+            } else if (elapsed < 20) {
+              phase = "download";
+              progress = (elapsed - 5) / 15;
+            } else if (elapsed < 35) {
+              phase = "upload";
+              progress = (elapsed - 20) / 15;
+            } else {
+              phase = "upload";
+              progress = 0.95;
+            }
+
+            console.log("[gonzales] poll: estimated phase=%s elapsed=%ds", phase, Math.round(elapsed));
+            setPollingProgress({
+              phase,
+              progress: Math.min(progress, 0.99),
+              elapsed,
+            });
           }
-
-          console.log("[gonzales] poll: test running, phase=%s elapsed=%ds", phase, Math.round(elapsed));
-
-          setPollingProgress({
-            phase,
-            progress: Math.min(progress, 0.99),
-            elapsed,
-          });
         } else {
           // Grace period: don't treat test_in_progress=false as completion
           // until we've ACTUALLY seen test_in_progress=true in a poll response.
@@ -246,16 +261,19 @@ export function SpeedTestProvider({ children }: { children: ReactNode }) {
   // Use SSE progress only if SSE is confirmed working
   // Otherwise use polling progress (which shows "started" immediately)
   const progress = sseWorking === true ? sseProgress : pollingProgress;
-  const isStreaming = sseWorking === true ? isSSEStreaming : (isPolling || pollingProgress.phase !== "idle");
+  const isStreaming = sseWorking === true ? isSSEStreaming : (isPolling || (pollingProgress.phase !== "idle" && pollingProgress.phase !== "complete" && pollingProgress.phase !== "error"));
 
   // Clear testActive when test reaches terminal state
   useEffect(() => {
     if (progress.phase === "complete" || progress.phase === "error") {
-      // Small delay so the result view can show briefly before reverting
-      const t = setTimeout(() => setTestActive(false), 100);
+      // Show results for 5 seconds before transitioning to full dashboard
+      const t = setTimeout(() => {
+        setTestActive(false);
+        resetPolling();
+      }, 5000);
       return () => clearTimeout(t);
     }
-  }, [progress.phase]);
+  }, [progress.phase, resetPolling]);
 
   // Auto-connect to SSE when a test is detected via status polling
   useEffect(() => {

@@ -33,10 +33,23 @@ class OutageStatus(BaseModel):
     last_failure_message: str = ""
 
 
+class TestProgress(BaseModel):
+    """Live test progress data from the event bus."""
+
+    phase: str
+    bandwidth_mbps: float | None = None
+    progress: float | None = None
+    ping_ms: float | None = None
+    elapsed: float | None = None
+    download_mbps: float | None = None
+    upload_mbps: float | None = None
+
+
 class StatusOut(BaseModel):
     version: str
     scheduler: SchedulerStatus
     outage: OutageStatus
+    test_progress: TestProgress | None = None
     last_test_time: datetime | None = None
     total_measurements: int
     total_failures: int

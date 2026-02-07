@@ -14,7 +14,9 @@ from gonzales.schemas.status import (
     SchedulerControlResponse,
     SchedulerStatus,
     StatusOut,
+    TestProgress,
 )
+from gonzales.services.event_bus import event_bus
 from gonzales.services.measurement_service import measurement_service
 from gonzales.services.scheduler_service import scheduler_service
 from gonzales.version import __version__
@@ -41,6 +43,21 @@ async def get_status(session: AsyncSession = Depends(get_db)):
     # Get outage status from scheduler
     outage_data = scheduler_service.outage_status
 
+    # Get live test progress from event bus (if test is running)
+    test_in_progress = measurement_service.test_in_progress or scheduler_service.test_in_progress
+    test_progress = None
+    if test_in_progress and event_bus._last_event is not None:
+        evt_data = event_bus._last_event.get("data", {})
+        test_progress = TestProgress(
+            phase=evt_data.get("phase", "started"),
+            bandwidth_mbps=evt_data.get("bandwidth_mbps"),
+            progress=evt_data.get("progress"),
+            ping_ms=evt_data.get("ping_ms"),
+            elapsed=evt_data.get("elapsed"),
+            download_mbps=evt_data.get("download_mbps"),
+            upload_mbps=evt_data.get("upload_mbps"),
+        )
+
     return StatusOut(
         version=__version__,
         scheduler=SchedulerStatus(
@@ -49,8 +66,9 @@ async def get_status(session: AsyncSession = Depends(get_db)):
             paused=scheduler_service.paused,
             next_run_time=scheduler_service.next_run_time if scheduler_service.enabled else None,
             interval_minutes=settings.test_interval_minutes,
-            test_in_progress=measurement_service.test_in_progress or scheduler_service.test_in_progress,
+            test_in_progress=test_in_progress,
         ),
+        test_progress=test_progress,
         outage=OutageStatus(
             outage_active=outage_data["outage_active"],
             outage_started_at=outage_data["outage_started_at"],

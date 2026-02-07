@@ -85,10 +85,21 @@ export interface OutageStatus {
   last_failure_message: string;
 }
 
+export interface TestProgress {
+  phase: string;
+  bandwidth_mbps?: number;
+  progress?: number;
+  ping_ms?: number;
+  elapsed?: number;
+  download_mbps?: number;
+  upload_mbps?: number;
+}
+
 export interface Status {
   version: string;
   scheduler: SchedulerStatus;
   outage: OutageStatus;
+  test_progress?: TestProgress;
   last_test_time: string | null;
   total_measurements: number;
   total_failures: number;
