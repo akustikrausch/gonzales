@@ -26,10 +26,10 @@ interface SpeedTestContextValue {
 
 const SpeedTestContext = createContext<SpeedTestContextValue | null>(null);
 
-// Don't treat test_in_progress=false as "completed" until we've confirmed the test
-// actually started. The trigger POST can take several seconds through HA Ingress proxy,
-// especially via Nabu Casa remote access.
-const GRACE_PERIOD_S = 30;
+// Don't treat test_in_progress=false as "completed" until we've seen it true
+// in an actual poll response. The trigger POST can take several seconds through
+// HA Ingress proxy, especially via Nabu Casa remote access.
+const GRACE_PERIOD_S = 60;
 
 /**
  * Polling fallback for when SSE doesn't work (e.g., Home Assistant Ingress).
@@ -45,6 +45,7 @@ function usePollingFallback(
   const pollingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const sseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const testStartTimeRef = useRef<number>(0);
+  // ONLY set true when a poll actually sees test_in_progress=true
   const sawTestInProgressRef = useRef(false);
   const [pollCount, setPollCount] = useState(0);
   const [lastPollResult, setLastPollResult] = useState<string>("");
@@ -92,15 +93,10 @@ function usePollingFallback(
     }, 5000);
   }, []);
 
-  // Allow external code to confirm the test was accepted by the backend
-  const confirmTestStarted = useCallback(() => {
-    sawTestInProgressRef.current = true;
-    console.log("[gonzales] Test start confirmed by trigger response");
-  }, []);
-
-  const stopPolling = useCallback(() => {
+  // Stop polling interval and timers, but do NOT reset pollingProgress.
+  // Progress is only reset by startPolling() or resetProgress().
+  const stopPollingInterval = useCallback(() => {
     setIsPolling(false);
-    setPollingProgress({ phase: "idle" });
     if (pollingIntervalRef.current) {
       clearInterval(pollingIntervalRef.current);
       pollingIntervalRef.current = null;
@@ -111,6 +107,12 @@ function usePollingFallback(
     }
     setSSEWorking(null);
   }, []);
+
+  // Full reset: stop polling AND reset progress to idle
+  const resetPolling = useCallback(() => {
+    stopPollingInterval();
+    setPollingProgress({ phase: "idle" });
+  }, [stopPollingInterval]);
 
   // Polling logic
   useEffect(() => {
@@ -156,8 +158,8 @@ function usePollingFallback(
           });
         } else {
           // Grace period: don't treat test_in_progress=false as completion
-          // until we've actually seen the test running. The trigger POST may
-          // still be in transit through the HA Ingress proxy chain.
+          // until we've ACTUALLY seen test_in_progress=true in a poll response.
+          // The trigger POST may still be in transit through HA Ingress proxy.
           if (!sawTestInProgressRef.current && elapsed < GRACE_PERIOD_S) {
             setLastPollResult(`false, grace (${Math.round(elapsed)}s/${GRACE_PERIOD_S}s)`);
             console.log("[gonzales] poll: waiting for test to start (elapsed=%ds/%ds)", Math.round(elapsed), GRACE_PERIOD_S);
@@ -166,6 +168,9 @@ function usePollingFallback(
 
           setLastPollResult(`completed (${Math.round(elapsed)}s)`);
           console.log("[gonzales] poll: test completed (sawInProgress=%s elapsed=%ds)", sawTestInProgressRef.current, Math.round(elapsed));
+
+          // Stop the interval FIRST to prevent duplicate completion
+          stopPollingInterval();
 
           // Test completed - fetch the latest measurement
           const latest = await api.getLatestMeasurement();
@@ -181,7 +186,6 @@ function usePollingFallback(
           } else {
             setPollingProgress({ phase: "complete" });
           }
-          stopPolling();
           onTestComplete();
         }
       } catch (err) {
@@ -191,25 +195,24 @@ function usePollingFallback(
       }
     };
 
-    // Poll immediately, then every 1000ms (was 500ms - reduced to avoid proxy overload)
-    console.log("[gonzales] Polling started (interval=1000ms)");
+    // Poll immediately, then every 2000ms
+    console.log("[gonzales] Polling started (interval=2000ms)");
     poll();
-    pollingIntervalRef.current = setInterval(poll, 1000);
+    pollingIntervalRef.current = setInterval(poll, 2000);
 
     return () => {
       if (pollingIntervalRef.current) {
         clearInterval(pollingIntervalRef.current);
       }
     };
-  }, [isPolling, stopPolling, onTestComplete]);
+  }, [isPolling, stopPollingInterval, onTestComplete]);
 
   return {
     isPolling,
     pollingProgress,
     startPolling,
-    stopPolling,
+    resetPolling,
     sseWorking,
-    confirmTestStarted,
     pollCount,
     lastPollResult,
   };
@@ -234,9 +237,8 @@ export function SpeedTestProvider({ children }: { children: ReactNode }) {
     isPolling,
     pollingProgress,
     startPolling,
-    stopPolling,
+    resetPolling,
     sseWorking,
-    confirmTestStarted,
     pollCount,
     lastPollResult,
   } = usePollingFallback(sseProgress, isSSEStreaming, invalidateQueries);
@@ -286,27 +288,21 @@ export function SpeedTestProvider({ children }: { children: ReactNode }) {
       .then(() => {
         console.log("[gonzales] runTest: trigger accepted (202)");
         setTriggerState("accepted");
-        // Backend has confirmed the test is started - mark it so polling
-        // won't treat the first test_in_progress=false as "test completed"
-        confirmTestStarted();
-        invalidateQueries();
+        // NOTE: Do NOT set sawTestInProgressRef here - only polls should set it.
+        // Setting it from trigger bypasses the grace period, causing premature completion.
       })
       .catch((err) => {
         console.warn("[gonzales] runTest: trigger failed:", err.message);
         setTriggerState(`error: ${err.message}`);
-        // If 503 "already in progress", the test IS running - mark it
-        if (err.message?.includes("503")) {
-          confirmTestStarted();
-        }
       });
-  }, [startStreaming, startPolling, invalidateQueries, confirmTestStarted]);
+  }, [startStreaming, startPolling]);
 
   const reset = useCallback(() => {
     resetSSE();
-    stopPolling();
+    resetPolling();
     setTestActive(false);
     setTriggerState("idle");
-  }, [resetSSE, stopPolling]);
+  }, [resetSSE, resetPolling]);
 
   // Build debug string for on-screen display
   const sseLabel = sseWorking === true ? "OK" : sseWorking === false ? "FAIL" : "?";
