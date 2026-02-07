@@ -190,10 +190,15 @@ export function MobileNav() {
                 padding: "0 var(--g-space-2)",
               })}
             >
-              <item.icon className="w-5 h-5 shrink-0" />
-              <span className="text-xs font-medium mt-1">
-                {item.shortLabel || item.label}
-              </span>
+              {({ isActive }) => (
+                <>
+                  <item.icon className="w-5 h-5 shrink-0" aria-hidden="true" />
+                  <span className="text-xs font-medium mt-1">
+                    {item.shortLabel || item.label}
+                  </span>
+                  {isActive && <span className="sr-only">(current page)</span>}
+                </>
+              )}
             </NavLink>
           ))}
           {/* More button with proper touch target */}

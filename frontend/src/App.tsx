@@ -6,6 +6,7 @@ import { ToastProvider } from "./context/ToastContext";
 import { ToastContainer } from "./components/ui/Toast";
 import { OnboardingWizard } from "./components/onboarding";
 import { Spinner } from "./components/ui/Spinner";
+import { ErrorBoundary } from "./components/ui/ErrorBoundary";
 import { useVersionCheck } from "./hooks/useVersionCheck";
 import { useOnboarding } from "./hooks/useOnboarding";
 
@@ -58,7 +59,7 @@ const RootCausePage = lazy(() =>
 
 function PageLoader() {
   return (
-    <div className="flex items-center justify-center" style={{ minHeight: "50vh" }}>
+    <div className="flex items-center justify-center" role="status" aria-label="Loading page" style={{ minHeight: "50vh" }}>
       <Spinner size={32} />
     </div>
   );
@@ -105,14 +106,16 @@ function AppContent() {
 
 export default function App() {
   return (
-    <VersionGuard>
-      <BrowserRouter basename={getBasename()}>
-        <ToastProvider>
-          <SpeedTestProvider>
-            <AppContent />
-          </SpeedTestProvider>
-        </ToastProvider>
-      </BrowserRouter>
-    </VersionGuard>
+    <ErrorBoundary>
+      <VersionGuard>
+        <BrowserRouter basename={getBasename()}>
+          <ToastProvider>
+            <SpeedTestProvider>
+              <AppContent />
+            </SpeedTestProvider>
+          </ToastProvider>
+        </BrowserRouter>
+      </VersionGuard>
+    </ErrorBoundary>
   );
 }

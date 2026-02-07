@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { NavLink } from "react-router-dom";
 import { Logo } from "../ui/Logo";
 import { useStatus } from "../../hooks/useApi";
@@ -10,7 +11,7 @@ interface SidebarProps {
   collapsed?: boolean;
 }
 
-function NavGroup({
+const NavGroup = memo(function NavGroup({
   items,
   collapsed,
   groupLabel,
@@ -46,7 +47,7 @@ function NavGroup({
       ))}
     </ul>
   );
-}
+});
 
 function GroupDivider({ label }: { label: string }) {
   return (
@@ -71,8 +72,7 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
   return (
     <aside
       className="glass-sidebar min-h-screen flex flex-col transition-all"
-      role="complementary"
-      aria-label="Main navigation"
+      aria-label="Sidebar"
       style={{
         width: collapsed
           ? "var(--g-sidebar-collapsed)"

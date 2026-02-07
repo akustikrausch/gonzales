@@ -16,6 +16,8 @@ export function Spinner({
       height={size}
       viewBox="0 0 24 24"
       fill="none"
+      role="status"
+      aria-label="Loading"
       style={{ animation: "g-spin 1s linear infinite" }}
     >
       <circle

@@ -37,7 +37,7 @@ export function Toast({ toast, onDismiss }: ToastProps) {
       <button
         className="glass-toast-dismiss"
         onClick={() => onDismiss(toast.id)}
-        aria-label="Dismiss"
+        aria-label="Dismiss notification"
       >
         <X className="w-4 h-4" />
       </button>
