@@ -10,6 +10,8 @@
 4. **Frontend version constant MUST match** backend version (prevents infinite reload loop)
 5. **Verify versions BEFORE pushing** - Always run the verification command below
 6. **ALWAYS create GitHub releases immediately after pushing** - Never leave releases out of sync with code
+7. **NEVER release gonzales without updating gonzales-ha** - Both repos MUST be released together as one atomic operation. The HA add-on runs the same backend, TUI, and web UI. Any code fix, feature, or change in gonzales MUST be reflected in gonzales-ha with matching version. A gonzales release without a gonzales-ha release is INCOMPLETE and FORBIDDEN.
+8. **gonzales-ha MUST be identical in functionality** - The HA add-on is the same app, just packaged for Home Assistant. TUI, Web UI, API, MCP, CLI must all be identical between standalone and HA versions.
 
 ### Version Verification Command
 
