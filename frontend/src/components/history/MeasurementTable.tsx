@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { ArrowUp, ArrowDown, ArrowUpDown, Trash2 } from "lucide-react";
 import type { Measurement, SortField, SortOrder } from "../../api/types";
 import { formatDate } from "../../utils/format";
@@ -56,7 +57,7 @@ interface MeasurementTableProps {
   onSort?: (field: SortField) => void;
 }
 
-export function MeasurementTable({ measurements, onDelete, sortBy, sortOrder, onSort }: MeasurementTableProps) {
+export const MeasurementTable = memo(function MeasurementTable({ measurements, onDelete, sortBy, sortOrder, onSort }: MeasurementTableProps) {
   return (
     <div className="overflow-x-auto">
       <table className="glass-table">
@@ -145,4 +146,4 @@ export function MeasurementTable({ measurements, onDelete, sortBy, sortOrder, on
       </table>
     </div>
   );
-}
+});

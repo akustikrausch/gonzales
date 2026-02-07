@@ -1,3 +1,4 @@
+import { memo, useMemo } from "react";
 import {
   CartesianGrid,
   Legend,
@@ -19,12 +20,16 @@ interface SpeedChartProps {
   uploadThreshold?: number;
 }
 
-export function SpeedChart({ measurements, downloadThreshold, uploadThreshold }: SpeedChartProps) {
-  const data = [...measurements].reverse().map((m) => ({
-    time: formatShortDate(m.timestamp),
-    download: Number(m.download_mbps.toFixed(1)),
-    upload: Number(m.upload_mbps.toFixed(1)),
-  }));
+export const SpeedChart = memo(function SpeedChart({ measurements, downloadThreshold, uploadThreshold }: SpeedChartProps) {
+  const data = useMemo(
+    () =>
+      [...measurements].reverse().map((m) => ({
+        time: formatShortDate(m.timestamp),
+        download: Number(m.download_mbps.toFixed(1)),
+        upload: Number(m.upload_mbps.toFixed(1)),
+      })),
+    [measurements],
+  );
 
   return (
     <GlassCard>
@@ -100,4 +105,4 @@ export function SpeedChart({ measurements, downloadThreshold, uploadThreshold }:
       </ResponsiveContainer>
     </GlassCard>
   );
-}
+});

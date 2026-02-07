@@ -19,9 +19,19 @@ export function useAnimatedNumber(
 
     if (from === to) return;
 
+    // Skip animation when tab is not visible
+    if (document.hidden) {
+      setCurrent(to);
+      return;
+    }
+
     const start = performance.now();
 
     function tick(now: number) {
+      if (document.hidden) {
+        setCurrent(to);
+        return;
+      }
       const elapsed = now - start;
       const t = Math.min(elapsed / duration, 1);
       // easeOutExpo

@@ -136,6 +136,7 @@ export function DataFlowCanvas({ direction, bandwidth, color }: DataFlowCanvasPr
       }
 
       ctx!.globalCompositeOperation = "lighter";
+      ctx!.fillStyle = `rgb(${r},${g},${b})`;
 
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
@@ -155,17 +156,13 @@ export function DataFlowCanvas({ direction, bandwidth, color }: DataFlowCanvasPr
           }
         }
 
-        // Draw with radial gradient glow
-        const grad = ctx!.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius * 3);
-        grad.addColorStop(0, `rgba(${r},${g},${b},${p.opacity})`);
-        grad.addColorStop(0.4, `rgba(${r},${g},${b},${p.opacity * 0.4})`);
-        grad.addColorStop(1, `rgba(${r},${g},${b},0)`);
-
+        // Draw with solid circle + globalAlpha (avoids createRadialGradient per particle)
+        ctx!.globalAlpha = p.opacity;
         ctx!.beginPath();
-        ctx!.arc(p.x, p.y, p.radius * 3, 0, Math.PI * 2);
-        ctx!.fillStyle = grad;
+        ctx!.arc(p.x, p.y, p.radius * 2, 0, Math.PI * 2);
         ctx!.fill();
       }
+      ctx!.globalAlpha = 1;
 
       ctx!.restore();
       animRef.current = requestAnimationFrame(tick);
