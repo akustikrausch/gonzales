@@ -11,7 +11,7 @@ Gonzales is a local network speed monitoring tool. It runs automated internet sp
 Python FastAPI application with async SQLAlchemy and APScheduler.
 
 - **Entry point**: `__main__.py` runs uvicorn with startup security warning, `main.py` contains the FastAPI app factory with lifespan (DB init, scheduler start/stop, security warning when host != 127.0.0.1 and no API key)
-- **Config**: `config.py` -- Pydantic Settings, all env vars prefixed `GONZALES_`. Mutable keys (interval, thresholds, preferred_server_id, cooldown, theme) persisted to `config.json`
+- **Config**: `config.py` -- Pydantic Settings, all env vars prefixed `GONZALES_`. Mutable keys (interval, thresholds, preferred_server_id, cooldown, theme, isp_name, data_retention_days, webhook_url, smart_scheduler_*) persisted to `config.json`
 - **Database**: `db/engine.py` (async SQLite + WAL mode), `db/models.py` (Measurement, TestFailure), `db/repository.py` (query layer)
 - **Services**:
   - `services/speedtest_runner.py` -- Ookla CLI subprocess. `run()` for simple execution, `run_with_progress()` for SSE streaming with progress events, `list_servers()` for server enumeration
@@ -19,8 +19,14 @@ Python FastAPI application with async SQLAlchemy and APScheduler.
   - `services/scheduler_service.py` -- APScheduler recurring test execution
   - `services/statistics_service.py` -- basic stats (percentiles, aggregates) + enhanced stats (hourly, daily, trend regression, SLA compliance, reliability score, per-server breakdown) + innovative insights (anomaly detection, ISP score, peak/off-peak, correlations, degradation alerts, predictions)
   - `services/event_bus.py` -- async pub/sub for real-time SSE streaming. `EventBus` class with per-subscriber `asyncio.Queue` fan-out
-  - `services/export_service.py` -- CSV + PDF generation
-- **API**: `api/v1/` -- REST endpoints for measurements, statistics (basic + enhanced with insights), status, export, speedtest trigger + SSE stream, config, servers
+  - `services/export_service.py` -- CSV + PDF + professional compliance report generation
+  - `services/smart_scheduler_service.py` -- adaptive test intervals based on network stability (normal/burst/recovery phases, daily data budget)
+  - `services/root_cause_service.py` -- multi-layer network health analysis (DNS/local/ISP), fingerprinting, hop correlations, recommendations
+  - `services/qos_service.py` -- QoS profile evaluation (gaming, streaming, video calls, remote work)
+  - `services/topology_service.py` -- traceroute analysis, hop tracking, network diagnosis
+  - `services/retention_service.py` -- data retention enforcement (delete data older than N days)
+  - `services/webhook_service.py` -- webhook notifications for events
+- **API**: `api/v1/` -- REST endpoints for measurements, statistics, status, export, speedtest, config, servers, outages, qos, topology, summary, smart-scheduler, root-cause
 - **Security**: `core/security.py` -- CORS (configurable origins), TrustedHost, GZip, security headers
 - **TUI**: `tui/app.py` -- Textual app with demoscene styling, 4 screens (dashboard, history, settings, real-time test)
   - `tui/screens/test.py` -- Real-time test screen with event bus subscription
@@ -44,7 +50,7 @@ React 19 + TypeScript + Vite 6 + Tailwind CSS 4 SPA with Liquid Glass design sys
   - `src/hooks/useSpeedHistory.ts` -- accumulates {time, value} bandwidth samples during download/upload with throttled re-renders (~250ms)
 - **Layout**: `src/components/layout/` -- AppShell (responsive flex), Sidebar (collapsible on tablet), Header (theme toggle + run test), MobileNav (fixed bottom nav)
 - **Speedtest**: `src/components/speedtest/` -- LiveTestView (SSE progress with canvas particle system, live speed graph, elapsed timer, phase transition animations), SpeedNeedle (SVG gauge with glow filters, gradient arc, pulsing tip, pulsing outer arc), ProgressRing (SVG circular progress with optional glow), DataFlowCanvas (HTML Canvas particle system with 60-120 glowing particles, direction/density scales with bandwidth, prefers-reduced-motion fallback), LiveSpeedGraph (pure SVG area chart with glow filter and pulsing dot), ElapsedTimer (M:SS elapsed display)
-- **Pages**: Dashboard (with live test overlay), History, Statistics (tabbed: Overview/Time Analysis/Trends/Servers/Insights), Export, Settings (with server picker + theme selector). All pages lazy-loaded via React.lazy()
+- **Pages**: Dashboard (with live test overlay), History, Statistics (tabbed: Overview/Time Analysis/Trends/Servers/Insights), Export, Settings (with server picker + theme selector), QoS (quality of service profiles), Topology (network path analysis), Root Cause (network health analysis), Docs (built-in documentation). All pages lazy-loaded via React.lazy()
 - **Statistics**: `src/components/statistics/` -- HourlyHeatmap, DayOfWeekChart (radar), TrendChart (area with prediction lines), SlaCard, ReliabilityCard, ServerComparison (bar), IspScoreCard, PeakAnalysis, QualityTimeline, CorrelationMatrix, DegradationAlert
 - **Common**: `src/components/common/` -- AnimatedNumber (easeOutExpo counting), PageTransition (route fade/slide)
 - **Built output**: Copied to `backend/gonzales/static/` and served by FastAPI at `/`. Code-split: vendor, charts, query as separate chunks
@@ -78,13 +84,18 @@ make clean      # Remove build artifacts
 
 ## Tests
 
-Backend tests in `backend/tests/` (74 tests, run with `cd backend && python3 -m pytest tests/ -v`):
+Backend tests in `backend/tests/` (114 tests, run with `cd backend && python3 -m pytest tests/ -v`):
 
 - **`conftest.py`** -- Shared fixtures: in-memory SQLite engine, session, measurement factory, FastAPI test app with overridden DB dependency, httpx AsyncClient
 - **`test_statistics_pure.py`** -- Pure function tests (no DB): `_percentile`, `_stddev`, `_linear_regression`, `_pearson`, `_compute_speed_stats`, `_compute_isp_score`, `_detect_anomalies`, `_compute_peak_offpeak`, `_detect_degradation`
 - **`test_event_bus.py`** -- EventBus pub/sub: publish/subscribe, fan-out, subscriber count/limit, complete/error termination, cleanup after disconnect
 - **`test_repository.py`** -- Repository CRUD with in-memory SQLite: create, get_by_id, get_latest, get_paginated (pagination, sorting, date filters), delete, count, get_statistics, TestFailureRepository
 - **`test_api.py`** -- REST API via httpx: measurements CRUD, statistics (basic + enhanced), status, API key authentication (protected/unprotected/wrong key)
+- **`test_retention_service.py`** -- Data retention service tests
+- **`test_rate_limit.py`** -- Rate limiting middleware tests
+- **`test_topology_validation.py`** -- Topology IP validation and security tests
+- **`test_measurement_service.py`** -- Measurement service orchestration tests
+- **`test_webhook_service.py`** -- Webhook notification service tests
 
 ## API Endpoints
 
@@ -96,16 +107,36 @@ All under `/api/v1`:
 | GET | `/measurements/latest` | Most recent result |
 | GET | `/measurements/{id}` | Single measurement |
 | DELETE | `/measurements/{id}` | Delete measurement |
+| DELETE | `/measurements/all` | Delete all measurements (requires `?confirm=true`) |
 | GET | `/statistics` | Basic stats with percentiles |
 | GET | `/statistics/enhanced` | Enhanced stats + insights (hourly, daily, trend, SLA, reliability, per-server, anomalies, ISP score, peak/off-peak, correlations, degradation, predictions) |
+| GET | `/summary` | AI-friendly status summary (supports `?format=markdown`) |
 | GET | `/status` | Scheduler state, uptime, DB size |
+| PUT | `/status/scheduler` | Enable/disable the scheduler |
 | GET | `/export/csv` | Download CSV |
 | GET | `/export/pdf` | Download PDF report |
+| GET | `/export/report/professional` | Professional compliance report (PDF) |
 | POST | `/speedtest/trigger` | Run test manually |
 | GET | `/speedtest/stream` | SSE stream for real-time test progress |
 | GET | `/config` | Current config |
-| PUT | `/config` | Update config (interval, thresholds, preferred_server_id, cooldown, theme) |
+| PUT | `/config` | Update config (interval, thresholds, preferred_server_id, cooldown, theme, isp_name, data_retention_days, webhook_url) |
 | GET | `/servers` | List available speedtest servers |
+| GET | `/outages` | List detected outages |
+| GET | `/outages/statistics` | Aggregated outage statistics |
+| GET | `/qos/profiles` | All QoS profiles with requirements |
+| GET | `/qos/current` | QoS status for latest measurement |
+| GET | `/qos/evaluate/{id}` | Evaluate measurement against QoS profiles |
+| GET | `/qos/history/{profile_id}` | QoS compliance history |
+| POST | `/topology/analyze` | Run traceroute analysis |
+| GET | `/topology/latest` | Most recent topology analysis |
+| GET | `/topology/history` | Recent topology analyses |
+| GET | `/topology/diagnosis` | Aggregated network diagnosis |
+| GET | `/topology/{id}` | Specific topology analysis |
+| GET | `/smart-scheduler/status` | Smart scheduler status |
+| GET/PUT | `/smart-scheduler/config` | Smart scheduler configuration |
+| POST | `/smart-scheduler/enable` | Enable smart scheduling |
+| POST | `/smart-scheduler/disable` | Disable smart scheduling |
+| GET/POST | `/root-cause/analysis` | Root-cause analysis with recommendations |
 
 ## Database
 

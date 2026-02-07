@@ -134,10 +134,7 @@ Returns:
 - `hop_correlations`: Traceroute hop impact on speed
 - `recommendations`: Prioritized action items
 
-```http
-GET /api/v1/root-cause/fingerprints
-GET /api/v1/root-cause/recommendations
-```
+The root-cause analysis endpoint returns fingerprints, recommendations, hop correlations, and layer scores in a single comprehensive response.
 
 ## CLI Commands
 
@@ -148,7 +145,7 @@ If CLI access is available:
 gonzales status
 
 # Run a speed test
-gonzales test
+gonzales run
 
 # Get statistics
 gonzales stats --days 7

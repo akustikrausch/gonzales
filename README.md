@@ -23,7 +23,7 @@
 
 **Comprehensive Analytics** — Real-time dashboard with historical trends, hourly/daily/weekly breakdowns, per-server comparisons, SLA compliance tracking, and 7-day predictive forecasts.
 
-**Home Assistant Integration** — One-click add-on installation with 10+ sensors. Build automations based on connection quality — notifications, smart device control, multi-WAN failover.
+**Home Assistant Integration** — One-click add-on installation with 10 sensors + diagnostics. Build automations based on connection quality — notifications, smart device control, multi-WAN failover.
 
 **100% Local & Private** — All data stays on your hardware. No cloud accounts, no subscriptions, no external dependencies. Self-hosted and fully offline-capable.
 
@@ -41,8 +41,8 @@
 | **Detection** | Outage detection (3-strike retry), jitter monitoring, packet loss tracking, performance degradation alerts |
 | **Export** | CSV export, PDF reports with charts, API access, data retention controls |
 | **Interfaces** | Web dashboard (React 19), Terminal UI (Textual), CLI (Typer), REST API, MCP server |
-| **Integration** | Home Assistant add-on, HACS integration, 15+ sensors, binary sensors, diagnostic entities |
-| **Security** | API key protection, rate limiting (120 req/min), CORS configuration, localhost-only by default |
+| **Integration** | Home Assistant add-on, HACS integration, 10 sensors + diagnostics, button entity |
+| **Security** | API key protection, dual rate limiting (100 req/min slowapi default + 120 req/min middleware), CORS configuration, localhost-only by default |
 | **Accessibility** | WCAG 2.1 AA compliant, keyboard navigation, screen reader support, focus management |
 | **Architecture** | Clean Architecture, Domain-Driven Design, async SQLAlchemy, SQLite with WAL mode |
 
@@ -180,7 +180,7 @@ cp .env.example .env
 |----------|---------|-------------|
 | `GONZALES_HOST` | `127.0.0.1` | Bind address |
 | `GONZALES_PORT` | `8470` | Server port |
-| `GONZALES_TEST_INTERVAL_MINUTES` | `30` | Minutes between tests |
+| `GONZALES_TEST_INTERVAL_MINUTES` | `60` | Minutes between tests (overridden to 30 in `.env.example`) |
 | `GONZALES_MANUAL_TRIGGER_COOLDOWN_SECONDS` | `60` | Cooldown between manual tests |
 | `GONZALES_SPEEDTEST_BINARY` | `speedtest` | Path to speedtest CLI binary |
 | `GONZALES_DOWNLOAD_THRESHOLD_MBPS` | `1000.0` | Expected download speed (your subscribed plan) |
@@ -195,6 +195,9 @@ cp .env.example .env
 | `GONZALES_THEME` | `auto` | UI theme: auto, light, or dark |
 | `GONZALES_CONFIG_PATH` | `config.json` | Path to runtime config file |
 | `GONZALES_HA_ADDON` | `false` | Enable Home Assistant Add-on mode (Ingress headers, stdout-only logging) |
+| `GONZALES_ISP_NAME` | *(empty)* | Provider name for reports |
+| `GONZALES_DATA_RETENTION_DAYS` | `0` | Delete data older than N days (0 = unlimited) |
+| `GONZALES_WEBHOOK_URL` | *(empty)* | Webhook URL for notifications (empty = disabled) |
 
 Settings can also be changed at runtime via the web UI (Settings page) or the API (`PUT /api/v1/config`). Runtime changes are persisted to `config.json`, which is auto-created and gitignored.
 
@@ -227,20 +230,31 @@ All under `/api/v1`:
 | GET | `/statistics/enhanced` | Enhanced stats (hourly, daily, trend, SLA, reliability, per-server) |
 | GET | `/summary` | AI-friendly status summary (supports `?format=markdown`) |
 | GET | `/status` | Scheduler state, uptime |
+| PUT | `/status/scheduler` | Enable/disable the scheduler |
 | GET | `/export/csv` | Download CSV |
 | GET | `/export/pdf` | Download PDF report |
+| GET | `/export/report/professional` | Professional compliance report (PDF) |
 | POST | `/speedtest/trigger` | Run test manually |
 | GET | `/speedtest/stream` | SSE stream for real-time test progress |
 | GET | `/config` | Current config |
 | PUT | `/config` | Update config |
 | GET | `/servers` | List available speedtest servers |
+| GET | `/outages` | List detected outages |
+| GET | `/outages/statistics` | Aggregated outage statistics |
+| GET | `/qos/profiles` | All QoS profiles with requirements |
+| GET | `/qos/current` | QoS status for latest measurement |
+| GET | `/qos/evaluate/{id}` | Evaluate a measurement against QoS profiles |
+| GET | `/qos/history/{profile_id}` | QoS compliance history for a profile |
+| POST | `/topology/analyze` | Run traceroute analysis |
+| GET | `/topology/latest` | Most recent topology analysis |
+| GET | `/topology/history` | Recent topology analyses |
+| GET | `/topology/diagnosis` | Aggregated network diagnosis |
+| GET | `/topology/{id}` | Specific topology analysis |
 | GET | `/smart-scheduler/status` | Smart scheduler status (phase, stability, data usage) |
 | GET/PUT | `/smart-scheduler/config` | Smart scheduler configuration |
 | POST | `/smart-scheduler/enable` | Enable smart scheduling |
 | POST | `/smart-scheduler/disable` | Disable smart scheduling |
-| GET | `/root-cause/analysis` | Full root-cause analysis with recommendations |
-| GET | `/root-cause/fingerprints` | Detected problem patterns |
-| GET | `/root-cause/recommendations` | Actionable recommendations |
+| GET/POST | `/root-cause/analysis` | Full root-cause analysis with recommendations |
 
 #### AI Agent Integration
 
@@ -295,7 +309,7 @@ Gonzales includes a comprehensive CLI for scripting and automation:
 
 ```bash
 # Run a speed test
-gonzales test
+gonzales run
 
 # View statistics
 gonzales stats
@@ -389,7 +403,7 @@ Run Gonzales on a separate machine (e.g. Raspberry Pi) and install the HACS inte
 
 **Umfassende Analysen** — Echtzeit-Dashboard mit historischen Trends, stündlichen/täglichen/wöchentlichen Aufschlüsselungen, Server-Vergleichen, SLA-Compliance-Tracking und 7-Tage-Vorhersagen.
 
-**Home Assistant Integration** — Ein-Klick-Add-on-Installation mit 10+ Sensoren. Erstelle Automationen basierend auf Verbindungsqualität — Benachrichtigungen, Smart-Device-Steuerung, Multi-WAN-Failover.
+**Home Assistant Integration** — Ein-Klick-Add-on-Installation mit 10 Sensoren + Diagnose-Entities. Erstelle Automationen basierend auf Verbindungsqualität — Benachrichtigungen, Smart-Device-Steuerung, Multi-WAN-Failover.
 
 **100% Lokal & Privat** — Alle Daten bleiben auf deiner Hardware. Keine Cloud-Konten, keine Abos, keine externen Abhängigkeiten. Selbst gehostet und vollständig offline-fähig.
 
@@ -407,8 +421,8 @@ Run Gonzales on a separate machine (e.g. Raspberry Pi) and install the HACS inte
 | **Erkennung** | Ausfallerkennung (3-Strike-Retry), Jitter-Monitoring, Paketverlust-Tracking, Performance-Degradation-Alerts |
 | **Export** | CSV-Export, PDF-Berichte mit Diagrammen, API-Zugriff, Datenaufbewahrungskontrolle |
 | **Oberflächen** | Web-Dashboard (React 19), Terminal UI (Textual), CLI (Typer), REST API, MCP-Server |
-| **Integration** | Home Assistant Add-on, HACS-Integration, 15+ Sensoren, Binary Sensors, Diagnose-Entities |
-| **Sicherheit** | API-Key-Schutz, Rate-Limiting (120 Req/Min), CORS-Konfiguration, standardmäßig nur localhost |
+| **Integration** | Home Assistant Add-on, HACS-Integration, 10 Sensoren + Diagnose-Entities, Button-Entity |
+| **Sicherheit** | API-Key-Schutz, duales Rate-Limiting (100 Req/Min slowapi-Standard + 120 Req/Min Middleware), CORS-Konfiguration, standardmäßig nur localhost |
 | **Barrierefreiheit** | WCAG 2.1 AA konform, Tastaturnavigation, Screenreader-Unterstützung, Fokus-Management |
 | **Architektur** | Clean Architecture, Domain-Driven Design, async SQLAlchemy, SQLite mit WAL-Modus |
 
@@ -503,7 +517,7 @@ cp .env.example .env
 |----------|----------|--------------|
 | `GONZALES_HOST` | `127.0.0.1` | Bind-Adresse |
 | `GONZALES_PORT` | `8470` | Server-Port |
-| `GONZALES_TEST_INTERVAL_MINUTES` | `30` | Minuten zwischen Tests |
+| `GONZALES_TEST_INTERVAL_MINUTES` | `60` | Minuten zwischen Tests (in `.env.example` auf 30 gesetzt) |
 | `GONZALES_MANUAL_TRIGGER_COOLDOWN_SECONDS` | `60` | Abklingzeit zwischen manuellen Tests |
 | `GONZALES_SPEEDTEST_BINARY` | `speedtest` | Pfad zur Speedtest-CLI |
 | `GONZALES_DOWNLOAD_THRESHOLD_MBPS` | `1000.0` | Erwartete Download-Geschwindigkeit (dein Tarif) |
@@ -518,6 +532,9 @@ cp .env.example .env
 | `GONZALES_THEME` | `auto` | UI-Thema: auto, light oder dark |
 | `GONZALES_CONFIG_PATH` | `config.json` | Pfad zur Laufzeit-Konfigurationsdatei |
 | `GONZALES_HA_ADDON` | `false` | Home Assistant Add-on Modus (Ingress-Header, nur stdout-Logging) |
+| `GONZALES_ISP_NAME` | *(leer)* | Provider-Name fuer Berichte |
+| `GONZALES_DATA_RETENTION_DAYS` | `0` | Daten aelter als N Tage loeschen (0 = unbegrenzt) |
+| `GONZALES_WEBHOOK_URL` | *(leer)* | Webhook-URL fuer Benachrichtigungen (leer = deaktiviert) |
 
 Einstellungen koennen auch zur Laufzeit ueber die Web-Oberflaeche (Einstellungen) oder die API (`PUT /api/v1/config`) geaendert werden. Laufzeitaenderungen werden in `config.json` gespeichert (wird automatisch erstellt, nicht in Git).
 
@@ -551,7 +568,7 @@ Gonzales enthaelt eine umfassende CLI fuer Scripting und Automatisierung:
 
 ```bash
 # Speedtest starten
-gonzales test
+gonzales run
 
 # Statistiken anzeigen
 gonzales stats
@@ -659,12 +676,12 @@ Read-only endpoints (measurements, statistics, status, export) remain open.
 
 ### Rate Limiting
 
-Gonzales includes built-in rate limiting to prevent abuse:
-- **Default:** 100 requests per minute per IP address
-- **Algorithm:** Token bucket with configurable burst capacity
-- **Response:** HTTP 429 (Too Many Requests) when limit exceeded
+Gonzales includes two layers of rate limiting to prevent abuse:
 
-Rate limiting is automatically enabled for all API endpoints.
+1. **slowapi (per-endpoint):** Default 100 requests/minute per IP. Specific endpoints have custom limits (e.g., speedtest trigger: 5/min, exports: 10/min, config updates: 20/min, reads: 200/min).
+2. **Middleware (global):** 120 requests/minute sustained (burst of 20) per IP. Resource-intensive endpoints (`/speedtest/trigger`, `/root-cause/analysis`, `/export/*`, `/topology/analyze`) limited to 6 requests/minute.
+
+The middleware layer is only active when binding to a non-localhost address (`host != 127.0.0.1`) and debug mode is off. HTTP 429 (Too Many Requests) is returned when limits are exceeded.
 
 For production deployments, consider placing Gonzales behind a reverse proxy (nginx, Caddy) for TLS and additional access control.
 
