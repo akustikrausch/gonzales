@@ -2,6 +2,15 @@
 
 All notable changes to Gonzales will be documented in this file.
 
+## [3.9.8] - 2026-02-07
+
+### Bug Fixes
+
+- **Fix "Invalid handler specified" when adding HA integration**: `HassioServiceInfo` was moved from `homeassistant.components.hassio` to `homeassistant.helpers.service_info.hassio` in recent HA Core versions. Import now tries the new location first with fallback to the old path, supporting both old and new HA versions.
+- **Fix hard hassio dependency**: Changed `dependencies` to `after_dependencies` in manifest.json so the integration can load even if the hassio component isn't fully initialized yet.
+
+---
+
 ## [3.9.7] - 2026-02-07
 
 ### Bug Fixes

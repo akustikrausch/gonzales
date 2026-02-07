@@ -2,7 +2,7 @@
   "name": "gonzales-frontend",
   "description": "Web dashboard for Gonzales internet speed monitor - React frontend with real-time speed test visualization and analytics",
   "private": true,
-  "version": "3.9.7",
+  "version": "3.9.8",
   "type": "module",
   "keywords": [
     "internet speed test",

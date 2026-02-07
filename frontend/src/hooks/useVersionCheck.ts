@@ -6,7 +6,7 @@ import { useStatus } from "./useApi";
  * When the backend returns a different version, we trigger a hard reload
  * to ensure the browser fetches fresh assets.
  */
-const FRONTEND_VERSION = "3.9.7";
+const FRONTEND_VERSION = "3.9.8";
 
 /**
  * Hook that checks if the frontend version matches the backend version.
