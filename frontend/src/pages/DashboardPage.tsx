@@ -18,7 +18,7 @@ export function DashboardPage() {
   const { data: stats } = useStatistics();
   const { data: enhanced } = useEnhancedStatistics();
   const { data: status } = useStatus();
-  const { progress, isStreaming } = useSpeedTest();
+  const { progress, isStreaming, _debug } = useSpeedTest();
 
   if (loadingLatest) {
     return (
@@ -46,6 +46,21 @@ export function DashboardPage() {
       {showLive && (
         <div className="g-animate-scale">
           <LiveTestView progress={progress} />
+        </div>
+      )}
+
+      {/* Debug overlay - visible diagnostics for HA Ingress troubleshooting */}
+      {_debug && (
+        <div
+          className="text-xs font-mono px-3 py-1.5 rounded-lg"
+          style={{
+            background: "rgba(0,0,0,0.6)",
+            color: "#0f0",
+            backdropFilter: "blur(4px)",
+            wordBreak: "break-all",
+          }}
+        >
+          {_debug}
         </div>
       )}
 

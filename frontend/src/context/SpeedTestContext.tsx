@@ -18,6 +18,8 @@ interface SpeedTestContextValue {
   runTest: () => void;
   reset: () => void;
   isPollingFallback: boolean;
+  /** Debug string for on-screen diagnostics */
+  _debug: string;
 }
 
 const SpeedTestContext = createContext<SpeedTestContextValue | null>(null);
@@ -42,6 +44,8 @@ function usePollingFallback(
   const sseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const testStartTimeRef = useRef<number>(0);
   const sawTestInProgressRef = useRef(false);
+  const [pollCount, setPollCount] = useState(0);
+  const [lastPollResult, setLastPollResult] = useState<string>("");
 
   // Detect if SSE is working - if we receive any event within 5 seconds, SSE works
   const [sseWorking, setSSEWorking] = useState<boolean | null>(null);
@@ -49,7 +53,7 @@ function usePollingFallback(
   useEffect(() => {
     if (isSSEStreaming && sseProgress.phase !== "idle") {
       // We received an SSE event, SSE is working
-      console.log("[gonzales] SSE event received, SSE confirmed working");
+      console.log("[gonzales] SSE event received, SSE confirmed working, phase:", sseProgress.phase);
       setSSEWorking(true);
       if (sseTimeoutRef.current) {
         clearTimeout(sseTimeoutRef.current);
@@ -69,6 +73,8 @@ function usePollingFallback(
     sawTestInProgressRef.current = false;
     setSSEWorking(null);
     setPollingProgress({ phase: "started" });
+    setPollCount(0);
+    setLastPollResult("waiting");
 
     // Give SSE 5 seconds to deliver an event (HA ingress adds latency)
     sseTimeoutRef.current = setTimeout(() => {
@@ -114,8 +120,11 @@ function usePollingFallback(
         const status = await api.getStatus(true);
         const elapsed = (Date.now() - testStartTimeRef.current) / 1000;
 
+        setPollCount((c) => c + 1);
+
         if (status.scheduler.test_in_progress) {
           sawTestInProgressRef.current = true;
+          setLastPollResult(`in_progress (${Math.round(elapsed)}s)`);
 
           // Estimate phase based on elapsed time
           // Typical test: 0-5s ping, 5-20s download, 20-35s upload
@@ -148,10 +157,12 @@ function usePollingFallback(
           // until we've actually seen the test running. The trigger POST may
           // still be in transit through the HA Ingress proxy chain.
           if (!sawTestInProgressRef.current && elapsed < GRACE_PERIOD_S) {
+            setLastPollResult(`false, grace (${Math.round(elapsed)}s/${GRACE_PERIOD_S}s)`);
             console.log("[gonzales] poll: waiting for test to start (elapsed=%ds/%ds)", Math.round(elapsed), GRACE_PERIOD_S);
             return; // Keep polling, test probably hasn't started yet
           }
 
+          setLastPollResult(`completed (${Math.round(elapsed)}s)`);
           console.log("[gonzales] poll: test completed (sawInProgress=%s elapsed=%ds)", sawTestInProgressRef.current, Math.round(elapsed));
 
           // Test completed - fetch the latest measurement
@@ -172,14 +183,16 @@ function usePollingFallback(
           onTestComplete();
         }
       } catch (err) {
-        console.log("[gonzales] poll: error:", err instanceof Error ? err.message : err);
+        const msg = err instanceof Error ? err.message : String(err);
+        setLastPollResult(`error: ${msg}`);
+        console.log("[gonzales] poll: error:", msg);
       }
     };
 
-    // Poll immediately, then every 500ms
-    console.log("[gonzales] Polling started (interval=500ms)");
+    // Poll immediately, then every 1000ms (was 500ms - reduced to avoid proxy overload)
+    console.log("[gonzales] Polling started (interval=1000ms)");
     poll();
-    pollingIntervalRef.current = setInterval(poll, 500);
+    pollingIntervalRef.current = setInterval(poll, 1000);
 
     return () => {
       if (pollingIntervalRef.current) {
@@ -195,6 +208,8 @@ function usePollingFallback(
     stopPolling,
     sseWorking,
     confirmTestStarted,
+    pollCount,
+    lastPollResult,
   };
 }
 
@@ -203,6 +218,7 @@ export function SpeedTestProvider({ children }: { children: ReactNode }) {
   const { data: status } = useStatus();
   const queryClient = useQueryClient();
   const connectingRef = useRef(false);
+  const [triggerState, setTriggerState] = useState<string>("idle");
 
   const invalidateQueries = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: ["measurement"] });
@@ -218,6 +234,8 @@ export function SpeedTestProvider({ children }: { children: ReactNode }) {
     stopPolling,
     sseWorking,
     confirmTestStarted,
+    pollCount,
+    lastPollResult,
   } = usePollingFallback(sseProgress, isSSEStreaming, invalidateQueries);
 
   // Use SSE progress only if SSE is confirmed working
@@ -235,6 +253,7 @@ export function SpeedTestProvider({ children }: { children: ReactNode }) {
       pollingProgress.phase === "idle" &&
       !connectingRef.current
     ) {
+      console.log("[gonzales] Auto-connect: test_in_progress detected, starting SSE + polling");
       connectingRef.current = true;
       startStreaming();
       startPolling();
@@ -246,11 +265,13 @@ export function SpeedTestProvider({ children }: { children: ReactNode }) {
 
   const runTest = useCallback(() => {
     console.log("[gonzales] runTest: starting SSE + polling fallback");
+    setTriggerState("pending");
     startStreaming();
     startPolling();
     api.triggerSpeedtest()
       .then(() => {
         console.log("[gonzales] runTest: trigger accepted (202)");
+        setTriggerState("accepted");
         // Backend has confirmed the test is started - mark it so polling
         // won't treat the first test_in_progress=false as "test completed"
         confirmTestStarted();
@@ -258,6 +279,7 @@ export function SpeedTestProvider({ children }: { children: ReactNode }) {
       })
       .catch((err) => {
         console.warn("[gonzales] runTest: trigger failed:", err.message);
+        setTriggerState(`error: ${err.message}`);
         // If 503 "already in progress", the test IS running - mark it
         if (err.message?.includes("503")) {
           confirmTestStarted();
@@ -268,7 +290,12 @@ export function SpeedTestProvider({ children }: { children: ReactNode }) {
   const reset = useCallback(() => {
     resetSSE();
     stopPolling();
+    setTriggerState("idle");
   }, [resetSSE, stopPolling]);
+
+  // Build debug string for on-screen display
+  const sseLabel = sseWorking === true ? "OK" : sseWorking === false ? "FAIL" : "?";
+  const _debug = `SSE:${sseLabel} | Poll:${isPolling ? "ON" : "OFF"}(#${pollCount}) | Trigger:${triggerState} | Phase:${progress.phase} | Last:${lastPollResult}`;
 
   return (
     <SpeedTestContext.Provider
@@ -278,6 +305,7 @@ export function SpeedTestProvider({ children }: { children: ReactNode }) {
         runTest,
         reset,
         isPollingFallback: sseWorking === false,
+        _debug,
       }}
     >
       {children}
