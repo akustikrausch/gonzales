@@ -2,6 +2,17 @@
 
 All notable changes to Gonzales will be documented in this file.
 
+## [3.9.3] - 2026-02-07
+
+### Bug Fixes
+
+- **Fix premature test completion in HA Ingress polling** (root cause!): `confirmTestStarted()` from trigger response was bypassing the grace period - first poll seeing `test_in_progress=false` was treated as "completed" after only 6 seconds while the test was still running.
+- **Fix "complete" phase never rendering**: `stopPolling()` reset progress to "idle" in same React batch as "complete", so the complete phase was never displayed. Split into `stopPollingInterval()` (keeps progress) and `resetPolling()` (full reset).
+- **Increase grace period to 60s**: More headroom for slow HA Ingress proxy chains.
+- **Increase poll interval to 2s**: Reduce proxy load during test.
+
+---
+
 ## [3.9.2] - 2026-02-07
 
 ### Bug Fixes
