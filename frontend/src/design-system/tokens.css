@@ -4,6 +4,7 @@
   --g-green: #34C759;
   --g-red: #FF3B30;
   --g-orange: #FF9500;
+  --g-yellow: #FFCC00;
   --g-purple: #AF52DE;
   --g-teal: #5AC8FA;
 
@@ -16,6 +17,7 @@
   --g-green-tint: rgba(52, 199, 89, 0.10);
   --g-red-tint: rgba(255, 59, 48, 0.10);
   --g-orange-tint: rgba(255, 149, 0, 0.10);
+  --g-yellow-tint: rgba(255, 204, 0, 0.10);
   --g-purple-tint: rgba(175, 82, 222, 0.10);
   --g-teal-tint: rgba(90, 200, 250, 0.10);
 

@@ -113,9 +113,9 @@ export function StatisticsPage() {
           <GlassButton
             key={tab.key}
             size="sm"
+            variant={activeTab === tab.key ? "primary" : "default"}
             onClick={() => setActiveTab(tab.key)}
             onKeyDown={(e) => handleTabKeyDown(e, index)}
-            className={activeTab === tab.key ? "glass-btn-primary" : ""}
             role="tab"
             aria-selected={activeTab === tab.key}
             aria-controls={`tabpanel-${tab.key}`}

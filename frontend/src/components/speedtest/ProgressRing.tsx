@@ -1,3 +1,5 @@
+import { useId } from "react";
+
 interface ProgressRingProps {
   value: number;
   max?: number;
@@ -17,11 +19,12 @@ export function ProgressRing({
   glow = false,
   children,
 }: ProgressRingProps) {
+  const uid = useId();
   const r = (size - strokeWidth * 2) / 2;
   const circumference = 2 * Math.PI * r;
   const pct = Math.min(1, Math.max(0, value / max));
   const offset = circumference * (1 - pct);
-  const filterId = `ring-glow-${size}`;
+  const filterId = `ring-glow${uid}`;
 
   return (
     <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }}>

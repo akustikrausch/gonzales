@@ -1,3 +1,4 @@
+import { useId } from "react";
 import type { SpeedSample } from "../../hooks/useSpeedHistory";
 
 interface LiveSpeedGraphProps {
@@ -9,6 +10,10 @@ interface LiveSpeedGraphProps {
 }
 
 export function LiveSpeedGraph({ samples, peak, color }: LiveSpeedGraphProps) {
+  const uid = useId();
+  const filterId = `speed-graph-glow${uid}`;
+  const gradientId = `graph-fill-grad${uid}`;
+
   if (samples.length < 2) return null;
 
   const width = 320;
@@ -38,7 +43,6 @@ export function LiveSpeedGraph({ samples, peak, color }: LiveSpeedGraphProps) {
     ` L ${points[points.length - 1].x},${padTop + graphH} Z`;
 
   const lastPoint = points[points.length - 1];
-  const filterId = "speed-graph-glow";
 
   return (
     <div className="w-full max-w-xs mx-auto">
@@ -58,7 +62,7 @@ export function LiveSpeedGraph({ samples, peak, color }: LiveSpeedGraphProps) {
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
-          <linearGradient id="graph-fill-grad" x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor={color} stopOpacity="0.3" />
             <stop offset="100%" stopColor={color} stopOpacity="0.02" />
           </linearGradient>
@@ -82,7 +86,7 @@ export function LiveSpeedGraph({ samples, peak, color }: LiveSpeedGraphProps) {
         })}
 
         {/* Fill area */}
-        <path d={fillD} fill="url(#graph-fill-grad)" />
+        <path d={fillD} fill={`url(#${gradientId})`} />
 
         {/* Line */}
         <polyline

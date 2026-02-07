@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { useAnimatedNumber } from "../../hooks/useAnimatedNumber";
 
 interface SpeedNeedleProps {
@@ -17,6 +18,12 @@ export function SpeedNeedle({
   unit = "Mbps",
   glowColor,
 }: SpeedNeedleProps) {
+  const uid = useId();
+  const needleGlowId = `needleGlow${uid}`;
+  const arcGlowId = `arcGlow${uid}`;
+  const tipPulseId = `tipPulse${uid}`;
+  const arcGradientId = `arcGradient${uid}`;
+
   const animated = useAnimatedNumber(value, 400);
   const clamped = Math.min(animated, max);
   const angle = -135 + (clamped / max) * 270;
@@ -72,7 +79,7 @@ export function SpeedNeedle({
       <svg viewBox="0 0 200 145" className="w-full max-w-[260px]">
         <defs>
           {/* Glow filter for needle */}
-          <filter id="needleGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <filter id={needleGlowId} x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur stdDeviation="3" result="blur" />
             <feFlood floodColor={glow} floodOpacity="0.6" result="color" />
             <feComposite in="color" in2="blur" operator="in" result="glow" />
@@ -82,7 +89,7 @@ export function SpeedNeedle({
             </feMerge>
           </filter>
           {/* Glow for arc */}
-          <filter id="arcGlow" x="-20%" y="-20%" width="140%" height="140%">
+          <filter id={arcGlowId} x="-20%" y="-20%" width="140%" height="140%">
             <feGaussianBlur stdDeviation="2.5" result="blur" />
             <feFlood floodColor={glow} floodOpacity="0.4" result="color" />
             <feComposite in="color" in2="blur" operator="in" result="glow" />
@@ -92,11 +99,11 @@ export function SpeedNeedle({
             </feMerge>
           </filter>
           {/* Tip pulse */}
-          <filter id="tipPulse" x="-100%" y="-100%" width="300%" height="300%">
+          <filter id={tipPulseId} x="-100%" y="-100%" width="300%" height="300%">
             <feGaussianBlur stdDeviation="4" />
           </filter>
           {/* Gradient for arc */}
-          <linearGradient id="arcGradient" x1="0" y1="0" x2="1" y2="1">
+          <linearGradient id={arcGradientId} x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stopColor={color} stopOpacity="0.3" />
             <stop offset="100%" stopColor={color} stopOpacity="1" />
           </linearGradient>
@@ -119,7 +126,7 @@ export function SpeedNeedle({
             stroke={color}
             strokeWidth="8"
             strokeLinecap="round"
-            filter="url(#arcGlow)"
+            filter={`url(#${arcGlowId})`}
           >
             <animate
               attributeName="opacity"
@@ -147,10 +154,10 @@ export function SpeedNeedle({
           <path
             d={`M ${startX} ${startY} A ${r} ${r} 0 ${largeArc} 1 ${endX} ${endY}`}
             fill="none"
-            stroke="url(#arcGradient)"
+            stroke={`url(#${arcGradientId})`}
             strokeWidth="6"
             strokeLinecap="round"
-            filter="url(#arcGlow)"
+            filter={`url(#${arcGlowId})`}
           />
         )}
 
@@ -186,7 +193,7 @@ export function SpeedNeedle({
           stroke={color}
           strokeWidth="2"
           strokeLinecap="round"
-          filter="url(#needleGlow)"
+          filter={`url(#${needleGlowId})`}
         />
 
         {/* Center dot */}
@@ -200,7 +207,7 @@ export function SpeedNeedle({
             cy={tipY}
             r="6"
             fill={color}
-            filter="url(#tipPulse)"
+            filter={`url(#${tipPulseId})`}
             opacity="0.5"
           >
             <animate
