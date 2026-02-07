@@ -46,10 +46,10 @@ React 19 + TypeScript + Vite 6 + Tailwind CSS 4 SPA with Liquid Glass design sys
   - `src/hooks/useSSE.ts` -- EventSource hook for real-time speed test streaming
   - `src/hooks/useTheme.ts` -- theme state management (auto/light/dark)
   - `src/hooks/useMediaQuery.ts` -- responsive breakpoint hooks (useIsMobile, useIsTablet, useIsDesktop)
-  - `src/hooks/useAnimatedNumber.ts` -- requestAnimationFrame number animation with easeOutExpo
+  - `src/hooks/useAnimatedNumber.ts` -- requestAnimationFrame number animation with easeOutExpo, animates from current visual position (not previous target) for smooth transitions during rapid polling
   - `src/hooks/useSpeedHistory.ts` -- accumulates {time, value} bandwidth samples during download/upload with throttled re-renders (~250ms)
 - **Layout**: `src/components/layout/` -- AppShell (responsive flex), Sidebar (collapsible on tablet), Header (theme toggle + run test), MobileNav (fixed bottom nav)
-- **Speedtest**: `src/components/speedtest/` -- LiveTestView (SSE progress with canvas particle system, live speed graph, elapsed timer, phase transition animations), SpeedNeedle (SVG gauge with glow filters, gradient arc, pulsing tip, pulsing outer arc), ProgressRing (SVG circular progress with optional glow), DataFlowCanvas (HTML Canvas particle system with 60-120 glowing particles, direction/density scales with bandwidth, prefers-reduced-motion fallback), LiveSpeedGraph (pure SVG area chart with glow filter and pulsing dot), ElapsedTimer (M:SS elapsed display)
+- **Speedtest**: `src/components/speedtest/` -- LiveTestView (SSE progress with canvas particle system, live speed graph, elapsed timer, phase transition animations), SpeedNeedle (240° bottom-centered SVG gauge with glow filters, gradient arc, pulsing tip), ProgressRing (SVG circular progress with optional glow), DataFlowCanvas (HTML Canvas particle system with 60-120 glowing particles, direction/density scales with bandwidth, prefers-reduced-motion fallback), LiveSpeedGraph (pure SVG area chart with glow filter and pulsing dot), ElapsedTimer (M:SS elapsed display)
 - **Pages**: Dashboard (with live test overlay), History, Statistics (tabbed: Overview/Time Analysis/Trends/Servers/Insights), Export, Settings (with server picker + theme selector), QoS (quality of service profiles), Topology (network path analysis), Root Cause (network health analysis), Docs (built-in documentation). All pages lazy-loaded via React.lazy()
 - **Statistics**: `src/components/statistics/` -- HourlyHeatmap, DayOfWeekChart (radar), TrendChart (area with prediction lines), SlaCard, ReliabilityCard, ServerComparison (bar), IspScoreCard, PeakAnalysis, QualityTimeline, CorrelationMatrix, DegradationAlert
 - **Common**: `src/components/common/` -- AnimatedNumber (easeOutExpo counting), PageTransition (route fade/slide)
@@ -63,7 +63,9 @@ React 19 + TypeScript + Vite 6 + Tailwind CSS 4 SPA with Liquid Glass design sys
 - Scheduler uses APScheduler `AsyncIOScheduler` with `max_instances=1`
 - Frontend uses TanStack Query with 30s polling for auto-refresh
 - Subprocess calls use list args (no `shell=True`)
-- SSE streaming: backend publishes progress events to EventBus (max 20 subscribers, 5min timeout), `/api/v1/speedtest/stream` yields SSE events, frontend `useSSE` hook consumes via native EventSource API
+- SSE streaming: backend publishes progress events to EventBus (max 20 subscribers, 5min timeout), `/api/v1/speedtest/stream` yields SSE events with `application/octet-stream` content-type (bypasses HA Core compression), frontend `useSSE` hook consumes via `fetch()`+`ReadableStream` (not EventSource, which rejects non-text/event-stream)
+- Polling fallback for HA Ingress: when SSE doesn't work (5s timeout), polls `/api/v1/status` every 2s. Status endpoint exposes `test_progress` (phase, bandwidth_mbps, progress, ping_ms, elapsed) from `event_bus._last_event` when a test is running. Grace period of 60s before treating `test_in_progress=false` as completion.
+- Version check: `useVersionCheck` compares `FRONTEND_VERSION` constant against `status.version` from backend. On mismatch, reloads once (tracked via `sessionStorage` to prevent infinite loops when HA Ingress proxy caches old assets)
 - Optional API key auth: `GONZALES_API_KEY` env var. When set, mutating endpoints (PUT config, POST trigger, DELETE measurements) require `X-API-Key` header. Read-only endpoints remain open. Startup warns if host != 127.0.0.1 and no API key is configured.
 - Security headers: CSP, X-Frame-Options DENY, X-Content-Type-Options nosniff, Referrer-Policy. CORS restricted to configured origins with specific methods/headers.
 - Design system uses CSS custom properties for theming; `data-theme` attribute on `<html>` for manual override
