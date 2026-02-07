@@ -67,3 +67,6 @@ audits/
 
 # Agent bootstrap prompt (meta-tooling, not project code)
 AGENT_BOOTSTRAP.md
+
+# Competitive analysis (internal strategy, not to be committed)
+COMPETITORS.md
