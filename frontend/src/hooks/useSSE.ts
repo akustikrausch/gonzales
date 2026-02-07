@@ -19,102 +19,149 @@ export interface SSEProgress {
   message?: string;
 }
 
+interface SSEEvent {
+  event: string;
+  data: string;
+}
+
+/** Parse raw SSE text chunk into events */
+function parseSSEEvents(raw: string): SSEEvent[] {
+  const events: SSEEvent[] = [];
+  const blocks = raw.split("\n\n");
+  for (const block of blocks) {
+    if (!block.trim()) continue;
+    let eventName = "message";
+    let data = "";
+    for (const line of block.split("\n")) {
+      if (line.startsWith(":")) continue; // comment / keepalive
+      if (line.startsWith("event: ")) eventName = line.slice(7);
+      else if (line.startsWith("data: ")) data = line.slice(6);
+    }
+    if (data || eventName !== "message") {
+      events.push({ event: eventName, data });
+    }
+  }
+  return events;
+}
+
 export function useSSE() {
   const [progress, setProgress] = useState<SSEProgress>({ phase: "idle" });
   const [isStreaming, setIsStreaming] = useState(false);
-  const esRef = useRef<EventSource | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
   const receivedTerminalRef = useRef(false);
 
   const startStreaming = useCallback(() => {
-    if (esRef.current) {
-      esRef.current.close();
+    if (abortRef.current) {
+      abortRef.current.abort();
     }
 
     setProgress({ phase: "idle" });
     setIsStreaming(true);
     receivedTerminalRef.current = false;
 
-    const es = new EventSource(`${getSSEBase()}/speedtest/stream`);
-    esRef.current = es;
+    const controller = new AbortController();
+    abortRef.current = controller;
 
-    es.addEventListener("started", () => {
-      setProgress({ phase: "started" });
-    });
+    const url = `${getSSEBase()}/speedtest/stream`;
 
-    es.addEventListener("progress", (e) => {
+    (async () => {
       try {
-        const data = JSON.parse(e.data);
-        setProgress({
-          phase: data.phase || "started",
-          bandwidth_mbps: data.bandwidth_mbps,
-          progress: data.progress,
-          ping_ms: data.ping_ms,
-          elapsed: data.elapsed,
+        const response = await fetch(url, {
+          signal: controller.signal,
+          headers: { "Accept": "text/event-stream" },
         });
-      } catch {
-        /* ignore malformed event */
-      }
-    });
 
-    es.addEventListener("complete", (e) => {
-      receivedTerminalRef.current = true;
-      try {
-        const data = JSON.parse(e.data);
-        setProgress({
-          phase: "complete",
-          download_mbps: data.download_mbps,
-          upload_mbps: data.upload_mbps,
-          ping_ms: data.ping_ms,
-          jitter_ms: data.jitter_ms,
-          measurement_id: data.measurement_id,
-        });
-      } catch {
-        setProgress({ phase: "complete" });
-      }
-      setIsStreaming(false);
-      es.close();
-      esRef.current = null;
-    });
-
-    es.addEventListener("error", (e) => {
-      // Only handle server-sent error events (MessageEvent), not connection errors
-      if (e instanceof MessageEvent) {
-        receivedTerminalRef.current = true;
-        try {
-          const data = JSON.parse(e.data);
-          setProgress({ phase: "error", message: data.message });
-        } catch {
-          setProgress({ phase: "error", message: "Unknown error" });
+        if (!response.ok || !response.body) {
+          throw new Error(`Stream failed: ${response.status}`);
         }
-        setIsStreaming(false);
-        es.close();
-        esRef.current = null;
-      }
-      // Connection errors: let EventSource auto-reconnect.
-      // The backend buffers the last event so reconnected subscribers catch up.
-    });
 
-    es.onerror = () => {
-      // If we already received complete/error, no need to reconnect
-      if (receivedTerminalRef.current) {
-        return;
-      }
-      // Otherwise let EventSource auto-reconnect.
-      // If the connection was permanently lost (readyState === CLOSED),
-      // clean up so auto-detect via status polling can take over.
-      if (es.readyState === EventSource.CLOSED) {
-        if (esRef.current === es) {
+        const reader = response.body
+          .pipeThrough(new TextDecoderStream())
+          .getReader();
+
+        let buffer = "";
+
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+
+          buffer += value;
+
+          const lastDoubleNewline = buffer.lastIndexOf("\n\n");
+          if (lastDoubleNewline === -1) continue;
+
+          const complete = buffer.slice(0, lastDoubleNewline + 2);
+          buffer = buffer.slice(lastDoubleNewline + 2);
+
+          const events = parseSSEEvents(complete);
+
+          for (const evt of events) {
+            if (evt.event === "started") {
+              setProgress({ phase: "started" });
+            } else if (evt.event === "progress") {
+              try {
+                const data = JSON.parse(evt.data);
+                setProgress({
+                  phase: data.phase || "started",
+                  bandwidth_mbps: data.bandwidth_mbps,
+                  progress: data.progress,
+                  ping_ms: data.ping_ms,
+                  elapsed: data.elapsed,
+                });
+              } catch { /* ignore malformed */ }
+            } else if (evt.event === "complete") {
+              receivedTerminalRef.current = true;
+              try {
+                const data = JSON.parse(evt.data);
+                setProgress({
+                  phase: "complete",
+                  download_mbps: data.download_mbps,
+                  upload_mbps: data.upload_mbps,
+                  ping_ms: data.ping_ms,
+                  jitter_ms: data.jitter_ms,
+                  measurement_id: data.measurement_id,
+                });
+              } catch {
+                setProgress({ phase: "complete" });
+              }
+              setIsStreaming(false);
+              abortRef.current = null;
+              return;
+            } else if (evt.event === "error") {
+              receivedTerminalRef.current = true;
+              try {
+                const data = JSON.parse(evt.data);
+                setProgress({ phase: "error", message: data.message });
+              } catch {
+                setProgress({ phase: "error", message: "Unknown error" });
+              }
+              setIsStreaming(false);
+              abortRef.current = null;
+              return;
+            }
+          }
+        }
+
+        if (!receivedTerminalRef.current) {
           setIsStreaming(false);
-          esRef.current = null;
+          abortRef.current = null;
+        }
+      } catch (err) {
+        if (err instanceof DOMException && err.name === "AbortError") {
+          return;
+        }
+        if (!receivedTerminalRef.current) {
+          setIsStreaming(false);
+          abortRef.current = null;
         }
       }
-    };
+    })();
   }, []);
 
   const reset = useCallback(() => {
-    if (esRef.current) {
-      esRef.current.close();
-      esRef.current = null;
+    if (abortRef.current) {
+      abortRef.current.abort();
+      abortRef.current = null;
     }
     receivedTerminalRef.current = false;
     setProgress({ phase: "idle" });

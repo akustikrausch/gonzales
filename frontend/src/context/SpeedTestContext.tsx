@@ -37,7 +37,7 @@ function usePollingFallback(
   const sseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const testStartTimeRef = useRef<number>(0);
 
-  // Detect if SSE is working - if we receive any event within 3 seconds, SSE works
+  // Detect if SSE is working - if we receive any event within 5 seconds, SSE works
   const [sseWorking, setSSEWorking] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -52,11 +52,17 @@ function usePollingFallback(
   }, [isSSEStreaming, sseProgress.phase]);
 
   const startPolling = useCallback(() => {
+    // Clear any existing timeout to prevent orphaned timers
+    if (sseTimeoutRef.current) {
+      clearTimeout(sseTimeoutRef.current);
+      sseTimeoutRef.current = null;
+    }
+
     testStartTimeRef.current = Date.now();
     setSSEWorking(null);
     setPollingProgress({ phase: "started" });
 
-    // Give SSE 3 seconds to deliver an event
+    // Give SSE 5 seconds to deliver an event (HA ingress adds latency)
     sseTimeoutRef.current = setTimeout(() => {
       // If we haven't received any SSE events, fall back to polling
       setSSEWorking((current) => {
@@ -67,7 +73,7 @@ function usePollingFallback(
         }
         return current;
       });
-    }, 3000);
+    }, 5000);
   }, []);
 
   const stopPolling = useCallback(() => {
@@ -165,6 +171,7 @@ export function SpeedTestProvider({ children }: { children: ReactNode }) {
   const { progress: sseProgress, isStreaming: isSSEStreaming, startStreaming, reset: resetSSE } = useSSE();
   const { data: status } = useStatus();
   const queryClient = useQueryClient();
+  const connectingRef = useRef(false);
 
   const invalidateQueries = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: ["measurement"] });
@@ -192,12 +199,18 @@ export function SpeedTestProvider({ children }: { children: ReactNode }) {
       status?.scheduler.test_in_progress &&
       !isSSEStreaming &&
       !isPolling &&
-      sseProgress.phase === "idle"
+      sseProgress.phase === "idle" &&
+      pollingProgress.phase === "idle" &&
+      !connectingRef.current
     ) {
+      connectingRef.current = true;
       startStreaming();
       startPolling();
     }
-  }, [status?.scheduler.test_in_progress, isSSEStreaming, isPolling, sseProgress.phase, startStreaming, startPolling]);
+    if (!status?.scheduler.test_in_progress) {
+      connectingRef.current = false;
+    }
+  }, [status?.scheduler.test_in_progress, isSSEStreaming, isPolling, sseProgress.phase, pollingProgress.phase, startStreaming, startPolling]);
 
   const runTest = useCallback(() => {
     startStreaming();

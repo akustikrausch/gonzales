@@ -1,3 +1,3 @@
 """Gonzales version information."""
 
-__version__ = "3.7.7"
+__version__ = "3.8.0"

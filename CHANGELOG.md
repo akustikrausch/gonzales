@@ -2,6 +2,21 @@
 
 All notable changes to Gonzales will be documented in this file.
 
+## [3.8.0] - 2026-02-07
+
+### Bug Fixes
+
+- **SSE Streaming in HA Ingress**: Definitive fix for live speedtest view not working in Home Assistant
+  - Root cause: HA Core's `should_compress()` applies deflate to `text/event-stream`, breaking SSE streaming through ingress proxy
+  - Fix: Use `application/octet-stream` content-type to bypass HA Core compression entirely
+  - Replace browser `EventSource` API with `fetch()` + `ReadableStream` + manual SSE parsing (EventSource rejects non-text/event-stream)
+  - Add 15-second keepalive heartbeats to prevent proxy idle timeouts
+  - Fix orphaned timer leak in polling fallback (`startPolling` now clears existing timeout)
+  - Fix auto-connect infinite loop when SSE reconnection fails repeatedly
+  - Increase SSE detection timeout from 3s to 5s (HA ingress adds latency)
+
+---
+
 ## [3.7.7] - 2026-02-07
 
 ### Bug Fixes
