@@ -22,6 +22,11 @@ interface SpeedTestContextValue {
 
 const SpeedTestContext = createContext<SpeedTestContextValue | null>(null);
 
+// Don't treat test_in_progress=false as "completed" until we've confirmed the test
+// actually started. The trigger POST can take several seconds through HA Ingress proxy,
+// especially via Nabu Casa remote access.
+const GRACE_PERIOD_S = 30;
+
 /**
  * Polling fallback for when SSE doesn't work (e.g., Home Assistant Ingress).
  * Polls the status endpoint to detect when a test completes.
@@ -36,6 +41,7 @@ function usePollingFallback(
   const pollingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const sseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const testStartTimeRef = useRef<number>(0);
+  const sawTestInProgressRef = useRef(false);
 
   // Detect if SSE is working - if we receive any event within 5 seconds, SSE works
   const [sseWorking, setSSEWorking] = useState<boolean | null>(null);
@@ -59,6 +65,7 @@ function usePollingFallback(
     }
 
     testStartTimeRef.current = Date.now();
+    sawTestInProgressRef.current = false;
     setSSEWorking(null);
     setPollingProgress({ phase: "started" });
 
@@ -67,7 +74,7 @@ function usePollingFallback(
       // If we haven't received any SSE events, fall back to polling
       setSSEWorking((current) => {
         if (current === null) {
-          // SSE didn't work, start polling
+          console.debug("[gonzales] SSE not working after 5s, falling back to polling");
           setIsPolling(true);
           return false;
         }
@@ -100,6 +107,8 @@ function usePollingFallback(
         const elapsed = (Date.now() - testStartTimeRef.current) / 1000;
 
         if (status.scheduler.test_in_progress) {
+          sawTestInProgressRef.current = true;
+
           // Estimate phase based on elapsed time
           // Typical test: 0-5s ping, 5-20s download, 20-35s upload
           let phase: SSEProgress["phase"] = "started";
@@ -125,6 +134,14 @@ function usePollingFallback(
             elapsed,
           });
         } else {
+          // Grace period: don't treat test_in_progress=false as completion
+          // until we've actually seen the test running. The trigger POST may
+          // still be in transit through the HA Ingress proxy chain.
+          if (!sawTestInProgressRef.current && elapsed < GRACE_PERIOD_S) {
+            console.debug("[gonzales] Waiting for test to start... elapsed=%ds", Math.round(elapsed));
+            return; // Keep polling, test probably hasn't started yet
+          }
+
           // Test completed - fetch the latest measurement
           const latest = await api.getLatestMeasurement();
           if (latest) {
@@ -213,11 +230,17 @@ export function SpeedTestProvider({ children }: { children: ReactNode }) {
   }, [status?.scheduler.test_in_progress, isSSEStreaming, isPolling, sseProgress.phase, pollingProgress.phase, startStreaming, startPolling]);
 
   const runTest = useCallback(() => {
+    console.debug("[gonzales] runTest: starting SSE + polling fallback");
     startStreaming();
     startPolling();
-    api.triggerSpeedtest().then(() => {
-      invalidateQueries();
-    });
+    api.triggerSpeedtest()
+      .then(() => {
+        console.debug("[gonzales] runTest: trigger accepted");
+        invalidateQueries();
+      })
+      .catch((err) => {
+        console.warn("[gonzales] runTest: trigger failed:", err.message);
+      });
   }, [startStreaming, startPolling, invalidateQueries]);
 
   const reset = useCallback(() => {
