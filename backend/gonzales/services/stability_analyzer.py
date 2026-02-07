@@ -6,6 +6,8 @@ from datetime import datetime, timezone
 import math
 from typing import Protocol
 
+from gonzales.utils.math_utils import coefficient_of_variation
+
 
 class MeasurementLike(Protocol):
     """Protocol for measurement objects."""
@@ -320,14 +322,7 @@ class StabilityAnalyzer:
 
         Returns 0 if insufficient data or mean is 0.
         """
-        if not values or len(values) < 2:
-            return 0.0
-        mean = sum(values) / len(values)
-        if mean == 0:
-            return 0.0
-        variance = sum((v - mean) ** 2 for v in values) / (len(values) - 1)
-        std = math.sqrt(variance)
-        return std / mean
+        return coefficient_of_variation(values)
 
     @staticmethod
     def _calculate_z_score(value: float, mean: float, std: float) -> float:

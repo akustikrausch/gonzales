@@ -13,6 +13,8 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 
+from gonzales.config import settings
+
 
 @dataclass
 class TokenBucket:
@@ -129,17 +131,22 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self._cleanup_interval = 300  # Clean up every 5 minutes
 
     def _get_client_ip(self, request: Request) -> str:
-        """Extract client IP, considering proxy headers."""
-        # Check X-Forwarded-For header (common for reverse proxies)
-        forwarded = request.headers.get("X-Forwarded-For")
-        if forwarded:
-            # Take the first IP in the chain
-            return forwarded.split(",")[0].strip()
+        """Extract client IP, considering proxy headers.
 
-        # Check X-Real-IP header (nginx default)
-        real_ip = request.headers.get("X-Real-IP")
-        if real_ip:
-            return real_ip.strip()
+        Only trusts X-Forwarded-For and X-Real-IP when running as
+        a Home Assistant add-on (behind a known reverse proxy).
+        """
+        if settings.ha_addon:
+            # Check X-Forwarded-For header (common for reverse proxies)
+            forwarded = request.headers.get("X-Forwarded-For")
+            if forwarded:
+                # Take the first IP in the chain
+                return forwarded.split(",")[0].strip()
+
+            # Check X-Real-IP header (nginx default)
+            real_ip = request.headers.get("X-Real-IP")
+            if real_ip:
+                return real_ip.strip()
 
         # Fall back to direct client IP
         if request.client:

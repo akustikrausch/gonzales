@@ -19,6 +19,7 @@ from reportlab.platypus import (
 
 from gonzales.config import settings
 from gonzales.db.models import Measurement
+from gonzales.domain.value_objects import ThresholdConfig
 
 
 class ExportService:
@@ -48,9 +49,9 @@ class ExportService:
         output.write(f"# Subscribed Download: {settings.download_threshold_mbps:.0f} Mbps\n")
         output.write(f"# Subscribed Upload: {settings.upload_threshold_mbps:.0f} Mbps\n")
         output.write(f"# Tolerance: {settings.tolerance_percent:.0f}%\n")
-        tolerance_factor = 1 - (settings.tolerance_percent / 100)
-        eff_dl = settings.download_threshold_mbps * tolerance_factor
-        eff_ul = settings.upload_threshold_mbps * tolerance_factor
+        threshold = ThresholdConfig.from_settings()
+        eff_dl = threshold.effective_download_mbps
+        eff_ul = threshold.effective_upload_mbps
         output.write(f"# Effective Min Download: {eff_dl:.0f} Mbps\n")
         output.write(f"# Effective Min Upload: {eff_ul:.0f} Mbps\n")
         output.write("#\n")

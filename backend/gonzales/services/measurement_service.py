@@ -15,6 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from gonzales.config import settings
 from gonzales.core.exceptions import CooldownError, TestInProgressError
+from gonzales.domain.value_objects import ThresholdConfig
 from gonzales.core.logging import logger
 from gonzales.db.models import Measurement, TestFailure
 from gonzales.db.repository import MeasurementRepository, TestFailureRepository
@@ -88,9 +89,9 @@ class MeasurementService:
         """
         # Calculate effective thresholds with tolerance
         # e.g., 1000 Mbps with 15% tolerance = 850 Mbps minimum acceptable
-        tolerance_factor = 1 - (settings.tolerance_percent / 100)
-        effective_download_threshold = settings.download_threshold_mbps * tolerance_factor
-        effective_upload_threshold = settings.upload_threshold_mbps * tolerance_factor
+        threshold = ThresholdConfig.from_settings()
+        effective_download_threshold = threshold.effective_download_mbps
+        effective_upload_threshold = threshold.effective_upload_mbps
 
         # Detect connection type based on interface name and VPN flag
         connection_type = detect_connection_type(

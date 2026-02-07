@@ -78,13 +78,14 @@ class MeasurementEntity:
         Returns:
             Tuple of (below_download, below_upload)
         """
-        effective_dl = download_threshold_mbps * (1 - tolerance_percent / 100)
-        effective_ul = upload_threshold_mbps * (1 - tolerance_percent / 100)
-
-        below_dl = self.download_mbps < effective_dl
-        below_ul = self.upload_mbps < effective_ul
-
-        return below_dl, below_ul
+        from gonzales.domain.value_objects import ThresholdConfig
+        config = ThresholdConfig(
+            download_mbps=download_threshold_mbps,
+            upload_mbps=upload_threshold_mbps,
+            tolerance_percent=tolerance_percent,
+        )
+        dl_ok, ul_ok = config.check_compliance(self.download_mbps, self.upload_mbps)
+        return not dl_ok, not ul_ok
 
 
 @dataclass

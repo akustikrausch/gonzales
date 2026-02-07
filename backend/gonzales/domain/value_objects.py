@@ -281,6 +281,16 @@ class ThresholdConfig:
         ul_ok = upload_mbps >= self.effective_upload_mbps
         return dl_ok, ul_ok
 
+    @classmethod
+    def from_settings(cls) -> "ThresholdConfig":
+        """Create ThresholdConfig from current application settings."""
+        from gonzales.config import settings
+        return cls(
+            download_mbps=settings.download_threshold_mbps,
+            upload_mbps=settings.upload_threshold_mbps,
+            tolerance_percent=settings.tolerance_percent,
+        )
+
     def get_deficit(self, download_mbps: float, upload_mbps: float) -> tuple[float, float]:
         """
         Calculate deficit percentages below threshold.

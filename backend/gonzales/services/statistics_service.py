@@ -18,6 +18,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from gonzales.config import settings
 from gonzales.db.repository import MeasurementRepository
+from gonzales.domain.value_objects import ThresholdConfig
+from gonzales.utils.math_utils import pearson_correlation
 from gonzales.schemas.statistics import (
     AnomalyPoint,
     BestWorstTimes,
@@ -385,9 +387,9 @@ def _compute_time_periods(measurements: list) -> TimePeriodAnalysis | None:
         return None
 
     # Calculate effective thresholds with tolerance
-    tolerance_factor = 1 - (settings.tolerance_percent / 100)
-    effective_dl_threshold = settings.download_threshold_mbps * tolerance_factor
-    effective_ul_threshold = settings.upload_threshold_mbps * tolerance_factor
+    threshold = ThresholdConfig.from_settings()
+    effective_dl_threshold = threshold.effective_download_mbps
+    effective_ul_threshold = threshold.effective_upload_mbps
 
     # Group measurements by time period
     buckets: dict[str, list] = {p[3]: [] for p in TIME_PERIODS}
@@ -566,17 +568,7 @@ def _find_best_worst_times(hourly: list[HourlyAverage]) -> BestWorstTimes | None
 
 def _pearson(xs: list[float], ys: list[float]) -> float:
     """Compute Pearson correlation coefficient."""
-    n = len(xs)
-    if n < 3:
-        return 0.0
-    mean_x = sum(xs) / n
-    mean_y = sum(ys) / n
-    num = sum((x - mean_x) * (y - mean_y) for x, y in zip(xs, ys))
-    den_x = math.sqrt(sum((x - mean_x) ** 2 for x in xs))
-    den_y = math.sqrt(sum((y - mean_y) ** 2 for y in ys))
-    if den_x == 0 or den_y == 0:
-        return 0.0
-    return num / (den_x * den_y)
+    return pearson_correlation(xs, ys)
 
 
 def _compute_correlations(measurements: list) -> CorrelationMatrix | None:

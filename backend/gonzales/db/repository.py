@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import asc, delete, desc, func, select
+from sqlalchemy import Integer, asc, delete, desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from gonzales.db.models import Measurement, Outage, TestFailure
@@ -124,10 +124,10 @@ class MeasurementRepository:
             func.max(Measurement.ping_latency_ms).label("max_ping"),
             func.avg(Measurement.ping_latency_ms).label("avg_ping"),
             func.sum(
-                func.cast(Measurement.below_download_threshold, __import__("sqlalchemy").Integer)
+                func.cast(Measurement.below_download_threshold, Integer)
             ).label("download_violations"),
             func.sum(
-                func.cast(Measurement.below_upload_threshold, __import__("sqlalchemy").Integer)
+                func.cast(Measurement.below_upload_threshold, Integer)
             ).label("upload_violations"),
         )
 
