@@ -9,18 +9,20 @@ export function useAnimatedNumber(
   duration = 600,
 ): number {
   const [current, setCurrent] = useState(target);
-  const prevRef = useRef(target);
+  const currentRef = useRef(target);
   const frameRef = useRef(0);
 
   useEffect(() => {
-    const from = prevRef.current;
+    // Animate from the current VISUAL position (not previous target)
+    // This prevents jumps when rapid value changes arrive
+    const from = currentRef.current;
     const to = target;
-    prevRef.current = to;
 
     if (from === to) return;
 
     // Skip animation when tab is not visible
     if (document.hidden) {
+      currentRef.current = to;
       setCurrent(to);
       return;
     }
@@ -29,6 +31,7 @@ export function useAnimatedNumber(
 
     function tick(now: number) {
       if (document.hidden) {
+        currentRef.current = to;
         setCurrent(to);
         return;
       }
@@ -36,7 +39,9 @@ export function useAnimatedNumber(
       const t = Math.min(elapsed / duration, 1);
       // easeOutExpo
       const eased = t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
-      setCurrent(from + (to - from) * eased);
+      const val = from + (to - from) * eased;
+      currentRef.current = val;
+      setCurrent(val);
 
       if (t < 1) {
         frameRef.current = requestAnimationFrame(tick);

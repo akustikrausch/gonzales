@@ -26,15 +26,18 @@ export function SpeedNeedle({
 
   const animated = useAnimatedNumber(value, 400);
   const clamped = Math.min(animated, max);
-  const angle = -135 + (clamped / max) * 270;
+  // Map value to 240° arc (-210° to 30°) for a bottom-centered gauge
+  const startAngle = -210;
+  const sweep = 240;
+  const angle = startAngle + (clamped / max) * sweep;
   const r = 80;
   const cx = 100;
-  const cy = 100;
+  const cy = 105;
   const glow = glowColor || color;
 
   // Generate more ticks for futuristic look
   const majorTicks = [0, 0.25, 0.5, 0.75, 1].map((pct) => {
-    const a = (-135 + pct * 270) * (Math.PI / 180);
+    const a = (startAngle + pct * sweep) * (Math.PI / 180);
     return {
       x1: cx + (r - 10) * Math.cos(a),
       y1: cy + (r - 10) * Math.sin(a),
@@ -48,7 +51,7 @@ export function SpeedNeedle({
 
   const minorTicks = Array.from({ length: 21 }, (_, i) => {
     const pct = i / 20;
-    const a = (-135 + pct * 270) * (Math.PI / 180);
+    const a = (startAngle + pct * sweep) * (Math.PI / 180);
     return {
       x1: cx + (r - 4) * Math.cos(a),
       y1: cy + (r - 4) * Math.sin(a),
@@ -58,13 +61,13 @@ export function SpeedNeedle({
     };
   });
 
-  const arcStart = -135 * (Math.PI / 180);
+  const arcStart = startAngle * (Math.PI / 180);
   const arcEnd = angle * (Math.PI / 180);
   const startX = cx + r * Math.cos(arcStart);
   const startY = cy + r * Math.sin(arcStart);
   const endX = cx + r * Math.cos(arcEnd);
   const endY = cy + r * Math.sin(arcEnd);
-  const largeArc = angle - (-135) > 180 ? 1 : 0;
+  const largeArc = angle - startAngle > 180 ? 1 : 0;
 
   const needleA = angle * (Math.PI / 180);
   const needleX = cx + (r - 18) * Math.cos(needleA);
@@ -76,7 +79,7 @@ export function SpeedNeedle({
 
   return (
     <div className="flex flex-col items-center">
-      <svg viewBox="0 0 200 145" className="w-full max-w-[260px]">
+      <svg viewBox="0 0 200 155" className="w-full max-w-[260px]">
         <defs>
           {/* Glow filter for needle */}
           <filter id={needleGlowId} x="-50%" y="-50%" width="200%" height="200%">
@@ -111,7 +114,7 @@ export function SpeedNeedle({
 
         {/* Background track with subtle pulse */}
         <path
-          d={`M ${cx + r * Math.cos(arcStart)} ${cy + r * Math.sin(arcStart)} A ${r} ${r} 0 1 1 ${cx + r * Math.cos(135 * Math.PI / 180)} ${cy + r * Math.sin(135 * Math.PI / 180)}`}
+          d={`M ${cx + r * Math.cos(arcStart)} ${cy + r * Math.sin(arcStart)} A ${r} ${r} 0 1 1 ${cx + r * Math.cos((startAngle + sweep) * Math.PI / 180)} ${cy + r * Math.sin((startAngle + sweep) * Math.PI / 180)}`}
           fill="none"
           stroke="var(--g-border)"
           strokeWidth="6"
@@ -121,7 +124,7 @@ export function SpeedNeedle({
         {/* Pulsing glow on outer arc */}
         {animated > 0 && (
           <path
-            d={`M ${cx + r * Math.cos(arcStart)} ${cy + r * Math.sin(arcStart)} A ${r} ${r} 0 1 1 ${cx + r * Math.cos(135 * Math.PI / 180)} ${cy + r * Math.sin(135 * Math.PI / 180)}`}
+            d={`M ${cx + r * Math.cos(arcStart)} ${cy + r * Math.sin(arcStart)} A ${r} ${r} 0 1 1 ${cx + r * Math.cos((startAngle + sweep) * Math.PI / 180)} ${cy + r * Math.sin((startAngle + sweep) * Math.PI / 180)}`}
             fill="none"
             stroke={color}
             strokeWidth="8"

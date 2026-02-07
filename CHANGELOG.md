@@ -2,6 +2,16 @@
 
 All notable changes to Gonzales will be documented in this file.
 
+## [3.9.6] - 2026-02-07
+
+### Bug Fixes
+
+- **Fix speed needle pointing to wrong position**: Redesigned gauge arc from 270° (clipped at bottom) to 240° bottom-centered layout. All tick marks and needle positions now fully visible within the viewBox. The needle correctly tracks the displayed value.
+- **Fix animation jumps during rapid polling**: `useAnimatedNumber` now animates from the current visual position instead of the previous target, preventing jerky needle movement when bandwidth values update every 2 seconds.
+- **Remove debug overlay**: Green diagnostic bar no longer shown on the dashboard.
+
+---
+
 ## [3.9.5] - 2026-02-07
 
 ### Bug Fixes
