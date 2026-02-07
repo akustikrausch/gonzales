@@ -49,6 +49,7 @@ function usePollingFallback(
   useEffect(() => {
     if (isSSEStreaming && sseProgress.phase !== "idle") {
       // We received an SSE event, SSE is working
+      console.log("[gonzales] SSE event received, SSE confirmed working");
       setSSEWorking(true);
       if (sseTimeoutRef.current) {
         clearTimeout(sseTimeoutRef.current);
@@ -74,13 +75,19 @@ function usePollingFallback(
       // If we haven't received any SSE events, fall back to polling
       setSSEWorking((current) => {
         if (current === null) {
-          console.debug("[gonzales] SSE not working after 5s, falling back to polling");
+          console.log("[gonzales] SSE not working after 5s, falling back to polling");
           setIsPolling(true);
           return false;
         }
         return current;
       });
     }, 5000);
+  }, []);
+
+  // Allow external code to confirm the test was accepted by the backend
+  const confirmTestStarted = useCallback(() => {
+    sawTestInProgressRef.current = true;
+    console.log("[gonzales] Test start confirmed by trigger response");
   }, []);
 
   const stopPolling = useCallback(() => {
@@ -103,7 +110,8 @@ function usePollingFallback(
 
     const poll = async () => {
       try {
-        const status = await api.getStatus();
+        // Add cache-busting param to prevent proxy caching
+        const status = await api.getStatus(true);
         const elapsed = (Date.now() - testStartTimeRef.current) / 1000;
 
         if (status.scheduler.test_in_progress) {
@@ -128,6 +136,8 @@ function usePollingFallback(
             progress = 0.95;
           }
 
+          console.log("[gonzales] poll: test running, phase=%s elapsed=%ds", phase, Math.round(elapsed));
+
           setPollingProgress({
             phase,
             progress: Math.min(progress, 0.99),
@@ -138,9 +148,11 @@ function usePollingFallback(
           // until we've actually seen the test running. The trigger POST may
           // still be in transit through the HA Ingress proxy chain.
           if (!sawTestInProgressRef.current && elapsed < GRACE_PERIOD_S) {
-            console.debug("[gonzales] Waiting for test to start... elapsed=%ds", Math.round(elapsed));
+            console.log("[gonzales] poll: waiting for test to start (elapsed=%ds/%ds)", Math.round(elapsed), GRACE_PERIOD_S);
             return; // Keep polling, test probably hasn't started yet
           }
+
+          console.log("[gonzales] poll: test completed (sawInProgress=%s elapsed=%ds)", sawTestInProgressRef.current, Math.round(elapsed));
 
           // Test completed - fetch the latest measurement
           const latest = await api.getLatestMeasurement();
@@ -159,12 +171,13 @@ function usePollingFallback(
           stopPolling();
           onTestComplete();
         }
-      } catch {
-        // Ignore errors, keep polling
+      } catch (err) {
+        console.log("[gonzales] poll: error:", err instanceof Error ? err.message : err);
       }
     };
 
     // Poll immediately, then every 500ms
+    console.log("[gonzales] Polling started (interval=500ms)");
     poll();
     pollingIntervalRef.current = setInterval(poll, 500);
 
@@ -181,6 +194,7 @@ function usePollingFallback(
     startPolling,
     stopPolling,
     sseWorking,
+    confirmTestStarted,
   };
 }
 
@@ -203,6 +217,7 @@ export function SpeedTestProvider({ children }: { children: ReactNode }) {
     startPolling,
     stopPolling,
     sseWorking,
+    confirmTestStarted,
   } = usePollingFallback(sseProgress, isSSEStreaming, invalidateQueries);
 
   // Use SSE progress only if SSE is confirmed working
@@ -230,18 +245,25 @@ export function SpeedTestProvider({ children }: { children: ReactNode }) {
   }, [status?.scheduler.test_in_progress, isSSEStreaming, isPolling, sseProgress.phase, pollingProgress.phase, startStreaming, startPolling]);
 
   const runTest = useCallback(() => {
-    console.debug("[gonzales] runTest: starting SSE + polling fallback");
+    console.log("[gonzales] runTest: starting SSE + polling fallback");
     startStreaming();
     startPolling();
     api.triggerSpeedtest()
       .then(() => {
-        console.debug("[gonzales] runTest: trigger accepted");
+        console.log("[gonzales] runTest: trigger accepted (202)");
+        // Backend has confirmed the test is started - mark it so polling
+        // won't treat the first test_in_progress=false as "test completed"
+        confirmTestStarted();
         invalidateQueries();
       })
       .catch((err) => {
         console.warn("[gonzales] runTest: trigger failed:", err.message);
+        // If 503 "already in progress", the test IS running - mark it
+        if (err.message?.includes("503")) {
+          confirmTestStarted();
+        }
       });
-  }, [startStreaming, startPolling, invalidateQueries]);
+  }, [startStreaming, startPolling, invalidateQueries, confirmTestStarted]);
 
   const reset = useCallback(() => {
     resetSSE();

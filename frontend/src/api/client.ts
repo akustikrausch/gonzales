@@ -100,8 +100,9 @@ export const api = {
     return fetchJSON(`${BASE}/statistics/enhanced${qs ? `?${qs}` : ""}`);
   },
 
-  getStatus(): Promise<Status> {
-    return fetchJSON(`${BASE}/status`);
+  getStatus(nocache?: boolean): Promise<Status> {
+    const url = nocache ? `${BASE}/status?_t=${Date.now()}` : `${BASE}/status`;
+    return fetchJSON(url);
   },
 
   triggerSpeedtest(): Promise<{ status: string; message: string }> {

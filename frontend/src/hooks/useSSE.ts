@@ -63,7 +63,7 @@ export function useSSE() {
     abortRef.current = controller;
 
     const url = `${getSSEBase()}/speedtest/stream`;
-    console.debug("[gonzales] SSE: connecting to", url);
+    console.log("[gonzales] SSE: connecting to", url);
 
     (async () => {
       try {
@@ -73,10 +73,10 @@ export function useSSE() {
         });
 
         if (!response.ok || !response.body) {
-          console.debug("[gonzales] SSE: failed with status", response.status);
+          console.log("[gonzales] SSE: failed with status", response.status);
           throw new Error(`Stream failed: ${response.status}`);
         }
-        console.debug("[gonzales] SSE: connected, reading stream...");
+        console.log("[gonzales] SSE: connected, reading stream...");
 
         const reader = response.body
           .pipeThrough(new TextDecoderStream())
@@ -153,7 +153,7 @@ export function useSSE() {
         if (err instanceof DOMException && err.name === "AbortError") {
           return;
         }
-        console.debug("[gonzales] SSE: connection error:", err instanceof Error ? err.message : err);
+        console.log("[gonzales] SSE: connection error:", err instanceof Error ? err.message : err);
         if (!receivedTerminalRef.current) {
           setIsStreaming(false);
           abortRef.current = null;
