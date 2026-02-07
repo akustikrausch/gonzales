@@ -139,17 +139,22 @@ class GonzalesMCPServer:
             elif name == "get_summary":
                 return await self._get_summary()
             else:
-                return {"error": f"Unknown tool: {name}"}
+                return {"error": f"Unknown tool: {name}", "isError": True}
         except Exception as e:
-            return {"error": str(e)}
+            return {"error": str(e), "isError": True}
 
     async def _make_api_request(self, endpoint: str, method: str = "GET") -> dict:
         """Make a request to the Gonzales API."""
         import aiohttp
 
         url = f"http://localhost:{settings.port}/api/v1{endpoint}"
+        timeout = aiohttp.ClientTimeout(total=120)
 
-        async with aiohttp.ClientSession() as session:
+        headers = {}
+        if settings.api_key:
+            headers["X-API-Key"] = settings.api_key
+
+        async with aiohttp.ClientSession(timeout=timeout, headers=headers) as session:
             if method == "GET":
                 async with session.get(url) as response:
                     if response.status == 200:
@@ -158,10 +163,12 @@ class GonzalesMCPServer:
                         return {"error": f"API returned {response.status}"}
             elif method == "POST":
                 async with session.post(url) as response:
-                    if response.status == 200:
+                    if response.status in (200, 202):
                         return await response.json()
                     else:
                         return {"error": f"API returned {response.status}"}
+            else:
+                return {"error": f"Unsupported HTTP method: {method}"}
 
     async def _get_latest_speedtest(self) -> dict:
         """Get the latest speed test result."""
@@ -181,18 +188,35 @@ class GonzalesMCPServer:
         }
 
     async def _run_speedtest(self) -> dict:
-        """Trigger a new speed test."""
-        data = await self._make_api_request("/speedtest/trigger", method="POST")
-        if "error" in data:
-            return data
+        """Trigger a new speed test and poll for results."""
+        # Get the latest test timestamp before triggering so we can detect the new result
+        before = await self._make_api_request("/measurements/latest")
+        before_ts = before.get("timestamp") if isinstance(before, dict) and "error" not in before else None
+
+        trigger = await self._make_api_request("/speedtest/trigger", method="POST")
+        if "error" in trigger:
+            return trigger
+
+        # Poll for the new result (up to 90 seconds, checking every 5 seconds)
+        max_attempts = 18
+        for _ in range(max_attempts):
+            await asyncio.sleep(5)
+            data = await self._make_api_request("/measurements/latest")
+            if isinstance(data, dict) and "error" not in data:
+                current_ts = data.get("timestamp")
+                if current_ts and current_ts != before_ts:
+                    return {
+                        "status": "completed",
+                        "download_mbps": data.get("download_mbps"),
+                        "upload_mbps": data.get("upload_mbps"),
+                        "ping_ms": data.get("ping_latency_ms"),
+                        "server": data.get("server_name"),
+                        "message": f"Speed test completed: {data.get('download_mbps', 0):.1f} Mbps down, {data.get('upload_mbps', 0):.1f} Mbps up, {data.get('ping_latency_ms', 0):.0f}ms ping"
+                    }
 
         return {
-            "status": "completed",
-            "download_mbps": data.get("download_mbps"),
-            "upload_mbps": data.get("upload_mbps"),
-            "ping_ms": data.get("ping_latency_ms"),
-            "server": data.get("server_name"),
-            "message": f"Speed test completed: {data.get('download_mbps', 0):.1f} Mbps down, {data.get('upload_mbps', 0):.1f} Mbps up, {data.get('ping_latency_ms', 0):.0f}ms ping"
+            "status": "started",
+            "message": "Speed test was triggered but did not complete within 90 seconds. Use get_latest_speedtest to check for results later."
         }
 
     async def _get_statistics(self, days: int) -> dict:
@@ -344,13 +368,15 @@ async def handle_request(server: GonzalesMCPServer, request: dict) -> dict:
         tool_name = params.get("name")
         tool_args = params.get("arguments", {})
         tool_result = await server.call_tool(tool_name, tool_args)
+        is_error = tool_result.get("isError", False) if isinstance(tool_result, dict) else False
         result = {
             "content": [
                 {
                     "type": "text",
                     "text": json.dumps(tool_result, indent=2)
                 }
-            ]
+            ],
+            "isError": is_error
         }
     elif method == "notifications/initialized":
         # Client is ready, no response needed
