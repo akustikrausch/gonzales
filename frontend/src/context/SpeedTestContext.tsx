@@ -15,6 +15,8 @@ import { api } from "../api/client";
 interface SpeedTestContextValue {
   progress: SSEProgress;
   isStreaming: boolean;
+  /** Sticky flag: true from runTest() until complete/error/reset */
+  testActive: boolean;
   runTest: () => void;
   reset: () => void;
   isPollingFallback: boolean;
@@ -219,6 +221,7 @@ export function SpeedTestProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
   const connectingRef = useRef(false);
   const [triggerState, setTriggerState] = useState<string>("idle");
+  const [testActive, setTestActive] = useState(false);
 
   const invalidateQueries = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: ["measurement"] });
@@ -243,6 +246,15 @@ export function SpeedTestProvider({ children }: { children: ReactNode }) {
   const progress = sseWorking === true ? sseProgress : pollingProgress;
   const isStreaming = sseWorking === true ? isSSEStreaming : (isPolling || pollingProgress.phase !== "idle");
 
+  // Clear testActive when test reaches terminal state
+  useEffect(() => {
+    if (progress.phase === "complete" || progress.phase === "error") {
+      // Small delay so the result view can show briefly before reverting
+      const t = setTimeout(() => setTestActive(false), 100);
+      return () => clearTimeout(t);
+    }
+  }, [progress.phase]);
+
   // Auto-connect to SSE when a test is detected via status polling
   useEffect(() => {
     if (
@@ -255,6 +267,7 @@ export function SpeedTestProvider({ children }: { children: ReactNode }) {
     ) {
       console.log("[gonzales] Auto-connect: test_in_progress detected, starting SSE + polling");
       connectingRef.current = true;
+      setTestActive(true);
       startStreaming();
       startPolling();
     }
@@ -265,6 +278,7 @@ export function SpeedTestProvider({ children }: { children: ReactNode }) {
 
   const runTest = useCallback(() => {
     console.log("[gonzales] runTest: starting SSE + polling fallback");
+    setTestActive(true);
     setTriggerState("pending");
     startStreaming();
     startPolling();
@@ -290,18 +304,20 @@ export function SpeedTestProvider({ children }: { children: ReactNode }) {
   const reset = useCallback(() => {
     resetSSE();
     stopPolling();
+    setTestActive(false);
     setTriggerState("idle");
   }, [resetSSE, stopPolling]);
 
   // Build debug string for on-screen display
   const sseLabel = sseWorking === true ? "OK" : sseWorking === false ? "FAIL" : "?";
-  const _debug = `SSE:${sseLabel} | Poll:${isPolling ? "ON" : "OFF"}(#${pollCount}) | Trigger:${triggerState} | Phase:${progress.phase} | Last:${lastPollResult}`;
+  const _debug = `Active:${testActive ? "Y" : "N"} | SSE:${sseLabel} | Poll:${isPolling ? "ON" : "OFF"}(#${pollCount}) | Trigger:${triggerState} | Phase:${progress.phase} | Last:${lastPollResult}`;
 
   return (
     <SpeedTestContext.Provider
       value={{
         progress,
         isStreaming,
+        testActive,
         runTest,
         reset,
         isPollingFallback: sseWorking === false,

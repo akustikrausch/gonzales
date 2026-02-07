@@ -18,7 +18,7 @@ export function DashboardPage() {
   const { data: stats } = useStatistics();
   const { data: enhanced } = useEnhancedStatistics();
   const { data: status } = useStatus();
-  const { progress, isStreaming, _debug } = useSpeedTest();
+  const { progress, isStreaming, testActive, _debug } = useSpeedTest();
 
   if (loadingLatest) {
     return (
@@ -28,7 +28,9 @@ export function DashboardPage() {
     );
   }
 
-  const showLive = isStreaming || (progress.phase !== "idle" && progress.phase !== "complete" && progress.phase !== "error");
+  // testActive is a "sticky" flag that stays true from runTest() until complete/error/reset
+  // This prevents the LiveTestView from flickering off due to transient state changes
+  const showLive = testActive || isStreaming || (progress.phase !== "idle" && progress.phase !== "complete" && progress.phase !== "error");
 
   return (
     <div className="space-y-6">
