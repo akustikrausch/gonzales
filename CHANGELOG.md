@@ -2,6 +2,14 @@
 
 All notable changes to Gonzales will be documented in this file.
 
+## [3.9.4] - 2026-02-07
+
+### Bug Fixes
+
+- **Fix manual test not showing progress in HA Ingress** (THE root cause): Status endpoint only checked `scheduler_service.test_in_progress` which is only set for scheduled tests. Manual triggers set `measurement_service.test_in_progress` instead. Status now checks both flags.
+
+---
+
 ## [3.9.3] - 2026-02-07
 
 ### Bug Fixes

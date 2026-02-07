@@ -49,7 +49,7 @@ async def get_status(session: AsyncSession = Depends(get_db)):
             paused=scheduler_service.paused,
             next_run_time=scheduler_service.next_run_time if scheduler_service.enabled else None,
             interval_minutes=settings.test_interval_minutes,
-            test_in_progress=scheduler_service.test_in_progress,
+            test_in_progress=measurement_service.test_in_progress or scheduler_service.test_in_progress,
         ),
         outage=OutageStatus(
             outage_active=outage_data["outage_active"],
