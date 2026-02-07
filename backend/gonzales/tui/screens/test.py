@@ -38,17 +38,26 @@ class TestScreen(Screen):
         yield Footer()
 
     def on_mount(self) -> None:
+        from gonzales.services.measurement_service import measurement_service
+
         if self._auto_start:
             self._start_test()
+        elif measurement_service.test_in_progress:
+            # A test is running in the background (user navigated away and back).
+            # Reconnect to the event bus to pick up remaining progress/completion.
+            self._running = True
+            gauge = self.query_one("#live-gauge", LiveGauge)
+            gauge.set_phase("started")
+            hint = self.query_one("#test-hint", Static)
+            hint.update("  [yellow]Test in progress...[/]")
+            self._listen_task = asyncio.create_task(self._listen_events())
 
     def on_unmount(self) -> None:
-        self._cancel_tasks()
-
-    def _cancel_tasks(self) -> None:
+        # Only cancel the listener; do NOT cancel _test_task so the speedtest
+        # keeps running in the background and results are saved to the DB.
         if self._listen_task and not self._listen_task.done():
             self._listen_task.cancel()
-        if self._test_task and not self._test_task.done():
-            self._test_task.cancel()
+            self._listen_task = None
 
     def action_run_test(self) -> None:
         if not self._running:
@@ -73,10 +82,18 @@ class TestScreen(Screen):
 
             async with async_session() as session:
                 await measurement_service.run_test(session, manual=True)
+        except asyncio.CancelledError:
+            # Screen unmounted while test was starting; the measurement_service
+            # holds its own lock and will finish independently.
+            pass
         except Exception as e:
-            gauge = self.query_one("#live-gauge", LiveGauge)
-            gauge.set_error(str(e))
-            self._finish_test()
+            try:
+                gauge = self.query_one("#live-gauge", LiveGauge)
+                gauge.set_error(str(e))
+                self._finish_test()
+            except Exception:
+                # Screen already unmounted, UI update not possible
+                pass
 
     async def _listen_events(self) -> None:
         """Subscribe to event bus and update the gauge in real-time."""

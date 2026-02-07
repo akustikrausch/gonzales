@@ -16,6 +16,7 @@ class StatisticsScreen(Screen):
         ("h", "app.switch_mode('history')", "History"),
         ("a", "app.switch_mode('statistics')", "Analytics"),
         ("s", "app.switch_mode('settings')", "Settings"),
+        ("t", "test_now", "Test"),
         ("?", "show_help", "Help"),
         ("q", "app.quit", "Quit"),
     ]
@@ -145,6 +146,9 @@ class StatisticsScreen(Screen):
             for t in types
         ]
         self.query_one("#connection-chart", AsciiBarChart).update_data(chart_data)
+
+    def action_test_now(self) -> None:
+        self.app.run_test_screen()
 
     def action_show_help(self) -> None:
         """Show help modal."""

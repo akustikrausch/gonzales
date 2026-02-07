@@ -19,14 +19,11 @@ HELP_TEXT = """
 
 [bold]Actions[/]
   [cyan]t[/]     Run speed test
-  [cyan]r[/]     Refresh data
   [cyan]?[/]     Show this help screen
 
 [bold]History Screen[/]
-  [cyan]1-5[/]   Sort by column (1=Time, 2=Download, 3=Upload, 4=Ping, 5=Server)
+  [cyan]1-4[/]   Sort by column (1=Time, 2=Download, 3=Upload, 4=Ping)
   [cyan]↑/↓[/]   Navigate rows
-  [cyan]PgUp[/]  Previous page
-  [cyan]PgDn[/]  Next page
 
 [bold]General[/]
   [cyan]Tab[/]   Move focus to next element

@@ -199,3 +199,26 @@ Input:focus {
     color: #888888;
     margin-top: 1;
 }
+
+/* Help Modal */
+
+#help-modal {
+    align: center middle;
+    width: 70;
+    max-height: 80%;
+    background: #1a1a2e;
+    border: solid #00ffff;
+    padding: 1 2;
+}
+
+#help-content {
+    height: auto;
+}
+
+#help-text {
+    color: #e0e0e0;
+}
+
+#close-btn {
+    margin-top: 1;
+}

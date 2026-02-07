@@ -10,6 +10,7 @@ class SettingsScreen(Screen):
         ("h", "app.switch_mode('history')", "History"),
         ("a", "app.switch_mode('statistics')", "Analytics"),
         ("s", "app.switch_mode('settings')", "Settings"),
+        ("t", "test_now", "Test"),
         ("ctrl+s", "save_settings", "Save"),
         ("?", "show_help", "Help"),
         ("q", "app.quit", "Quit"),
@@ -74,6 +75,9 @@ class SettingsScreen(Screen):
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "save-btn":
             self.action_save_settings()
+
+    def action_test_now(self) -> None:
+        self.app.run_test_screen()
 
     def action_save_settings(self) -> None:
         """Save current settings."""
