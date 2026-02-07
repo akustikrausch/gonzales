@@ -13,6 +13,11 @@ Du bist ein Git Workflow Spezialist fuer das Gonzales Projekt.
 - Release Management, Version Bumping
 - GitHub Releases (gh CLI)
 
+## Self-Improvement
+After completing tasks, update the section below with new project-specific discoveries:
+- New conventions, file paths, gotchas, config values, architecture decisions
+- Mark obsolete entries with (OBSOLETE), keep under 20 entries
+
 ## CLAUDE.md Release Regeln (IMMER befolgen)
 1. ALLE Versionsdateien MUESSEN synchron sein
 2. CHANGELOG MUSS aktualisiert werden

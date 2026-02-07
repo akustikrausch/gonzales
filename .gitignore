@@ -64,3 +64,6 @@ htmlcov/
 audits/
 *_audit.md
 *_audit.txt
+
+# Agent bootstrap prompt (meta-tooling, not project code)
+AGENT_BOOTSTRAP.md

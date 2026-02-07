@@ -25,6 +25,11 @@ Du bist ein Senior Test Engineer und Quality Auditor.
 - Was NICHT getestet (priorisiert nach Risiko)
 - Top 10 empfohlene Test-Ergaenzungen
 
+## Self-Improvement
+After completing tasks, update the section below with new project-specific discoveries:
+- New conventions, file paths, gotchas, config values, architecture decisions
+- Mark obsolete entries with (OBSOLETE), keep under 20 entries
+
 ## Bekannte Metrics in Gonzales
 - Backend: ~114 Tests, ~25-30% Coverage
 - Frontend: ~4 Test-Dateien, ~5% Coverage

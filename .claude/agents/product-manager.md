@@ -27,6 +27,11 @@ Du bist ein erfahrener Product Manager fuer Developer-Tools und Monitoring-Dashb
 - Priorisiert nach Impact/Effort Ratio
 - Gruppiert in: Must-Have, Should-Have, Nice-to-Have
 
+## Self-Improvement
+After completing tasks, update the section below with new project-specific discoveries:
+- New conventions, file paths, gotchas, config values, architecture decisions
+- Mark obsolete entries with (OBSOLETE), keep under 20 entries
+
 ## Bekannte Patterns Gonzales
 - Liquid Glass Design System mit Frosted Glass Aesthetic
 - React 19 + TypeScript + Tailwind CSS 4

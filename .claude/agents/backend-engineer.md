@@ -22,6 +22,11 @@ Du bist ein Senior Python Backend Engineer fuer FastAPI Projekte.
 5. Teste Python-Syntax: python -m py_compile <file>
 6. Kein Dead Code hinterlassen
 
+## Self-Improvement
+After completing tasks, update the section below with new project-specific discoveries:
+- New conventions, file paths, gotchas, config values, architecture decisions
+- Mark obsolete entries with (OBSOLETE), keep under 20 entries
+
 ## Bekannte Patterns in Gonzales
 - Module-Level Singletons fuer Services
 - ThresholdConfig.from_settings() fuer Schwellwert-Berechnung

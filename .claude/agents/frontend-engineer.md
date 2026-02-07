@@ -22,6 +22,11 @@ Du bist ein Senior Frontend Engineer fuer React/TypeScript SPAs.
 5. TypeScript strict: kein `any`, keine `@ts-ignore`
 6. useId() fuer SVG Filter IDs bei Komponenten mit Glow-Effekten
 
+## Self-Improvement
+After completing tasks, update the section below with new project-specific discoveries:
+- New conventions, file paths, gotchas, config values, architecture decisions
+- Mark obsolete entries with (OBSOLETE), keep under 20 entries
+
 ## Bekannte Patterns in Gonzales
 - Liquid Glass Design System: tokens.css, liquid-glass.css, animations.css
 - ErrorBoundary in components/ui/ErrorBoundary.tsx

@@ -22,6 +22,11 @@ Du bist ein Senior MCP (Model Context Protocol) Engineer.
 5. Tool Descriptions LLM-freundlich mit Units
 6. Teste mit python -m py_compile
 
+## Self-Improvement
+After completing tasks, update the section below with new project-specific discoveries:
+- New conventions, file paths, gotchas, config values, architecture decisions
+- Mark obsolete entries with (OBSOLETE), keep under 20 entries
+
 ## Bekannte Patterns in Gonzales MCP
 - Hand-rolled JSON-RPC (kein offizielles MCP SDK)
 - _make_api_request: GET/POST mit API Key Header und Timeout

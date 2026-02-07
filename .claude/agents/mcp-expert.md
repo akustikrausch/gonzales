@@ -27,6 +27,11 @@ Du bist ein Senior MCP (Model Context Protocol) Experte.
 ## Output-Format
 Scoring pro Kategorie (1-10) plus priorisierte Fix-Liste.
 
+## Self-Improvement
+After completing tasks, update the section below with new project-specific discoveries:
+- New conventions, file paths, gotchas, config values, architecture decisions
+- Mark obsolete entries with (OBSOLETE), keep under 20 entries
+
 ## Bekannte Issues in Gonzales MCP
 - API Key wird jetzt korrekt mitgesendet (gefixt)
 - run_speedtest pollt jetzt /measurements/latest (gefixt)

@@ -100,3 +100,59 @@ cd backend && python -m gonzales
 - Backend: FastAPI + SQLAlchemy + SQLite
 - Frontend: React + TypeScript + Vite + TailwindCSS
 - Home Assistant: Add-on with Ingress support
+
+## Agent System
+
+### Available Agents (15)
+
+| Agent | Type | Tools | Purpose |
+|-------|------|-------|---------|
+| backend-auditor | Audit | Read, Grep, Glob | Python/FastAPI architecture, security, code quality |
+| frontend-auditor | Audit | Read, Grep, Glob | React/TypeScript quality, accessibility, performance |
+| test-auditor | Audit | Read, Grep, Glob, Bash | Test coverage analysis and gap identification |
+| web-ux-expert | Audit | Read, Grep, Glob | Dashboard UX, glass morphism design review |
+| tui-ux-expert | Audit | Read, Grep, Glob | Terminal UI design, demoscene aesthetic |
+| mcp-expert | Audit | Read, Grep, Glob | MCP protocol compliance, tool coverage |
+| docs-expert | Audit | Read, Grep, Glob | Documentation accuracy and completeness |
+| backend-engineer | Impl | Read, Grep, Glob, Edit, Write, Bash | Python/FastAPI implementation |
+| frontend-engineer | Impl | Read, Grep, Glob, Edit, Write, Bash | React/TypeScript implementation |
+| tui-engineer | Impl | Read, Grep, Glob, Edit, Write, Bash | Textual TUI implementation |
+| mcp-engineer | Impl | Read, Grep, Glob, Edit, Write, Bash | MCP server development |
+| docs-writer | Impl | Read, Grep, Glob, Edit, Write | Documentation updates |
+| git-agent | Workflow | Read, Grep, Glob, Bash | Git operations, releases |
+| code-reviewer | Workflow | Read, Grep, Glob | Code review |
+| product-manager | Product | Read, Grep, Glob, WebSearch, WebFetch | Feature planning, competitive analysis |
+
+### Agent Usage Rules
+1. **Auditors are read-only** - Never assign implementation tasks to auditor agents
+2. **Always audit before implementing** - Run auditor first, then engineer
+3. **One concern per agent** - Do not overload agents with unrelated tasks
+4. **Create feature branches first** - Before spawning implementation agents
+5. **Update Known Patterns** - After every major session, update agent pattern sections
+6. **Shut down agents before TeamDelete** - Always clean up properly
+7. **Use bypassPermissions for version bumps** - Avoids blocking on edit approvals
+
+### Standard Workflows
+- **Audit Sprint**: Spawn all 7 auditors in parallel, collect reports, prioritize
+- **Bug Fix**: code-reviewer -> relevant-auditor -> relevant-engineer -> test-auditor
+- **Feature**: product-manager -> auditors -> engineers -> test-auditor -> docs-writer
+- **Release**: git-agent (follows Release Checklist above)
+
+## Learning Protocol
+
+### How Agents Self-Improve
+Each agent in `.claude/agents/` has a "Bekannte Patterns" (Known Patterns) section at the
+bottom of its definition file. This section serves as persistent, project-specific memory
+that accumulates knowledge across sessions.
+
+### Update Rules
+1. **When**: After every audit session, feature implementation, bug fix, or session with new knowledge
+2. **What**: Project conventions, file paths, gotchas, config values, architecture decisions
+3. **How**: Append new bullet points to the agent's Known Patterns section
+4. **Limit**: Keep under 20 bullet points per agent. Consolidate if needed.
+5. **Obsolete**: Mark outdated patterns with (OBSOLETE), remove on next update
+
+### Memory Locations
+- Agent-specific: `.claude/agents/<name>.md` (Known Patterns section per agent)
+- Project-wide: Auto-memory `MEMORY.md` (cross-cutting lessons, release history)
+- Rules: `CLAUDE.md` (this file - immutable rules all agents follow)
