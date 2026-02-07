@@ -498,12 +498,15 @@ export function SettingsPage() {
                   >
                     Version
                   </p>
-                  <p
-                    className="text-sm font-semibold"
+                  <a
+                    href="https://github.com/akustikrausch/gonzales/releases"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-semibold hover:underline"
                     style={{ color: "var(--g-accent)" }}
                   >
                     v{status.version}
-                  </p>
+                  </a>
                 </div>
                 <div>
                   <p

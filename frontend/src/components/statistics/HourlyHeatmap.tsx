@@ -20,7 +20,7 @@ export function HourlyHeatmap({ data }: HourlyHeatmapProps) {
       <h4 className="text-sm font-semibold mb-4" style={{ color: "var(--g-text)" }}>
         Speed by Hour of Day
       </h4>
-      <div className="grid grid-cols-12 gap-1">
+      <div className="grid grid-cols-8 sm:grid-cols-12 gap-1">
         {data.map((h) => (
           <div
             key={h.hour}
@@ -34,7 +34,7 @@ export function HourlyHeatmap({ data }: HourlyHeatmapProps) {
                 minWidth: "20px",
               }}
             />
-            <span className="text-[9px] tabular-nums" style={{ color: "var(--g-text-tertiary)" }}>
+            <span className="text-[9px] sm:text-[10px] tabular-nums" style={{ color: "var(--g-text-tertiary)" }}>
               {h.hour}
             </span>
           </div>

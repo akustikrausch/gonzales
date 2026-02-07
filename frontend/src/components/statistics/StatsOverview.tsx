@@ -6,6 +6,13 @@ interface StatsOverviewProps {
   stats: Statistics;
 }
 
+function formatBytes(bytes: number): string {
+  if (bytes >= 1e12) return `${(bytes / 1e12).toFixed(1)} TB`;
+  if (bytes >= 1e9) return `${(bytes / 1e9).toFixed(1)} GB`;
+  if (bytes >= 1e6) return `${(bytes / 1e6).toFixed(1)} MB`;
+  return `${(bytes / 1e3).toFixed(0)} KB`;
+}
+
 function StatRow({
   label,
   stat,
@@ -42,10 +49,14 @@ function StatRow({
 }
 
 export function StatsOverview({ stats }: StatsOverviewProps) {
+  const avgDataPerTest = stats.total_tests > 0
+    ? stats.total_data_used_bytes / stats.total_tests
+    : 0;
+
   return (
     <div className="space-y-4">
       <GlassCard>
-        <div className="flex items-center justify-between">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div>
             <p className="text-sm" style={{ color: "var(--g-text-secondary)" }}>Total Tests</p>
             <AnimatedNumber
@@ -55,7 +66,7 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
               style={{ color: "var(--g-text)" }}
             />
           </div>
-          <div className="text-right">
+          <div>
             <p className="text-sm" style={{ color: "var(--g-text-secondary)" }}>Threshold Violations</p>
             <div className="flex gap-4 mt-1">
               <span className="text-sm">
@@ -75,6 +86,18 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
                 />{" "}UL
               </span>
             </div>
+          </div>
+          <div>
+            <p className="text-sm" style={{ color: "var(--g-text-secondary)" }}>Total Data Used</p>
+            <p className="text-2xl font-bold" style={{ color: "var(--g-text)" }}>
+              {formatBytes(stats.total_data_used_bytes)}
+            </p>
+          </div>
+          <div>
+            <p className="text-sm" style={{ color: "var(--g-text-secondary)" }}>Avg per Test</p>
+            <p className="text-2xl font-bold" style={{ color: "var(--g-text)" }}>
+              {formatBytes(avgDataPerTest)}
+            </p>
           </div>
         </div>
       </GlassCard>

@@ -6,6 +6,16 @@ interface LatestResultProps {
   measurement: Measurement;
 }
 
+function detectConnectionType(interfaceName: string, isVpn: boolean): string {
+  if (isVpn) return "VPN";
+  const name = interfaceName.toLowerCase();
+  if (name.startsWith("eth") || name.startsWith("en") || name.startsWith("docker") || name.startsWith("br")) return "Ethernet";
+  if (name.startsWith("wl") || name.startsWith("wi") || name.includes("wifi") || name.includes("wlan")) return "WiFi";
+  if (name.startsWith("tun") || name.startsWith("tap") || name.startsWith("wg")) return "VPN";
+  if (!name || name === "unknown") return "Unknown";
+  return interfaceName;
+}
+
 export function LatestResult({ measurement: m }: LatestResultProps) {
   return (
     <GlassCard>
@@ -17,7 +27,7 @@ export function LatestResult({ measurement: m }: LatestResultProps) {
           {formatDate(m.timestamp)}
         </span>
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
         <div>
           <p style={{ color: "var(--g-text-secondary)" }}>Server</p>
           <p className="font-medium" style={{ color: "var(--g-text)" }}>{m.server_name}</p>
@@ -31,9 +41,25 @@ export function LatestResult({ measurement: m }: LatestResultProps) {
           <p className="font-medium" style={{ color: "var(--g-text)" }}>{m.isp}</p>
         </div>
         <div>
+          <p style={{ color: "var(--g-text-secondary)" }}>Jitter</p>
+          <p className="font-medium" style={{ color: "var(--g-text)" }}>
+            {m.ping_jitter_ms !== null && m.ping_jitter_ms !== undefined
+              ? `${m.ping_jitter_ms.toFixed(1)} ms`
+              : "N/A"}
+          </p>
+        </div>
+        <div>
           <p style={{ color: "var(--g-text-secondary)" }}>Packet Loss</p>
           <p className="font-medium" style={{ color: "var(--g-text)" }}>
-            {m.packet_loss_pct !== null ? `${m.packet_loss_pct.toFixed(1)}%` : "N/A"}
+            {m.packet_loss_pct !== null && m.packet_loss_pct !== undefined
+              ? `${m.packet_loss_pct.toFixed(1)}%`
+              : "N/A"}
+          </p>
+        </div>
+        <div>
+          <p style={{ color: "var(--g-text-secondary)" }}>Connection</p>
+          <p className="font-medium" style={{ color: "var(--g-text)" }}>
+            {detectConnectionType(m.interface_name, m.is_vpn)}
           </p>
         </div>
       </div>

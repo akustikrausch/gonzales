@@ -9,7 +9,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import type { TrendAnalysis, PredictiveTrend } from "../../api/types";
+import type { TrendAnalysis, PredictiveTrend, EnhancedPredictiveTrend } from "../../api/types";
 import { GlassCard } from "../ui/GlassCard";
 import { GlassBadge } from "../ui/GlassBadge";
 import { formatShortDate } from "../../utils/format";
@@ -17,11 +17,12 @@ import { formatShortDate } from "../../utils/format";
 interface TrendChartProps {
   trend: TrendAnalysis;
   predictions?: PredictiveTrend | null;
+  enhancedPredictions?: EnhancedPredictiveTrend | null;
   downloadThreshold?: number;
   uploadThreshold?: number;
 }
 
-export function TrendChart({ trend, predictions, downloadThreshold, uploadThreshold }: TrendChartProps) {
+export function TrendChart({ trend, predictions, enhancedPredictions, downloadThreshold, uploadThreshold }: TrendChartProps) {
   if (trend.points.length === 0) return null;
 
   const data = trend.points.map((p) => ({
@@ -31,21 +32,39 @@ export function TrendChart({ trend, predictions, downloadThreshold, uploadThresh
   }));
 
   // Append prediction points with separate keys
-  if (predictions && predictions.points.length > 0) {
+  const usedPredictions = enhancedPredictions || predictions;
+  if (usedPredictions && usedPredictions.points.length > 0) {
     // Connect prediction to last actual point
     const lastActual = data[data.length - 1];
     data.push({
       ...lastActual,
       pred_download: lastActual.download,
       pred_upload: lastActual.upload,
-    } as typeof data[number] & { pred_download?: number; pred_upload?: number });
+      ...(enhancedPredictions ? {
+        dl_upper: lastActual.download,
+        dl_lower: lastActual.download,
+        ul_upper: lastActual.upload,
+        ul_lower: lastActual.upload,
+      } : {}),
+    } as typeof data[number]);
 
-    for (const p of predictions.points) {
-      data.push({
+    for (const p of usedPredictions.points) {
+      const point: Record<string, unknown> = {
         time: formatShortDate(p.timestamp),
         pred_download: Number(p.download_mbps.toFixed(1)),
         pred_upload: Number(p.upload_mbps.toFixed(1)),
-      } as typeof data[number] & { pred_download?: number; pred_upload?: number });
+      };
+
+      // Add confidence intervals if available
+      if (enhancedPredictions && "download_interval" in p) {
+        const ep = p as (typeof enhancedPredictions.points)[number];
+        point.dl_upper = Number(ep.download_interval.upper.toFixed(1));
+        point.dl_lower = Number(ep.download_interval.lower.toFixed(1));
+        point.ul_upper = Number(ep.upload_interval.upper.toFixed(1));
+        point.ul_lower = Number(ep.upload_interval.lower.toFixed(1));
+      }
+
+      data.push(point as typeof data[number]);
     }
   }
 
@@ -54,16 +73,18 @@ export function TrendChart({ trend, predictions, downloadThreshold, uploadThresh
     return `${label}: ${dir}${slope.toFixed(2)} Mbps/day`;
   };
 
+  const confidenceLevel = enhancedPredictions?.confidence_level || predictions?.confidence;
+
   return (
     <GlassCard>
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
         <div className="flex items-center gap-2">
           <h4 className="text-sm font-semibold" style={{ color: "var(--g-text)" }}>
             Speed Trend
           </h4>
-          {predictions && (
+          {confidenceLevel && (
             <GlassBadge color="var(--g-teal)">
-              7-day forecast ({predictions.confidence})
+              7-day forecast ({confidenceLevel})
             </GlassBadge>
           )}
         </div>
@@ -128,6 +149,55 @@ export function TrendChart({ trend, predictions, downloadThreshold, uploadThresh
               }}
             />
           )}
+          {/* Confidence bands (shaded areas behind prediction lines) */}
+          {enhancedPredictions && (
+            <>
+              <Area
+                type="monotone"
+                dataKey="dl_upper"
+                stroke="none"
+                fill="var(--g-blue)"
+                fillOpacity={0.08}
+                connectNulls
+                activeDot={false}
+                name="DL Upper"
+                isAnimationActive={false}
+              />
+              <Area
+                type="monotone"
+                dataKey="dl_lower"
+                stroke="none"
+                fill="var(--g-bg, #fff)"
+                fillOpacity={1}
+                connectNulls
+                activeDot={false}
+                name="DL Lower"
+                isAnimationActive={false}
+              />
+              <Area
+                type="monotone"
+                dataKey="ul_upper"
+                stroke="none"
+                fill="var(--g-green)"
+                fillOpacity={0.08}
+                connectNulls
+                activeDot={false}
+                name="UL Upper"
+                isAnimationActive={false}
+              />
+              <Area
+                type="monotone"
+                dataKey="ul_lower"
+                stroke="none"
+                fill="var(--g-bg, #fff)"
+                fillOpacity={1}
+                connectNulls
+                activeDot={false}
+                name="UL Lower"
+                isAnimationActive={false}
+              />
+            </>
+          )}
           <Area
             type="monotone"
             dataKey="download"
@@ -179,6 +249,30 @@ export function TrendChart({ trend, predictions, downloadThreshold, uploadThresh
           />
         </AreaChart>
       </ResponsiveContainer>
+      {/* Seasonal factors */}
+      {enhancedPredictions?.seasonal_factors && enhancedPredictions.seasonal_factors.length > 0 && (
+        <div className="flex items-center gap-2 mt-3 pt-3 border-t" style={{ borderColor: "var(--g-border)" }}>
+          <span className="text-[10px] shrink-0" style={{ color: "var(--g-text-tertiary)" }}>
+            Day patterns:
+          </span>
+          <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
+            {enhancedPredictions.seasonal_factors.map((sf) => {
+              const factor = sf.download_factor;
+              const color = factor >= 1.02 ? "var(--g-green)" : factor <= 0.98 ? "var(--g-red)" : "var(--g-text-tertiary)";
+              return (
+                <span
+                  key={sf.day}
+                  className="text-[10px] font-medium px-1.5 py-0.5 rounded shrink-0"
+                  style={{ color, background: `${color}10` }}
+                  title={`${sf.day_name}: DL ${(factor * 100 - 100).toFixed(1)}%`}
+                >
+                  {sf.day_name.slice(0, 3)}
+                </span>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </GlassCard>
   );
 }

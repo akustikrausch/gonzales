@@ -1,5 +1,5 @@
 import { Gauge } from "lucide-react";
-import { useLatestMeasurement, useMeasurements, useStatistics } from "../hooks/useApi";
+import { useLatestMeasurement, useMeasurements, useStatistics, useEnhancedStatistics, useStatus } from "../hooks/useApi";
 import { useSpeedTest } from "../context/SpeedTestContext";
 
 import { SpeedGauge } from "../components/dashboard/SpeedGauge";
@@ -7,6 +7,8 @@ import { LatestResult } from "../components/dashboard/LatestResult";
 import { SpeedChart } from "../components/dashboard/SpeedChart";
 import { PingChart } from "../components/dashboard/PingChart";
 import { QuickQosStatus } from "../components/dashboard/QuickQosStatus";
+import { ConnectionHealth } from "../components/dashboard/ConnectionHealth";
+import { OutageAlert } from "../components/dashboard/OutageAlert";
 import { LiveTestView } from "../components/speedtest/LiveTestView";
 import { Spinner } from "../components/ui/Spinner";
 
@@ -14,6 +16,8 @@ export function DashboardPage() {
   const { data: latest, isLoading: loadingLatest } = useLatestMeasurement();
   const { data: page } = useMeasurements({ page_size: 50 });
   const { data: stats } = useStatistics();
+  const { data: enhanced } = useEnhancedStatistics();
+  const { data: status } = useStatus();
   const { progress, isStreaming } = useSpeedTest();
 
   if (loadingLatest) {
@@ -35,6 +39,9 @@ export function DashboardPage() {
         <Gauge className="w-5 h-5" />
         Dashboard
       </h2>
+
+      {/* Outage alert banner */}
+      {status?.outage && <OutageAlert outage={status.outage} />}
 
       {showLive && (
         <div className="g-animate-scale">
@@ -70,13 +77,20 @@ export function DashboardPage() {
             />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 g-animate-in g-stagger-2">
+          {/* Connection Health Score */}
+          {enhanced?.isp_score && (
+            <div className="g-animate-in g-stagger-2">
+              <ConnectionHealth score={enhanced.isp_score} />
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 g-animate-in g-stagger-3">
             <LatestResult measurement={latest} />
             <QuickQosStatus />
           </div>
 
           {page && page.items.length > 1 && (
-            <div className="space-y-4 g-animate-in g-stagger-3">
+            <div className="space-y-4 g-animate-in g-stagger-4">
               <SpeedChart
                 measurements={page.items}
                 downloadThreshold={stats?.effective_download_threshold_mbps}

@@ -105,7 +105,7 @@ export function StatisticsPage() {
       )}
 
       <div
-        className="flex gap-2 g-animate-in g-stagger-1"
+        className="flex gap-2 overflow-x-auto scrollbar-hide snap-x pb-1 -mb-1 g-animate-in g-stagger-1"
         role="tablist"
         aria-label="Statistics sections"
       >
@@ -121,6 +121,7 @@ export function StatisticsPage() {
             aria-controls={`tabpanel-${tab.key}`}
             id={`tab-${tab.key}`}
             tabIndex={activeTab === tab.key ? 0 : -1}
+            className="snap-start shrink-0"
           >
             {tab.label}
           </GlassButton>
@@ -147,7 +148,7 @@ export function StatisticsPage() {
               <Percentiles label="Ping" stat={stats.ping} unit="ms" color="var(--g-orange)" />
             )}
             {page && page.items.length > 0 && (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <Distribution
                   measurements={page.items}
                   field="download_mbps"
@@ -209,6 +210,7 @@ export function StatisticsPage() {
             <TrendChart
               trend={enhanced.trend}
               predictions={enhanced.predictions}
+              enhancedPredictions={enhanced.enhanced_predictions}
               downloadThreshold={stats.effective_download_threshold_mbps}
               uploadThreshold={stats.effective_upload_threshold_mbps}
             />

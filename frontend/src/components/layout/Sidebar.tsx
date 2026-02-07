@@ -133,13 +133,16 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
             borderColor: "var(--g-border)",
           }}
         >
-          <p
-            className="text-[10px] cursor-help"
+          <a
+            href="https://github.com/akustikrausch/gonzales/releases"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[10px] hover:underline transition-colors"
             style={{ color: "var(--g-text-secondary)" }}
-            title="Backend version - refresh page if outdated"
+            title="View releases on GitHub"
           >
             Gonzales v{status?.version ?? "..."}
-          </p>
+          </a>
         </div>
       )}
     </aside>

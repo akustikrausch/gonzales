@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { getMainNavItems, getMoreNavItems, type NavItem } from "../../config/navigation";
+import { useStatus } from "../../hooks/useApi";
 
 const mainNavItems = getMainNavItems();
 const moreNavItems = getMoreNavItems();
@@ -10,10 +11,12 @@ function BottomSheet({
   isOpen,
   onClose,
   items,
+  version,
 }: {
   isOpen: boolean;
   onClose: () => void;
   items: NavItem[];
+  version?: string;
 }) {
   const location = useLocation();
   const [isClosing, setIsClosing] = useState(false);
@@ -145,6 +148,22 @@ function BottomSheet({
             );
           })}
         </nav>
+        {version && (
+          <div
+            className="px-4 py-2 border-t"
+            style={{ borderColor: "var(--g-border)" }}
+          >
+            <a
+              href="https://github.com/akustikrausch/gonzales/releases"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[10px] hover:underline"
+              style={{ color: "var(--g-text-tertiary)" }}
+            >
+              Gonzales v{version}
+            </a>
+          </div>
+        )}
       </div>
     </>
   );
@@ -153,6 +172,7 @@ function BottomSheet({
 export function MobileNav() {
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const location = useLocation();
+  const { data: status } = useStatus();
 
   // Check if current path is in "more" items
   const isMoreActive = moreNavItems.some(
@@ -165,6 +185,7 @@ export function MobileNav() {
         isOpen={isMoreOpen}
         onClose={() => setIsMoreOpen(false)}
         items={moreNavItems}
+        version={status?.version}
       />
       {/* Fixed nav container with proper safe-area handling */}
       <nav

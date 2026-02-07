@@ -2,6 +2,26 @@
 
 All notable changes to Gonzales will be documented in this file.
 
+## [3.9.0] - 2026-02-07
+
+### New Features
+
+- **Dashboard: Connection Health Score** - New widget showing composite ISP health score (0-100) with letter grade (A-F), 4 breakdown bars (Speed, Reliability, Latency, Consistency), and plain-language summary
+- **Dashboard: Outage Alert Banner** - Red warning banner shows immediately when an outage is detected with failure count and start time
+- **Dashboard: Enhanced Latest Result** - Added Jitter, Packet Loss, and Connection Type (WiFi/Ethernet/VPN) fields to the latest test result card
+- **Statistics: Confidence Bands** - Trend chart now shows shaded confidence intervals for enhanced predictions with seasonal day-of-week factors
+- **Statistics: Data Usage** - Overview now shows Total Data Used and Average Data per Test
+
+### Improvements
+
+- **Mobile: Tab Navigation** - Statistics tabs now scroll horizontally with snap behavior on mobile devices
+- **Mobile: Heatmap Readability** - Hourly heatmap uses 8-column grid on mobile (was 12), larger text
+- **Mobile: Grid Breakpoints** - Added `md:` breakpoints for tablet-sized screens across distribution charts
+- **Mobile: Version Footer** - Version number now visible in mobile bottom sheet navigation
+- **Version Links** - Version number is now clickable in sidebar, mobile nav, and settings page (links to GitHub releases)
+
+---
+
 ## [3.8.0] - 2026-02-07
 
 ### Bug Fixes
