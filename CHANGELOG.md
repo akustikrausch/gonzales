@@ -2,6 +2,18 @@
 
 All notable changes to Gonzales will be documented in this file.
 
+## [3.9.2] - 2026-02-07
+
+### Bug Fixes
+
+- **Fix live test view disappearing in HA Ingress**: Added sticky `testActive` flag that prevents the speed meter from flickering off due to transient state changes during proxy delays. LiveTestView now stays mounted from test start until completion.
+- **Add visible debug overlay**: Green-on-black diagnostic bar on dashboard showing SSE state, polling status, trigger state, phase, and poll results - visible without browser DevTools.
+- **Improve polling diagnostics**: Track poll count, last poll result, and trigger state for better troubleshooting in HA Ingress environments.
+- **Fix console.debug invisibility**: Changed all `console.debug()` to `console.log()` (debug level hidden by default in Chrome).
+- **Add cache-busting to status polls**: Prevent HA Ingress proxy from caching status responses during test.
+
+---
+
 ## [3.9.1] - 2026-02-07
 
 ### Bug Fixes
