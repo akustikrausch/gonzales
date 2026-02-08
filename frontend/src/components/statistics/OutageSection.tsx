@@ -1,4 +1,5 @@
 import { AlertTriangle, Clock, TrendingUp, Wifi, WifiOff } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useOutages, useOutageStatistics } from "../../hooks/useApi";
 import type { OutageRecord } from "../../api/types";
 
@@ -67,6 +68,8 @@ function StatCard({
 }
 
 function OutageTimeline({ outages }: { outages: OutageRecord[] }) {
+  const { t } = useTranslation();
+
   if (outages.length === 0) {
     return (
       <div
@@ -74,8 +77,8 @@ function OutageTimeline({ outages }: { outages: OutageRecord[] }) {
         style={{ color: "var(--g-text-secondary)" }}
       >
         <Wifi className="w-12 h-12 mx-auto mb-3 opacity-50" />
-        <p className="font-medium">No outages recorded</p>
-        <p className="text-sm mt-1">Your connection has been stable</p>
+        <p className="font-medium">{t("docs.noOutagesRecorded")}</p>
+        <p className="text-sm mt-1">{t("docs.connectionStable")}</p>
       </div>
     );
   }
@@ -86,7 +89,7 @@ function OutageTimeline({ outages }: { outages: OutageRecord[] }) {
         className="text-sm font-semibold mb-4"
         style={{ color: "var(--g-text)" }}
       >
-        Outage History
+        {t("docs.outageHistory")}
       </h3>
       <div className="space-y-3">
         {outages.map((outage) => (
@@ -114,7 +117,7 @@ function OutageTimeline({ outages }: { outages: OutageRecord[] }) {
                   className="font-medium text-sm"
                   style={{ color: "var(--g-text)" }}
                 >
-                  {outage.is_active ? "Active Outage" : "Resolved Outage"}
+                  {outage.is_active ? t("docs.activeOutage") : t("docs.resolvedOutage")}
                 </span>
                 {outage.is_active && (
                   <span
@@ -124,7 +127,7 @@ function OutageTimeline({ outages }: { outages: OutageRecord[] }) {
                       color: "white",
                     }}
                   >
-                    ACTIVE
+                    {t("docs.activeOutage").toUpperCase()}
                   </span>
                 )}
               </div>
@@ -132,14 +135,14 @@ function OutageTimeline({ outages }: { outages: OutageRecord[] }) {
                 className="text-xs mt-1"
                 style={{ color: "var(--g-text-secondary)" }}
               >
-                Started: {formatDate(outage.started_at)}
+                {t("docs.started")}: {formatDate(outage.started_at)}
               </p>
               {outage.ended_at && (
                 <p
                   className="text-xs"
                   style={{ color: "var(--g-text-secondary)" }}
                 >
-                  Ended: {formatDate(outage.ended_at)}
+                  {t("docs.ended")}: {formatDate(outage.ended_at)}
                 </p>
               )}
               <div className="flex items-center gap-4 mt-2">
@@ -154,7 +157,7 @@ function OutageTimeline({ outages }: { outages: OutageRecord[] }) {
                   className="text-xs"
                   style={{ color: "var(--g-text-tertiary)" }}
                 >
-                  {outage.failure_count} failed tests
+                  {outage.failure_count} {t("docs.failedTests")}
                 </span>
               </div>
               {outage.trigger_error && (
@@ -175,6 +178,7 @@ function OutageTimeline({ outages }: { outages: OutageRecord[] }) {
 }
 
 export function OutageSection({ startDate, endDate }: OutageSectionProps) {
+  const { t } = useTranslation();
   const dateParams = {
     start_date: startDate,
     end_date: endDate,
@@ -205,11 +209,11 @@ export function OutageSection({ startDate, endDate }: OutageSectionProps) {
           </div>
           <div>
             <p className="font-bold text-lg" style={{ color: "var(--g-red)" }}>
-              Outage In Progress
+              {t("docs.outageInProgress")}
             </p>
             <p className="text-sm" style={{ color: "var(--g-text-secondary)" }}>
-              Started {formatDate(activeOutage.started_at)} -{" "}
-              {activeOutage.failure_count} consecutive failures
+              {t("docs.started")} {formatDate(activeOutage.started_at)} -{" "}
+              {activeOutage.failure_count} {t("docs.consecutiveFailures")}
             </p>
           </div>
         </div>
@@ -219,26 +223,26 @@ export function OutageSection({ startDate, endDate }: OutageSectionProps) {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard
           icon={AlertTriangle}
-          label="Total Outages"
+          label={t("docs.totalOutages")}
           value={stats?.total_outages ?? 0}
           color="var(--g-red)"
         />
         <StatCard
           icon={TrendingUp}
-          label="Uptime"
+          label={t("docs.uptime")}
           value={`${(stats?.uptime_pct ?? 100).toFixed(1)}%`}
-          subValue="of monitored period"
+          subValue={t("docs.ofMonitoredPeriod")}
           color="var(--g-green)"
         />
         <StatCard
           icon={Clock}
-          label="Avg Duration"
+          label={t("docs.avgDuration")}
           value={formatDuration(stats?.avg_duration_seconds ?? 0)}
           color="var(--g-orange)"
         />
         <StatCard
           icon={Clock}
-          label="Longest Outage"
+          label={t("docs.longestOutage")}
           value={formatDuration(stats?.longest_outage_seconds ?? 0)}
           color="var(--g-red)"
         />

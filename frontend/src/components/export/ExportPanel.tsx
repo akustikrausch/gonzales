@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { FileSpreadsheet, FileText } from "lucide-react";
 import { api } from "../../api/client";
 import { GlassCard } from "../ui/GlassCard";
@@ -6,6 +7,7 @@ import { GlassButton } from "../ui/GlassButton";
 import { DateRangeFilter } from "../history/DateRangeFilter";
 
 export function ExportPanel() {
+  const { t } = useTranslation();
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
@@ -18,7 +20,7 @@ export function ExportPanel() {
     <div className="space-y-6">
       <GlassCard>
         <h3 className="text-sm font-semibold mb-4" style={{ color: "var(--g-text)" }}>
-          Date Range
+          {t("export.dateRange")}
         </h3>
         <DateRangeFilter
           startDate={startDate}
@@ -27,7 +29,7 @@ export function ExportPanel() {
           onEndDateChange={setEndDate}
         />
         <p className="text-xs mt-2" style={{ color: "var(--g-text-secondary)" }}>
-          Leave empty to export all data.
+          {t("export.leaveEmpty")}
         </p>
       </GlassCard>
 
@@ -35,15 +37,15 @@ export function ExportPanel() {
         <GlassCard hover>
           <h3 className="text-sm font-semibold mb-2 flex items-center gap-2" style={{ color: "var(--g-text)" }}>
             <FileSpreadsheet className="w-4 h-4" style={{ color: "var(--g-text-secondary)" }} />
-            CSV Export
+            {t("export.csvExport")}
           </h3>
           <p className="text-xs mb-4" style={{ color: "var(--g-text-secondary)" }}>
-            Download raw measurement data as a CSV spreadsheet.
+            {t("export.csvDescription")}
           </p>
           <a href={api.getExportCsvUrl(params)} download>
             <GlassButton variant="primary">
               <FileSpreadsheet className="w-4 h-4" />
-              Download CSV
+              {t("export.downloadCsv")}
             </GlassButton>
           </a>
         </GlassCard>
@@ -51,15 +53,15 @@ export function ExportPanel() {
         <GlassCard hover>
           <h3 className="text-sm font-semibold mb-2 flex items-center gap-2" style={{ color: "var(--g-text)" }}>
             <FileText className="w-4 h-4" style={{ color: "var(--g-text-secondary)" }} />
-            PDF Report
+            {t("export.pdfReport")}
           </h3>
           <p className="text-xs mb-4" style={{ color: "var(--g-text-secondary)" }}>
-            Generate a formatted report with statistics and measurement table.
+            {t("export.pdfDescription")}
           </p>
           <a href={api.getExportPdfUrl(params)} download>
             <GlassButton variant="primary" className="!bg-[var(--g-green)] hover:!bg-[#2DB84D]">
               <FileText className="w-4 h-4" />
-              Download PDF
+              {t("export.downloadPdf")}
             </GlassButton>
           </a>
         </GlassCard>

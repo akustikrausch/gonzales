@@ -2,7 +2,7 @@
   "name": "gonzales-frontend",
   "description": "Web dashboard for Gonzales internet speed monitor - React frontend with real-time speed test visualization and analytics",
   "private": true,
-  "version": "3.9.8",
+  "version": "3.9.9",
   "type": "module",
   "keywords": [
     "internet speed test",
@@ -29,9 +29,12 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.62.0",
+    "i18next": "^25.8.4",
+    "i18next-browser-languagedetector": "^8.2.0",
     "lucide-react": "^0.563.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-i18next": "^16.5.4",
     "react-router-dom": "^7.1.0",
     "recharts": "^2.15.0"
   },

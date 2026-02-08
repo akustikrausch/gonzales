@@ -13,7 +13,7 @@ interface SpeedNeedleProps {
 export function SpeedNeedle({
   value,
   max = 1000,
-  label = "Speed",
+  label,
   color = "var(--g-blue)",
   unit = "Mbps",
   glowColor,
@@ -243,9 +243,11 @@ export function SpeedNeedle({
           {unit}
         </span>
       </div>
-      <span className="text-xs mt-1 font-medium uppercase tracking-wider" style={{ color: "var(--g-text-tertiary)" }}>
-        {label}
-      </span>
+      {label && (
+        <span className="text-xs mt-1 font-medium uppercase tracking-wider" style={{ color: "var(--g-text-tertiary)" }}>
+          {label}
+        </span>
+      )}
     </div>
   );
 }

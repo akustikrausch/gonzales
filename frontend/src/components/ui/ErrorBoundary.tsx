@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
+import i18n from "../../i18n";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -33,10 +34,10 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         <div className="min-h-screen flex items-center justify-center p-6 bg-[var(--color-bg-primary)]">
           <div className="glass-card p-8 max-w-md w-full text-center space-y-4">
             <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">
-              Something went wrong
+              {i18n.t("common.errorBoundaryTitle")}
             </h1>
             <p className="text-sm text-[var(--color-text-secondary)]">
-              An unexpected error occurred. Please reload the page to try again.
+              {i18n.t("common.errorBoundaryText")}
             </p>
             {this.state.error && (
               <pre className="text-xs text-left bg-black/20 rounded-lg p-3 overflow-auto max-h-32 text-[var(--color-text-tertiary)]">
@@ -47,7 +48,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               onClick={this.handleReload}
               className="glass-btn glass-btn-primary px-6 py-2.5 text-sm"
             >
-              Reload Page
+              {i18n.t("common.errorBoundaryRefresh")}
             </button>
           </div>
         </div>

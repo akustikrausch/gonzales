@@ -9,6 +9,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useTranslation } from "react-i18next";
 import type { TrendAnalysis, PredictiveTrend, EnhancedPredictiveTrend } from "../../api/types";
 import { GlassCard } from "../ui/GlassCard";
 import { GlassBadge } from "../ui/GlassBadge";
@@ -23,6 +24,8 @@ interface TrendChartProps {
 }
 
 export function TrendChart({ trend, predictions, enhancedPredictions, downloadThreshold, uploadThreshold }: TrendChartProps) {
+  const { t } = useTranslation();
+
   if (trend.points.length === 0) return null;
 
   const data = trend.points.map((p) => ({
@@ -70,7 +73,7 @@ export function TrendChart({ trend, predictions, enhancedPredictions, downloadTh
 
   const slopeLabel = (slope: number, label: string) => {
     const dir = slope > 0 ? "+" : "";
-    return `${label}: ${dir}${slope.toFixed(2)} Mbps/day`;
+    return `${label}: ${dir}${slope.toFixed(2)} ${t("common.mbps")}/day`;
   };
 
   const confidenceLevel = enhancedPredictions?.confidence_level || predictions?.confidence;
@@ -80,20 +83,20 @@ export function TrendChart({ trend, predictions, enhancedPredictions, downloadTh
       <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
         <div className="flex items-center gap-2">
           <h4 className="text-sm font-semibold" style={{ color: "var(--g-text)" }}>
-            Speed Trend
+            {t("docs.speedTrendTitle")}
           </h4>
           {confidenceLevel && (
             <GlassBadge color="var(--g-teal)">
-              7-day forecast ({confidenceLevel})
+              {t("docs.forecastDays")} ({confidenceLevel})
             </GlassBadge>
           )}
         </div>
         <div className="flex gap-4">
           <span className="text-xs" style={{ color: "var(--g-blue)" }}>
-            {slopeLabel(trend.download_slope, "DL")}
+            {slopeLabel(trend.download_slope, t("docs.down"))}
           </span>
           <span className="text-xs" style={{ color: "var(--g-green)" }}>
-            {slopeLabel(trend.upload_slope, "UL")}
+            {slopeLabel(trend.upload_slope, t("docs.up"))}
           </span>
         </div>
       </div>
@@ -111,7 +114,7 @@ export function TrendChart({ trend, predictions, enhancedPredictions, downloadTh
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--g-border)" />
           <XAxis dataKey="time" tick={{ fontSize: 11 }} stroke="var(--g-text-tertiary)" />
-          <YAxis tick={{ fontSize: 11 }} stroke="var(--g-text-tertiary)" unit=" Mbps" />
+          <YAxis tick={{ fontSize: 11 }} stroke="var(--g-text-tertiary)" unit={` ${t("common.mbps")}`} />
           <Tooltip
             contentStyle={{
               background: "var(--g-card-bg)",
@@ -128,7 +131,7 @@ export function TrendChart({ trend, predictions, enhancedPredictions, downloadTh
               strokeDasharray="5 5"
               strokeOpacity={0.6}
               label={{
-                value: `Min ${downloadThreshold} Mbps`,
+                value: `Min ${downloadThreshold} ${t("common.mbps")}`,
                 position: "right",
                 fill: "var(--g-blue)",
                 fontSize: 10,
@@ -142,7 +145,7 @@ export function TrendChart({ trend, predictions, enhancedPredictions, downloadTh
               strokeDasharray="5 5"
               strokeOpacity={0.6}
               label={{
-                value: `Min ${uploadThreshold} Mbps`,
+                value: `Min ${uploadThreshold} ${t("common.mbps")}`,
                 position: "right",
                 fill: "var(--g-green)",
                 fontSize: 10,
@@ -204,7 +207,7 @@ export function TrendChart({ trend, predictions, enhancedPredictions, downloadTh
             stroke="var(--g-blue)"
             fill="url(#dlGrad)"
             strokeWidth={2}
-            name="Download"
+            name={t("common.download")}
             animationDuration={1000}
             animationBegin={0}
             animationEasing="ease-out"
@@ -216,7 +219,7 @@ export function TrendChart({ trend, predictions, enhancedPredictions, downloadTh
             stroke="var(--g-green)"
             fill="url(#ulGrad)"
             strokeWidth={2}
-            name="Upload"
+            name={t("common.upload")}
             animationDuration={1000}
             animationBegin={200}
             animationEasing="ease-out"
@@ -230,7 +233,7 @@ export function TrendChart({ trend, predictions, enhancedPredictions, downloadTh
             strokeWidth={2}
             strokeDasharray="6 4"
             dot={false}
-            name="DL Forecast"
+            name={`${t("docs.down")} ${t("docs.forecastDays").split(" ")[0]}`}
             animationDuration={800}
             animationBegin={400}
             connectNulls
@@ -242,7 +245,7 @@ export function TrendChart({ trend, predictions, enhancedPredictions, downloadTh
             strokeWidth={2}
             strokeDasharray="6 4"
             dot={false}
-            name="UL Forecast"
+            name={`${t("docs.up")} ${t("docs.forecastDays").split(" ")[0]}`}
             animationDuration={800}
             animationBegin={600}
             connectNulls
@@ -253,7 +256,7 @@ export function TrendChart({ trend, predictions, enhancedPredictions, downloadTh
       {enhancedPredictions?.seasonal_factors && enhancedPredictions.seasonal_factors.length > 0 && (
         <div className="flex items-center gap-2 mt-3 pt-3 border-t" style={{ borderColor: "var(--g-border)" }}>
           <span className="text-[10px] shrink-0" style={{ color: "var(--g-text-tertiary)" }}>
-            Day patterns:
+            {t("docs.dayPatterns")}:
           </span>
           <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
             {enhancedPredictions.seasonal_factors.map((sf) => {

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Network, Play, Info, AlertTriangle, CheckCircle, Clock, History } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useLatestTopology, useTopologyHistory, useNetworkDiagnosis, useAnalyzeTopology } from "../hooks/useApi";
 import { Spinner } from "../components/ui/Spinner";
 import { HopVisualization } from "../components/topology/HopVisualization";
@@ -7,6 +8,7 @@ import { TopologyHistoryList } from "../components/topology/TopologyHistoryList"
 import type { NetworkTopology } from "../api/types";
 
 export function TopologyPage() {
+  const { t } = useTranslation();
   const { data: latestTopology, isLoading: topologyLoading } = useLatestTopology();
   const { data: historyData, isLoading: historyLoading } = useTopologyHistory(5);
   const { data: diagnosis, isLoading: diagnosisLoading } = useNetworkDiagnosis(7);
@@ -35,7 +37,7 @@ export function TopologyPage() {
         <div className="flex items-center gap-2">
           <Network className="w-5 h-5" style={{ color: "var(--g-accent)" }} />
           <h2 className="text-xl font-bold" style={{ color: "var(--g-text)" }}>
-            Network Topology
+            {t("topology.title")}
           </h2>
         </div>
         <button
@@ -54,7 +56,7 @@ export function TopologyPage() {
           ) : (
             <Play className="w-4 h-4" />
           )}
-          Analyze Now
+          {t("topology.analyzeNow")}
         </button>
       </div>
 
@@ -63,7 +65,7 @@ export function TopologyPage() {
         <div className="glass-card p-6 g-animate-in g-stagger-1">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold" style={{ color: "var(--g-text)" }}>
-              Network Health (Last 7 Days)
+              {t("topology.networkHealth")}
             </h3>
             <div
               className="px-3 py-1 rounded-full text-sm font-medium"
@@ -85,31 +87,31 @@ export function TopologyPage() {
               {diagnosis.overall_status === "healthy" && <CheckCircle className="w-4 h-4 inline mr-1" />}
               {diagnosis.overall_status === "degraded" && <AlertTriangle className="w-4 h-4 inline mr-1" />}
               {diagnosis.overall_status === "problematic" && <AlertTriangle className="w-4 h-4 inline mr-1" />}
-              {diagnosis.overall_status.charAt(0).toUpperCase() + diagnosis.overall_status.slice(1)}
+              {t(`topology.${diagnosis.overall_status}`)}
             </div>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div title="Percentage of analyses where local network hops had acceptable latency">
-              <p className="text-xs cursor-help" style={{ color: "var(--g-text-secondary)" }}>Local Network Health</p>
+              <p className="text-xs cursor-help" style={{ color: "var(--g-text-secondary)" }}>{t("topology.localNetworkHealth")}</p>
               <p className="text-xl font-bold" style={{ color: "var(--g-text)" }}>
                 {diagnosis.local_network_health_pct.toFixed(0)}%
               </p>
             </div>
             <div title="Average number of network hops to reach the target">
-              <p className="text-xs cursor-help" style={{ color: "var(--g-text-secondary)" }}>Avg Hops</p>
+              <p className="text-xs cursor-help" style={{ color: "var(--g-text-secondary)" }}>{t("topology.avgHops")}</p>
               <p className="text-xl font-bold" style={{ color: "var(--g-text)" }}>
                 {diagnosis.avg_total_hops.toFixed(1)}
               </p>
             </div>
             <div title="Average total round-trip time across all hops">
-              <p className="text-xs cursor-help" style={{ color: "var(--g-text-secondary)" }}>Avg Latency</p>
+              <p className="text-xs cursor-help" style={{ color: "var(--g-text-secondary)" }}>{t("topology.avgLatency")}</p>
               <p className="text-xl font-bold" style={{ color: "var(--g-text)" }}>
-                {diagnosis.avg_total_latency_ms.toFixed(1)} ms
+                {diagnosis.avg_total_latency_ms.toFixed(1)} {t("common.ms")}
               </p>
             </div>
             <div title="Total number of traceroute analyses performed">
-              <p className="text-xs cursor-help" style={{ color: "var(--g-text-secondary)" }}>Analyses</p>
+              <p className="text-xs cursor-help" style={{ color: "var(--g-text-secondary)" }}>{t("topology.analyses")}</p>
               <p className="text-xl font-bold" style={{ color: "var(--g-text)" }}>
                 {diagnosis.total_analyses}
               </p>
@@ -119,7 +121,7 @@ export function TopologyPage() {
           {diagnosis.recommendations.length > 0 && (
             <div className="mt-4 pt-4" style={{ borderTop: "1px solid var(--g-border)" }}>
               <p className="text-sm font-medium mb-2" style={{ color: "var(--g-text)" }}>
-                Recommendations
+                {t("topology.recommendations")}
               </p>
               <ul className="space-y-1">
                 {diagnosis.recommendations.map((rec, i) => (
@@ -143,10 +145,10 @@ export function TopologyPage() {
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h3 className="text-lg font-semibold" style={{ color: "var(--g-text)" }}>
-                    Route Analysis
+                    {t("topology.routeAnalysis")}
                   </h3>
                   <p className="text-sm" style={{ color: "var(--g-text-secondary)" }}>
-                    Target: {displayedTopology.target_host}
+                    {t("topology.target")}: {displayedTopology.target_host}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 text-sm" style={{ color: "var(--g-text-secondary)" }}>
@@ -182,21 +184,21 @@ export function TopologyPage() {
               {/* Summary stats */}
               <div className="grid grid-cols-3 gap-4 mb-6">
                 <div className="text-center p-3 rounded-lg" style={{ backgroundColor: "var(--g-surface)" }}>
-                  <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>Total Hops</p>
+                  <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>{t("topology.totalHops")}</p>
                   <p className="text-xl font-bold" style={{ color: "var(--g-text)" }}>
                     {displayedTopology.total_hops}
                   </p>
                 </div>
                 <div className="text-center p-3 rounded-lg" style={{ backgroundColor: "var(--g-surface)" }}>
-                  <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>Total Latency</p>
+                  <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>{t("topology.totalLatency")}</p>
                   <p className="text-xl font-bold" style={{ color: "var(--g-text)" }}>
-                    {displayedTopology.total_latency_ms.toFixed(1)} ms
+                    {displayedTopology.total_latency_ms.toFixed(1)} {t("common.ms")}
                   </p>
                 </div>
                 <div className="text-center p-3 rounded-lg" style={{ backgroundColor: "var(--g-surface)" }}>
-                  <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>Bottleneck</p>
+                  <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>{t("topology.bottleneck")}</p>
                   <p className="text-xl font-bold" style={{ color: displayedTopology.bottleneck_hop ? "var(--g-amber)" : "var(--g-green)" }}>
-                    {displayedTopology.bottleneck_hop ? `Hop ${displayedTopology.bottleneck_hop}` : "None"}
+                    {displayedTopology.bottleneck_hop ? `${t("topology.hop")} ${displayedTopology.bottleneck_hop}` : t("topology.none")}
                   </p>
                 </div>
               </div>
@@ -208,7 +210,7 @@ export function TopologyPage() {
             <div className="text-center py-12">
               <Network className="w-12 h-12 mx-auto mb-4" style={{ color: "var(--g-text-secondary)" }} />
               <p style={{ color: "var(--g-text-secondary)" }}>
-                No topology analysis available yet. Click "Analyze Now" to trace your network route.
+                {t("topology.noData")}
               </p>
             </div>
           )}
@@ -219,7 +221,7 @@ export function TopologyPage() {
           <div className="flex items-center gap-2 mb-4">
             <History className="w-5 h-5" style={{ color: "var(--g-text-secondary)" }} />
             <h3 className="text-lg font-semibold" style={{ color: "var(--g-text)" }}>
-              Recent Analyses
+              {t("topology.historyRecent")}
             </h3>
           </div>
 
@@ -239,7 +241,7 @@ export function TopologyPage() {
             />
           ) : (
             <p className="text-sm" style={{ color: "var(--g-text-secondary)" }}>
-              No analysis history yet.
+              {t("topology.noAnalysisHistory")}
             </p>
           )}
         </div>
@@ -249,19 +251,19 @@ export function TopologyPage() {
       <div className="flex flex-wrap items-center gap-6 text-sm g-animate-in g-stagger-4" style={{ color: "var(--g-text-secondary)" }}>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "var(--g-green)" }} />
-          <span>&lt;20ms (Excellent)</span>
+          <span>{t("topology.excellent")}</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "var(--g-amber)" }} />
-          <span>20-50ms (Good)</span>
+          <span>{t("topology.good")}</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "var(--g-red)" }} />
-          <span>&gt;50ms (High)</span>
+          <span>{t("topology.high")}</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "var(--g-text-secondary)" }} />
-          <span>Timeout</span>
+          <span>{t("topology.timeout")}</span>
         </div>
       </div>
     </div>

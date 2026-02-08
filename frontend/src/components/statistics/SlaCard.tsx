@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { SlaCompliance } from "../../api/types";
 import { GlassCard } from "../ui/GlassCard";
 import { ProgressRing } from "../speedtest/ProgressRing";
@@ -8,10 +9,11 @@ interface SlaCardProps {
 }
 
 export function SlaCard({ sla }: SlaCardProps) {
+  const { t } = useTranslation();
   return (
     <GlassCard>
       <h4 className="text-sm font-semibold mb-4" style={{ color: "var(--g-text)" }}>
-        SLA Compliance
+        {t("statistics.slaCompliance")}
       </h4>
       <div className="flex justify-around">
         <div className="flex flex-col items-center gap-2">
@@ -27,9 +29,9 @@ export function SlaCard({ sla }: SlaCardProps) {
               className="text-sm font-bold"
               style={{ color: "var(--g-blue)" }}
             />
-            <span className="text-xs" style={{ color: "var(--g-blue)" }}>%</span>
+            <span className="text-xs" style={{ color: "var(--g-blue)" }}>{t("common.pct")}</span>
           </ProgressRing>
-          <span className="text-xs" style={{ color: "var(--g-text-secondary)" }}>Download</span>
+          <span className="text-xs" style={{ color: "var(--g-text-secondary)" }}>{t("common.download")}</span>
           <span className="text-[10px] tabular-nums" style={{ color: "var(--g-text-tertiary)" }}>
             {sla.download_compliant}/{sla.total_tests}
           </span>
@@ -47,9 +49,9 @@ export function SlaCard({ sla }: SlaCardProps) {
               className="text-sm font-bold"
               style={{ color: "var(--g-green)" }}
             />
-            <span className="text-xs" style={{ color: "var(--g-green)" }}>%</span>
+            <span className="text-xs" style={{ color: "var(--g-green)" }}>{t("common.pct")}</span>
           </ProgressRing>
-          <span className="text-xs" style={{ color: "var(--g-text-secondary)" }}>Upload</span>
+          <span className="text-xs" style={{ color: "var(--g-text-secondary)" }}>{t("common.upload")}</span>
           <span className="text-[10px] tabular-nums" style={{ color: "var(--g-text-tertiary)" }}>
             {sla.upload_compliant}/{sla.total_tests}
           </span>

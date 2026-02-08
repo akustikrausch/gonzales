@@ -1,4 +1,5 @@
 import { Gauge } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { GlassButton } from "../../ui/GlassButton";
 import { GlassInput } from "../../ui/GlassInput";
 
@@ -19,22 +20,23 @@ export function ThresholdsStep({
   onNext,
   onBack,
 }: ThresholdsStepProps) {
+  const { t } = useTranslation();
   return (
     <div>
       <div className="text-center mb-8">
         <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--g-green)] bg-opacity-10 flex items-center justify-center">
           <Gauge className="w-8 h-8 text-[var(--g-green)]" />
         </div>
-        <h2 className="text-xl font-bold mb-2">Speed Thresholds</h2>
+        <h2 className="text-xl font-bold mb-2">{t("onboarding.step1Title")}</h2>
         <p className="text-[var(--g-text-secondary)] text-sm">
-          Set the minimum speeds you expect from your ISP contract
+          {t("onboarding.step1Text")}
         </p>
       </div>
 
       <div className="max-w-sm mx-auto space-y-4 mb-8">
         <div>
           <label className="block text-sm font-medium mb-2">
-            Download Threshold (Mbps)
+            {t("settings.downloadThreshold")}
           </label>
           <GlassInput
             type="number"
@@ -44,13 +46,13 @@ export function ThresholdsStep({
             max={10000}
           />
           <p className="text-xs text-[var(--g-text-tertiary)] mt-1">
-            You'll be notified when download speed falls below this
+            {t("settings.downloadThresholdDesc")}
           </p>
         </div>
 
         <div>
           <label className="block text-sm font-medium mb-2">
-            Upload Threshold (Mbps)
+            {t("settings.uploadThreshold")}
           </label>
           <GlassInput
             type="number"
@@ -60,17 +62,17 @@ export function ThresholdsStep({
             max={10000}
           />
           <p className="text-xs text-[var(--g-text-tertiary)] mt-1">
-            You'll be notified when upload speed falls below this
+            {t("settings.uploadThresholdDesc")}
           </p>
         </div>
       </div>
 
       <div className="flex gap-3 justify-center">
         <GlassButton variant="default" onClick={onBack}>
-          Back
+          {t("onboarding.back")}
         </GlassButton>
         <GlassButton variant="primary" onClick={onNext}>
-          Continue
+          {t("onboarding.next")}
         </GlassButton>
       </div>
     </div>

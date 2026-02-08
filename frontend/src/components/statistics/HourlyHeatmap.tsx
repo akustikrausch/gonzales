@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { HourlyAverage } from "../../api/types";
 import { GlassCard } from "../ui/GlassCard";
 
@@ -6,6 +7,7 @@ interface HourlyHeatmapProps {
 }
 
 export function HourlyHeatmap({ data }: HourlyHeatmapProps) {
+  const { t } = useTranslation();
   const maxSpeed = Math.max(...data.map((d) => d.avg_download_mbps), 1);
 
   const getColor = (value: number) => {
@@ -18,7 +20,7 @@ export function HourlyHeatmap({ data }: HourlyHeatmapProps) {
   return (
     <GlassCard>
       <h4 className="text-sm font-semibold mb-4" style={{ color: "var(--g-text)" }}>
-        Speed by Hour of Day
+        {t("statistics.hourlyHeatmap")}
       </h4>
       <div className="grid grid-cols-8 sm:grid-cols-12 gap-1">
         {data.map((h) => (
@@ -42,7 +44,7 @@ export function HourlyHeatmap({ data }: HourlyHeatmapProps) {
       </div>
       <div className="flex items-center justify-between mt-3">
         <span className="text-[10px]" style={{ color: "var(--g-text-tertiary)" }}>
-          0 Mbps
+          0 {t("common.mbps")}
         </span>
         <div className="flex gap-0.5">
           {[0.2, 0.4, 0.6, 0.8, 1.0].map((i) => (
@@ -54,7 +56,7 @@ export function HourlyHeatmap({ data }: HourlyHeatmapProps) {
           ))}
         </div>
         <span className="text-[10px]" style={{ color: "var(--g-text-tertiary)" }}>
-          {maxSpeed.toFixed(0)} Mbps
+          {maxSpeed.toFixed(0)} {t("common.mbps")}
         </span>
       </div>
     </GlassCard>

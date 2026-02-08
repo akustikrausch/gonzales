@@ -1,4 +1,5 @@
 import { CheckCircle, XCircle, Tv, Video, Gamepad2, Briefcase, Upload, Radio, Home, PlayCircle, Users, Swords } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { QosTestResult } from "../../api/types";
 
 const iconMap: Record<string, React.ElementType> = {
@@ -20,6 +21,7 @@ interface QosProfileCardProps {
 }
 
 export function QosProfileCard({ result, onClick }: QosProfileCardProps) {
+  const { t } = useTranslation();
   const Icon = iconMap[result.icon] || Tv;
   const StatusIcon = result.passed ? CheckCircle : XCircle;
   const statusColor = result.passed ? "var(--g-green)" : "var(--g-red)";
@@ -37,7 +39,7 @@ export function QosProfileCard({ result, onClick }: QosProfileCardProps) {
         >
           <Icon className="w-5 h-5" style={{ color: statusColor }} />
         </div>
-        <span title={result.passed ? "All requirements met for this application" : "Some requirements not met - click for details"}>
+        <span title={result.passed ? t("qos.allRequirementsMetForApp") : t("qos.someRequirementsNotMetDetails")}>
           <StatusIcon className="w-5 h-5" style={{ color: statusColor }} />
         </span>
       </div>
@@ -51,7 +53,7 @@ export function QosProfileCard({ result, onClick }: QosProfileCardProps) {
         style={{ color: "var(--g-text-secondary)" }}
         title="Number of quality requirements met (download, upload, ping, jitter, packet loss)"
       >
-        <span>{result.passed_count}/{result.total_checks} checks passed</span>
+        <span>{t("qos.checksPassed", { passed: result.passed_count, total: result.total_checks })}</span>
       </div>
 
       {!result.passed && result.recommendation && (

@@ -1,4 +1,5 @@
 import { CheckCircle, ChevronRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { Recommendation } from "../../api/types";
 
 interface RecommendationsListProps {
@@ -9,21 +10,23 @@ const difficultyConfig = {
   easy: {
     color: "var(--g-green)",
     bgColor: "var(--g-green-tint)",
-    label: "Easy",
+    label: "rootCause.easy",
   },
   moderate: {
     color: "var(--g-orange)",
     bgColor: "var(--g-orange-tint)",
-    label: "Moderate",
+    label: "rootCause.moderate",
   },
   advanced: {
     color: "var(--g-red)",
     bgColor: "var(--g-red-tint)",
-    label: "Advanced",
+    label: "rootCause.advanced",
   },
 };
 
 export function RecommendationsList({ recommendations }: RecommendationsListProps) {
+  const { t } = useTranslation();
+
   if (recommendations.length === 0) {
     return (
       <div
@@ -32,7 +35,7 @@ export function RecommendationsList({ recommendations }: RecommendationsListProp
       >
         <CheckCircle className="w-8 h-8 mx-auto mb-2" style={{ color: "var(--g-green)" }} />
         <p className="text-sm" style={{ color: "var(--g-text-secondary)" }}>
-          No recommendations at this time.
+          {t("rootCause.noRecommendations")}
         </p>
       </div>
     );
@@ -69,7 +72,7 @@ export function RecommendationsList({ recommendations }: RecommendationsListProp
                     className="text-xs px-1.5 py-0.5 rounded"
                     style={{ background: difficulty.bgColor, color: difficulty.color }}
                   >
-                    {difficulty.label}
+                    {t(difficulty.label)}
                   </span>
                 </div>
                 <p className="text-sm mt-1" style={{ color: "var(--g-text-secondary)" }}>

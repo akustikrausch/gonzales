@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useServers } from "../../hooks/useApi";
 import { GlassSelect } from "../ui/GlassSelect";
 import { Spinner } from "../ui/Spinner";
@@ -9,6 +10,7 @@ interface ServerPickerProps {
 }
 
 export function ServerPicker({ value, onChange }: ServerPickerProps) {
+  const { t } = useTranslation();
   const { data, isLoading, error } = useServers();
   const [search, setSearch] = useState("");
 
@@ -17,7 +19,7 @@ export function ServerPicker({ value, onChange }: ServerPickerProps) {
       <div className="flex items-center gap-2">
         <Spinner size={16} />
         <span className="text-sm" style={{ color: "var(--g-text-secondary)" }}>
-          Loading servers...
+          {t("settings.loadingServers")}
         </span>
       </div>
     );
@@ -26,7 +28,7 @@ export function ServerPicker({ value, onChange }: ServerPickerProps) {
   if (error) {
     return (
       <p className="text-sm" style={{ color: "var(--g-red)" }}>
-        Failed to load servers. Speedtest CLI may not be available.
+        {t("settings.failedToLoadServers")}
       </p>
     );
   }
@@ -45,7 +47,7 @@ export function ServerPicker({ value, onChange }: ServerPickerProps) {
     <div className="space-y-2">
       <input
         type="text"
-        placeholder="Search servers..."
+        placeholder={t("settings.searchServers")}
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         className="glass-input"
@@ -54,7 +56,7 @@ export function ServerPicker({ value, onChange }: ServerPickerProps) {
         value={String(value)}
         onChange={(e) => onChange(Number(e.target.value))}
       >
-        <option value="0">Auto (nearest server)</option>
+        <option value="0">{t("settings.autoNearestServer")}</option>
         {filtered.map((s) => (
           <option key={s.id} value={s.id}>
             {s.name} - {s.location}, {s.country}

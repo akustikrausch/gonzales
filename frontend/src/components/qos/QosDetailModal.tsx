@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { X, CheckCircle, XCircle, Tv, Video, Gamepad2, Briefcase, Upload, Radio, Home, PlayCircle, Users, Swords } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { QosTestResult, QosCheck } from "../../api/types";
 import { GlassButton } from "../ui/GlassButton";
 
@@ -22,6 +23,7 @@ interface QosDetailModalProps {
 }
 
 function CheckBar({ check }: { check: QosCheck }) {
+  const { t } = useTranslation();
   const passed = check.passed;
   const color = passed ? "var(--g-green)" : "var(--g-red)";
   const bgColor = passed ? "var(--g-green-muted)" : "var(--g-red-muted)";
@@ -54,10 +56,10 @@ function CheckBar({ check }: { check: QosCheck }) {
         />
       </div>
       <div className="flex justify-between text-[10px] mt-0.5" style={{ color: "var(--g-text-secondary)" }}>
-        <span>{check.threshold_type === "min" ? "Min required" : "Max allowed"}</span>
+        <span>{check.threshold_type === "min" ? t("qos.minRequired") : t("qos.maxAllowed")}</span>
         <span className="flex items-center gap-1">
           {passed ? <CheckCircle className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
-          {passed ? "Pass" : "Fail"}
+          {passed ? t("qos.pass") : t("qos.fail")}
         </span>
       </div>
     </div>
@@ -65,6 +67,7 @@ function CheckBar({ check }: { check: QosCheck }) {
 }
 
 export function QosDetailModal({ result, onClose }: QosDetailModalProps) {
+  const { t } = useTranslation();
   const Icon = iconMap[result.icon] || Tv;
   const statusColor = result.passed ? "var(--g-green)" : "var(--g-red)";
   const modalRef = useRef<HTMLDivElement>(null);
@@ -141,14 +144,14 @@ export function QosDetailModal({ result, onClose }: QosDetailModalProps) {
                 {result.profile_name}
               </h3>
               <p className="text-sm" style={{ color: statusColor }}>
-                {result.passed ? "All requirements met" : "Requirements not met"}
+                {result.passed ? t("qos.allRequirementsMet") : t("qos.requirementsNotMet")}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
             className="p-1 rounded hover:bg-white/10"
-            aria-label="Close dialog"
+            aria-label={t("qos.closeDialog")}
           >
             <X className="w-5 h-5" style={{ color: "var(--g-text-secondary)" }} aria-hidden="true" />
           </button>
@@ -171,7 +174,7 @@ export function QosDetailModal({ result, onClose }: QosDetailModalProps) {
 
         <div className="mt-4 flex justify-end">
           <GlassButton size="sm" onClick={onClose}>
-            Close
+            {t("qos.close")}
           </GlassButton>
         </div>
       </div>

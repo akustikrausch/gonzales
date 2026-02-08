@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import {
   CartesianGrid,
   Line,
@@ -16,6 +17,7 @@ interface PingChartProps {
 }
 
 export function PingChart({ measurements }: PingChartProps) {
+  const { t } = useTranslation();
   const data = [...measurements].reverse().map((m) => ({
     time: formatShortDate(m.timestamp),
     ping: Number(m.ping_latency_ms.toFixed(1)),
@@ -25,13 +27,13 @@ export function PingChart({ measurements }: PingChartProps) {
   return (
     <GlassCard>
       <h3 className="text-sm font-semibold mb-4" style={{ color: "var(--g-text)" }}>
-        Latency Over Time
+        {t("dashboard.ping")} / {t("latestResult.jitter")}
       </h3>
       <ResponsiveContainer width="100%" height={250}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--g-border)" />
           <XAxis dataKey="time" tick={{ fontSize: 11 }} stroke="var(--g-text-tertiary)" />
-          <YAxis tick={{ fontSize: 11 }} stroke="var(--g-text-tertiary)" unit=" ms" />
+          <YAxis tick={{ fontSize: 11 }} stroke="var(--g-text-tertiary)" unit={` ${t("common.ms")}`} />
           <Tooltip
             contentStyle={{
               background: "var(--g-card-bg)",
@@ -47,7 +49,7 @@ export function PingChart({ measurements }: PingChartProps) {
             stroke="var(--g-orange)"
             strokeWidth={2}
             dot={false}
-            name="Ping"
+            name={t("common.ping")}
             animationDuration={800}
             animationBegin={0}
             animationEasing="ease-out"
@@ -58,7 +60,7 @@ export function PingChart({ measurements }: PingChartProps) {
             stroke="var(--g-purple)"
             strokeWidth={2}
             dot={false}
-            name="Jitter"
+            name={t("latestResult.jitter")}
             animationDuration={800}
             animationBegin={200}
             animationEasing="ease-out"

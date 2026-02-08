@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { NavLink, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Menu, X } from "lucide-react";
 import { getMainNavItems, getMoreNavItems, type NavItem } from "../../config/navigation";
 import { useStatus } from "../../hooks/useApi";
@@ -18,6 +19,7 @@ function BottomSheet({
   items: NavItem[];
   version?: string;
 }) {
+  const { t } = useTranslation();
   const location = useLocation();
   const [isClosing, setIsClosing] = useState(false);
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -88,7 +90,7 @@ function BottomSheet({
         ref={sheetRef}
         role="dialog"
         aria-modal="true"
-        aria-label="More navigation options"
+        aria-label={t("nav.moreNavigation")}
         className={`fixed bottom-0 left-0 right-0 z-50 glass-card rounded-t-2xl ${
           isClosing ? "g-animate-slide-down" : "g-animate-slide-up"
         }`}
@@ -109,7 +111,7 @@ function BottomSheet({
           style={{ borderColor: "var(--g-border)" }}
         >
           <span className="font-semibold" style={{ color: "var(--g-text)" }}>
-            More
+            {t("nav.more")}
           </span>
           <button
             ref={firstFocusableRef}
@@ -120,13 +122,13 @@ function BottomSheet({
               width: "44px",
               height: "44px",
             }}
-            aria-label="Close menu"
+            aria-label={t("nav.closeMenu")}
           >
             <X className="w-5 h-5" />
           </button>
         </div>
         {/* Items */}
-        <nav className="p-2" aria-label="Additional navigation">
+        <nav className="p-2" aria-label={t("nav.additionalNavigation")}>
           {items.map((item) => {
             const isActive = location.pathname === item.to;
             return (
@@ -143,7 +145,7 @@ function BottomSheet({
                 }}
               >
                 <item.icon className="w-5 h-5 shrink-0" />
-                <span className="font-medium">{item.label}</span>
+                <span className="font-medium">{t(item.labelKey)}</span>
               </NavLink>
             );
           })}
@@ -170,6 +172,7 @@ function BottomSheet({
 }
 
 export function MobileNav() {
+  const { t } = useTranslation();
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const location = useLocation();
   const { data: status } = useStatus();
@@ -191,7 +194,7 @@ export function MobileNav() {
       <nav
         className="fixed bottom-0 left-0 right-0 glass-header"
         style={{ zIndex: 30 }}
-        aria-label="Main navigation"
+        aria-label={t("nav.mainNavigation")}
       >
         {/* Navigation items container - fixed height with proper touch targets */}
         <div
@@ -215,9 +218,9 @@ export function MobileNav() {
                 <>
                   <item.icon className="w-5 h-5 shrink-0" aria-hidden="true" />
                   <span className="text-xs font-medium mt-1">
-                    {item.shortLabel || item.label}
+                    {t(item.shortLabelKey || item.labelKey)}
                   </span>
-                  {isActive && <span className="sr-only">(current page)</span>}
+                  {isActive && <span className="sr-only">{t("nav.currentPage")}</span>}
                 </>
               )}
             </NavLink>
@@ -232,12 +235,12 @@ export function MobileNav() {
               height: "var(--g-mobile-nav-height)",
               padding: "0 var(--g-space-2)",
             }}
-            aria-label="More options"
+            aria-label={t("nav.moreOptions")}
             aria-expanded={isMoreOpen}
             aria-haspopup="dialog"
           >
             <Menu className="w-5 h-5 shrink-0" />
-            <span className="text-xs font-medium mt-1">More</span>
+            <span className="text-xs font-medium mt-1">{t("nav.more")}</span>
           </button>
         </div>
         {/* Safe area spacer - only adds padding, not affecting nav item positioning */}

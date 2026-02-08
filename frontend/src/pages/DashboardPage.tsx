@@ -1,4 +1,5 @@
 import { Gauge } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useLatestMeasurement, useMeasurements, useStatistics, useEnhancedStatistics, useStatus } from "../hooks/useApi";
 import { useSpeedTest } from "../context/SpeedTestContext";
 
@@ -13,6 +14,7 @@ import { LiveTestView } from "../components/speedtest/LiveTestView";
 import { Spinner } from "../components/ui/Spinner";
 
 export function DashboardPage() {
+  const { t } = useTranslation();
   const { data: latest, isLoading: loadingLatest } = useLatestMeasurement();
   const { data: page } = useMeasurements({ page_size: 50 });
   const { data: stats } = useStatistics();
@@ -39,7 +41,7 @@ export function DashboardPage() {
         style={{ color: "var(--g-text)" }}
       >
         <Gauge className="w-5 h-5" />
-        Dashboard
+        {t("dashboard.title")}
       </h2>
 
       {/* Outage alert banner */}
@@ -55,26 +57,26 @@ export function DashboardPage() {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 g-animate-in g-stagger-1">
             <SpeedGauge
-              label="Download"
-              sublabel="Latest Test"
+              label={t("dashboard.download")}
+              sublabel={t("dashboard.latestTest")}
               value={latest.download_mbps}
               color="var(--g-blue)"
               threshold={stats?.effective_download_threshold_mbps}
-              thresholdLabel={stats ? `Min. ${stats.effective_download_threshold_mbps} Mbps` : undefined}
+              thresholdLabel={stats ? t("dashboard.minThreshold", { value: stats.effective_download_threshold_mbps }) : undefined}
             />
             <SpeedGauge
-              label="Upload"
-              sublabel="Latest Test"
+              label={t("dashboard.upload")}
+              sublabel={t("dashboard.latestTest")}
               value={latest.upload_mbps}
               color="var(--g-green)"
               threshold={stats?.effective_upload_threshold_mbps}
-              thresholdLabel={stats ? `Min. ${stats.effective_upload_threshold_mbps} Mbps` : undefined}
+              thresholdLabel={stats ? t("dashboard.minThreshold", { value: stats.effective_upload_threshold_mbps }) : undefined}
             />
             <SpeedGauge
-              label="Ping"
-              sublabel="Latest Test"
+              label={t("dashboard.ping")}
+              sublabel={t("dashboard.latestTest")}
               value={latest.ping_latency_ms}
-              unit="ms"
+              unit={t("common.ms")}
               color="var(--g-orange)"
             />
           </div>
@@ -107,9 +109,9 @@ export function DashboardPage() {
           className="text-center py-20 g-animate-in"
           style={{ color: "var(--g-text-secondary)" }}
         >
-          <p className="text-lg font-medium">No measurements yet</p>
+          <p className="text-lg font-medium">{t("dashboard.noMeasurements")}</p>
           <p className="text-sm mt-1">
-            Click "Run Test" to perform your first speed test.
+            {t("dashboard.noMeasurementsHint")}
           </p>
         </div>
       ) : null}

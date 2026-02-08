@@ -6,6 +6,7 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
+import { useTranslation } from "react-i18next";
 import type { DayOfWeekAverage } from "../../api/types";
 import { GlassCard } from "../ui/GlassCard";
 
@@ -14,6 +15,7 @@ interface DayOfWeekChartProps {
 }
 
 export function DayOfWeekChart({ data }: DayOfWeekChartProps) {
+  const { t } = useTranslation();
   const chartData = data.map((d) => ({
     day: d.day_name.slice(0, 3),
     download: d.avg_download_mbps,
@@ -23,7 +25,7 @@ export function DayOfWeekChart({ data }: DayOfWeekChartProps) {
   return (
     <GlassCard>
       <h4 className="text-sm font-semibold mb-4" style={{ color: "var(--g-text)" }}>
-        Average Speed by Day of Week
+        {t("statistics.dayOfWeek")}
       </h4>
       <ResponsiveContainer width="100%" height={300}>
         <RadarChart data={chartData} cx="50%" cy="50%" outerRadius="70%">
@@ -34,7 +36,7 @@ export function DayOfWeekChart({ data }: DayOfWeekChartProps) {
           />
           <Tooltip />
           <Radar
-            name="Download"
+            name={t("common.download")}
             dataKey="download"
             stroke="var(--g-blue)"
             fill="var(--g-blue)"
@@ -42,7 +44,7 @@ export function DayOfWeekChart({ data }: DayOfWeekChartProps) {
             strokeWidth={2}
           />
           <Radar
-            name="Upload"
+            name={t("common.upload")}
             dataKey="upload"
             stroke="var(--g-green)"
             fill="var(--g-green)"

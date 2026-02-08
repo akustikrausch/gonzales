@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { HourlyAverage } from "../../api/types";
 import { GlassCard } from "../ui/GlassCard";
 
@@ -15,29 +16,31 @@ function getQualityColor(avgDownload: number, threshold: number, count: number):
   return "var(--g-red)";
 }
 
-function getQualityLabel(avgDownload: number, threshold: number, count: number): string {
-  if (count === 0) return "No data";
+function getQualityLabel(avgDownload: number, threshold: number, count: number, t: (key: string) => string): string {
+  if (count === 0) return t("common.noData");
   const ratio = avgDownload / threshold;
-  if (ratio >= 0.9) return "Excellent";
-  if (ratio >= 0.7) return "Good";
-  if (ratio >= 0.5) return "Fair";
-  return "Poor";
+  if (ratio >= 0.9) return t("docs.excellent");
+  if (ratio >= 0.7) return t("docs.good");
+  if (ratio >= 0.5) return t("docs.fair");
+  return t("docs.poor");
 }
 
 export function QualityTimeline({ data, downloadThreshold }: QualityTimelineProps) {
+  const { t } = useTranslation();
+
   return (
     <GlassCard padding="md" className="g-animate-in">
       <h3
         className="text-sm font-semibold mb-4"
         style={{ color: "var(--g-text)" }}
       >
-        Network Quality by Hour
+        {t("docs.qualityTimeline")}
       </h3>
 
       <div className="flex gap-0.5">
         {data.map((hour) => {
           const color = getQualityColor(hour.avg_download_mbps, downloadThreshold, hour.count);
-          const label = getQualityLabel(hour.avg_download_mbps, downloadThreshold, hour.count);
+          const label = getQualityLabel(hour.avg_download_mbps, downloadThreshold, hour.count, t);
           return (
             <div key={hour.hour} className="flex-1 group relative">
               <div
@@ -70,7 +73,7 @@ export function QualityTimeline({ data, downloadThreshold }: QualityTimelineProp
                 </div>
                 {hour.count > 0 && (
                   <div className="text-[9px] mt-0.5" style={{ color: "var(--g-text-secondary)" }}>
-                    {hour.avg_download_mbps.toFixed(0)} Mbps / {hour.avg_ping_ms.toFixed(0)} ms / {hour.count} tests
+                    {hour.avg_download_mbps.toFixed(0)} {t("common.mbps")} / {hour.avg_ping_ms.toFixed(0)} {t("common.ms")} / {hour.count} {t("docs.tests")}
                   </div>
                 )}
               </div>
@@ -82,15 +85,15 @@ export function QualityTimeline({ data, downloadThreshold }: QualityTimelineProp
       {/* Legend */}
       <div className="flex items-center gap-4 mt-3 pt-2" style={{ borderTop: "1px solid var(--g-border)" }}>
         {[
-          { label: "Excellent", color: "var(--g-green)" },
-          { label: "Good", color: "var(--g-teal)" },
-          { label: "Fair", color: "var(--g-orange)" },
-          { label: "Poor", color: "var(--g-red)" },
+          { labelKey: "docs.excellent", color: "var(--g-green)" },
+          { labelKey: "docs.good", color: "var(--g-teal)" },
+          { labelKey: "docs.fair", color: "var(--g-orange)" },
+          { labelKey: "docs.poor", color: "var(--g-red)" },
         ].map((item) => (
-          <div key={item.label} className="flex items-center gap-1">
+          <div key={item.labelKey} className="flex items-center gap-1">
             <div className="w-2.5 h-2.5 rounded-sm" style={{ background: item.color, opacity: 0.8 }} />
             <span className="text-[10px]" style={{ color: "var(--g-text-tertiary)" }}>
-              {item.label}
+              {t(item.labelKey)}
             </span>
           </div>
         ))}

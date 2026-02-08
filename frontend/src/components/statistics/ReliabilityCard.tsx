@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { ReliabilityScore } from "../../api/types";
 import { GlassCard } from "../ui/GlassCard";
 import { ProgressRing } from "../speedtest/ProgressRing";
@@ -8,13 +9,14 @@ interface ReliabilityCardProps {
 }
 
 export function ReliabilityCard({ reliability }: ReliabilityCardProps) {
+  const { t } = useTranslation();
   const score = reliability.composite_score;
   const color = score >= 80 ? "var(--g-green)" : score >= 50 ? "var(--g-orange)" : "var(--g-red)";
 
   return (
     <GlassCard>
       <h4 className="text-sm font-semibold mb-4" style={{ color: "var(--g-text)" }}>
-        Reliability Score
+        {t("statistics.reliabilityScore")}
       </h4>
       <div className="flex flex-col items-center gap-3">
         <ProgressRing value={score} size={110} strokeWidth={8} color={color}>
@@ -34,7 +36,7 @@ export function ReliabilityCard({ reliability }: ReliabilityCardProps) {
               className="text-sm font-medium"
               style={{ color: "var(--g-text)" }}
             />
-            <span className="text-xs" style={{ color: "var(--g-text-secondary)" }}>%</span>
+            <span className="text-xs" style={{ color: "var(--g-text-secondary)" }}>{t("common.pct")}</span>
           </div>
           <div>
             <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>UL CV</p>
@@ -44,7 +46,7 @@ export function ReliabilityCard({ reliability }: ReliabilityCardProps) {
               className="text-sm font-medium"
               style={{ color: "var(--g-text)" }}
             />
-            <span className="text-xs" style={{ color: "var(--g-text-secondary)" }}>%</span>
+            <span className="text-xs" style={{ color: "var(--g-text-secondary)" }}>{t("common.pct")}</span>
           </div>
           <div>
             <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>Ping CV</p>
@@ -54,7 +56,7 @@ export function ReliabilityCard({ reliability }: ReliabilityCardProps) {
               className="text-sm font-medium"
               style={{ color: "var(--g-text)" }}
             />
-            <span className="text-xs" style={{ color: "var(--g-text-secondary)" }}>%</span>
+            <span className="text-xs" style={{ color: "var(--g-text-secondary)" }}>{t("common.pct")}</span>
           </div>
         </div>
       </div>

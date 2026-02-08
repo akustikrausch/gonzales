@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Activity, Calendar, RefreshCw, Search, TrendingUp } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { GlassCard } from "../components/ui/GlassCard";
 import { GlassButton } from "../components/ui/GlassButton";
 import { Spinner } from "../components/ui/Spinner";
@@ -22,6 +23,7 @@ const analysisWindows = [
 ];
 
 export function RootCausePage() {
+  const { t } = useTranslation();
   const [days, setDays] = useState(30);
   const { data: analysis, isLoading, refetch, isFetching } = useRootCauseAnalysis({ days });
 
@@ -35,10 +37,10 @@ export function RootCausePage() {
             style={{ color: "var(--g-text)" }}
           >
             <Search className="w-5 h-5" style={{ color: "var(--g-text-secondary)" }} />
-            Root-Cause Analysis
+            {t("rootCause.title")}
           </h1>
           <p className="text-sm mt-1" style={{ color: "var(--g-text-secondary)" }}>
-            Identify and diagnose network performance issues
+            {t("rootCause.subtitle")}
           </p>
         </div>
 
@@ -73,7 +75,7 @@ export function RootCausePage() {
             ) : (
               <RefreshCw className="w-4 h-4" />
             )}
-            <span className="ml-2 hidden sm:inline">Refresh</span>
+            <span className="ml-2 hidden sm:inline">{t("rootCause.refresh")}</span>
           </GlassButton>
         </div>
       </div>
@@ -87,11 +89,10 @@ export function RootCausePage() {
           <div className="text-center py-12">
             <Activity className="w-12 h-12 mx-auto mb-4" style={{ color: "var(--g-text-secondary)" }} />
             <h2 className="text-lg font-medium" style={{ color: "var(--g-text)" }}>
-              No Analysis Available
+              {t("rootCause.noAnalysisAvailable")}
             </h2>
             <p className="text-sm mt-2" style={{ color: "var(--g-text-secondary)" }}>
-              Not enough data to perform root-cause analysis.
-              Run more speed tests to gather data.
+              {t("rootCause.noData")}
             </p>
           </div>
         </GlassCard>
@@ -105,11 +106,11 @@ export function RootCausePage() {
                 <NetworkHealthGauge score={analysis.network_health_score} />
                 <div className="mt-4 text-center">
                   <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>
-                    Based on {analysis.measurement_count} measurements
-                    {analysis.topology_count > 0 && ` and ${analysis.topology_count} topology scans`}
+                    {t("rootCause.basedOn", { count: analysis.measurement_count })}
+                    {analysis.topology_count > 0 && ` ${t("rootCause.andTopology", { count: analysis.topology_count })}`}
                   </p>
                   <p className="text-xs mt-1" style={{ color: "var(--g-text-secondary)" }}>
-                    Analysis window: {analysis.data_window_days} days
+                    {t("rootCause.analysisWindow", { days: analysis.data_window_days })}
                   </p>
                 </div>
               </div>
@@ -122,7 +123,7 @@ export function RootCausePage() {
                 style={{ color: "var(--g-text)" }}
               >
                 <TrendingUp className="w-4 h-4" style={{ color: "var(--g-text-secondary)" }} />
-                Layer Health Breakdown
+                {t("rootCause.layerHealthBreakdown")}
               </h3>
               <LayerHealthChart scores={analysis.layer_scores} />
             </GlassCard>
@@ -136,7 +137,7 @@ export function RootCausePage() {
                 style={{ color: "var(--g-text)" }}
               >
                 <Activity className="w-4 h-4" style={{ color: "var(--g-text-secondary)" }} />
-                Primary Diagnosis
+                {t("rootCause.primaryDiagnosis")}
               </h3>
               <ProblemFingerprintCard fingerprint={analysis.primary_cause} isPrimary />
             </GlassCard>
@@ -149,7 +150,7 @@ export function RootCausePage() {
                 className="text-sm font-semibold mb-4"
                 style={{ color: "var(--g-text)" }}
               >
-                Additional Issues ({analysis.secondary_causes.length})
+                {t("rootCause.additionalIssues")} ({analysis.secondary_causes.length})
               </h3>
               <div className="space-y-3">
                 {analysis.secondary_causes.map((fp, idx) => (
@@ -166,7 +167,7 @@ export function RootCausePage() {
                 className="text-sm font-semibold mb-4"
                 style={{ color: "var(--g-text)" }}
               >
-                Time-Based Patterns
+                {t("rootCause.timeBasedPatterns")}
               </h3>
               <TimePatternCard pattern={analysis.time_pattern} />
             </GlassCard>
@@ -176,7 +177,7 @@ export function RootCausePage() {
                 className="text-sm font-semibold mb-4"
                 style={{ color: "var(--g-text)" }}
               >
-                Connection Type Impact
+                {t("rootCause.connectionTypeImpact")}
               </h3>
               {analysis.connection_impact ? (
                 <div
@@ -194,7 +195,7 @@ export function RootCausePage() {
                     <div className="mt-3 grid grid-cols-2 gap-4 text-center">
                       <div>
                         <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>
-                          Best
+                          {t("rootCause.best")}
                         </p>
                         <p className="text-sm font-medium capitalize" style={{ color: "var(--g-green)" }}>
                           {analysis.connection_impact.best_connection}
@@ -202,7 +203,7 @@ export function RootCausePage() {
                       </div>
                       <div>
                         <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>
-                          Worst
+                          {t("rootCause.worst")}
                         </p>
                         <p className="text-sm font-medium capitalize" style={{ color: "var(--g-orange)" }}>
                           {analysis.connection_impact.worst_connection}
@@ -217,7 +218,7 @@ export function RootCausePage() {
                   style={{ background: "var(--g-card-bg)" }}
                 >
                   <p className="text-sm" style={{ color: "var(--g-text-secondary)" }}>
-                    Not enough data from different connection types.
+                    {t("rootCause.notEnoughConnectionData")}
                   </p>
                 </div>
               )}
@@ -231,7 +232,7 @@ export function RootCausePage() {
                 className="text-sm font-semibold mb-4"
                 style={{ color: "var(--g-text)" }}
               >
-                Hop-Speed Correlation Analysis
+                {t("rootCause.hopSpeedCorrelationAnalysis")}
               </h3>
               <HopCorrelationView hops={analysis.hop_correlations} />
             </GlassCard>
@@ -243,7 +244,7 @@ export function RootCausePage() {
               className="text-sm font-semibold mb-4"
               style={{ color: "var(--g-text)" }}
             >
-              Recommendations
+              {t("rootCause.recommendations")}
             </h3>
             <RecommendationsList recommendations={analysis.recommendations} />
           </GlassCard>

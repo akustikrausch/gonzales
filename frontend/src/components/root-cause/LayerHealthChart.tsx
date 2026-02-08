@@ -1,4 +1,5 @@
 import { Globe, Router, Server, Wifi, Zap } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { LayerScores } from "../../api/types";
 
 interface LayerHealthChartProps {
@@ -6,11 +7,11 @@ interface LayerHealthChartProps {
 }
 
 const layers = [
-  { key: "dns_score" as const, label: "DNS", icon: Globe },
-  { key: "local_network_score" as const, label: "Local Network", icon: Router },
-  { key: "isp_backbone_score" as const, label: "ISP Backbone", icon: Zap },
-  { key: "isp_lastmile_score" as const, label: "ISP Last-Mile", icon: Wifi },
-  { key: "server_score" as const, label: "Server", icon: Server },
+  { key: "dns_score" as const, labelKey: "rootCause.dns", icon: Globe },
+  { key: "local_network_score" as const, labelKey: "rootCause.localNetwork", icon: Router },
+  { key: "isp_backbone_score" as const, labelKey: "rootCause.ispBackbone", icon: Zap },
+  { key: "isp_lastmile_score" as const, labelKey: "rootCause.ispLastMile", icon: Wifi },
+  { key: "server_score" as const, labelKey: "rootCause.server", icon: Server },
 ];
 
 function getBarColor(score: number): string {
@@ -21,9 +22,11 @@ function getBarColor(score: number): string {
 }
 
 export function LayerHealthChart({ scores }: LayerHealthChartProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="space-y-3">
-      {layers.map(({ key, label, icon: Icon }) => {
+      {layers.map(({ key, labelKey, icon: Icon }) => {
         const score = scores[key];
         const color = getBarColor(score);
 
@@ -33,7 +36,7 @@ export function LayerHealthChart({ scores }: LayerHealthChartProps) {
               <div className="flex items-center gap-2">
                 <Icon className="w-3.5 h-3.5" style={{ color: "var(--g-text-secondary)" }} />
                 <span className="text-xs" style={{ color: "var(--g-text)" }}>
-                  {label}
+                  {t(labelKey)}
                 </span>
               </div>
               <span className="text-xs font-medium" style={{ color }}>

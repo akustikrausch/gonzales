@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Brain, Zap, TrendingUp, Battery, Clock, Shield } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { GlassCard } from "../ui/GlassCard";
 import { GlassButton } from "../ui/GlassButton";
 import { GlassInput } from "../ui/GlassInput";
@@ -12,31 +13,32 @@ import {
   useDisableSmartScheduler,
 } from "../../hooks/useApi";
 
-const phaseConfig = {
+const getPhaseConfig = (t: (key: string) => string) => ({
   normal: {
     color: "var(--g-green)",
     bgColor: "var(--g-green-tint)",
-    label: "Normal",
-    description: "Standard testing intervals",
+    label: t("settings.phaseNormal"),
+    description: t("settings.phaseNormalDesc"),
     icon: TrendingUp,
   },
   burst: {
     color: "var(--g-orange)",
     bgColor: "var(--g-orange-tint)",
-    label: "Burst Mode",
-    description: "Frequent testing due to anomaly",
+    label: t("settings.phaseBurst"),
+    description: t("settings.phaseBurstDesc"),
     icon: Zap,
   },
   recovery: {
     color: "var(--g-blue)",
     bgColor: "var(--g-blue-tint)",
-    label: "Recovery",
-    description: "Gradually returning to normal",
+    label: t("settings.phaseRecovery"),
+    description: t("settings.phaseRecoveryDesc"),
     icon: TrendingUp,
   },
-};
+});
 
 export function SmartSchedulerCard() {
+  const { t } = useTranslation();
   const { data: status, isLoading: statusLoading } = useSmartSchedulerStatus();
   const { data: config, isLoading: configLoading } = useSmartSchedulerConfig();
   const updateConfig = useUpdateSmartSchedulerConfig();
@@ -68,6 +70,7 @@ export function SmartSchedulerCard() {
   if (!status || !config) return null;
 
   const isToggling = enableMutation.isPending || disableMutation.isPending;
+  const phaseConfig = getPhaseConfig(t);
   const phase = phaseConfig[status.phase] || phaseConfig.normal;
   const PhaseIcon = phase.icon;
 
@@ -93,17 +96,17 @@ export function SmartSchedulerCard() {
         style={{ color: "var(--g-text)" }}
       >
         <Brain className="w-4 h-4" style={{ color: "var(--g-text-secondary)" }} />
-        Smart Scheduling
+        {t("settings.smartScheduling")}
       </h3>
 
       {/* Enable/Disable Toggle */}
       <div className="flex items-center justify-between mb-6">
         <div>
           <p className="text-sm font-medium" style={{ color: "var(--g-text)" }}>
-            Adaptive Test Frequency
+            {t("settings.adaptiveTestFrequency")}
           </p>
           <p className="text-xs mt-1" style={{ color: "var(--g-text-secondary)" }}>
-            Automatically adjust intervals based on network conditions
+            {t("settings.adaptiveTestFrequencyDesc")}
           </p>
         </div>
         <GlassButton
@@ -111,7 +114,7 @@ export function SmartSchedulerCard() {
           onClick={handleToggle}
           disabled={isToggling}
         >
-          {isToggling ? <Spinner size={16} /> : status.enabled ? "Disable" : "Enable"}
+          {isToggling ? <Spinner size={16} /> : status.enabled ? t("settings.disable") : t("settings.enable")}
         </GlassButton>
       </div>
 
@@ -127,7 +130,7 @@ export function SmartSchedulerCard() {
               <div className="flex items-center gap-1.5 mb-1">
                 <PhaseIcon className="w-3 h-3" style={{ color: phase.color }} />
                 <span className="text-xs" style={{ color: "var(--g-text-secondary)" }}>
-                  Phase
+                  {t("settings.phase")}
                 </span>
               </div>
               <p className="text-sm font-medium" style={{ color: phase.color }}>
@@ -143,14 +146,14 @@ export function SmartSchedulerCard() {
               <div className="flex items-center gap-1.5 mb-1">
                 <Clock className="w-3 h-3" style={{ color: "var(--g-text-secondary)" }} />
                 <span className="text-xs" style={{ color: "var(--g-text-secondary)" }}>
-                  Interval
+                  {t("settings.interval")}
                 </span>
               </div>
               <p className="text-sm font-medium" style={{ color: "var(--g-text)" }}>
                 {status.current_interval_minutes}m
               </p>
               <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>
-                Base: {status.base_interval_minutes}m
+                {t("settings.baseInterval", { minutes: status.base_interval_minutes })}
               </p>
             </div>
 
@@ -162,7 +165,7 @@ export function SmartSchedulerCard() {
               <div className="flex items-center gap-1.5 mb-1">
                 <TrendingUp className="w-3 h-3" style={{ color: "var(--g-text-secondary)" }} />
                 <span className="text-xs" style={{ color: "var(--g-text-secondary)" }}>
-                  Stability
+                  {t("settings.stability")}
                 </span>
               </div>
               <p
@@ -185,7 +188,7 @@ export function SmartSchedulerCard() {
               <div className="flex items-center gap-1.5 mb-1">
                 <Battery className="w-3 h-3" style={{ color: "var(--g-text-secondary)" }} />
                 <span className="text-xs" style={{ color: "var(--g-text-secondary)" }}>
-                  Data Budget
+                  {t("settings.dataBudget")}
                 </span>
               </div>
               <p
@@ -197,7 +200,7 @@ export function SmartSchedulerCard() {
                 {status.data_budget_remaining_pct.toFixed(0)}%
               </p>
               <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>
-                {status.daily_data_used_mb.toFixed(0)} MB used
+                {t("settings.dataBudgetUsed", { used: status.daily_data_used_mb.toFixed(0) })}
               </p>
             </div>
           </div>
@@ -211,10 +214,10 @@ export function SmartSchedulerCard() {
               <Shield className="w-4 h-4" style={{ color: "var(--g-red)" }} />
               <div>
                 <p className="text-sm font-medium" style={{ color: "var(--g-red)" }}>
-                  Circuit Breaker Active
+                  {t("settings.circuitBreakerActive")}
                 </p>
                 <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>
-                  Too many tests in short period. Using maximum interval to protect data budget.
+                  {t("settings.circuitBreakerDesc")}
                 </p>
               </div>
             </div>
@@ -227,7 +230,7 @@ export function SmartSchedulerCard() {
               style={{ background: "var(--g-card-bg)" }}
             >
               <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>
-                Last Decision
+                {t("settings.lastDecision")}
               </p>
               <p className="text-sm" style={{ color: "var(--g-text)" }}>
                 {status.last_decision_reason}
@@ -241,13 +244,13 @@ export function SmartSchedulerCard() {
             className="text-xs underline mb-4"
             style={{ color: "var(--g-text-secondary)" }}
           >
-            {showAdvanced ? "Hide" : "Show"} Advanced Settings
+            {showAdvanced ? t("settings.hideAdvancedSettings") : t("settings.showAdvancedSettings")}
           </button>
 
           {showAdvanced && (
             <div className="space-y-4 max-w-sm">
               <GlassInput
-                label="Burst Interval (minutes)"
+                label={t("settings.burstInterval")}
                 type="number"
                 min={5}
                 max={30}
@@ -255,11 +258,11 @@ export function SmartSchedulerCard() {
                 onChange={(e) => setBurstInterval(e.target.value)}
               />
               <p className="text-xs -mt-2" style={{ color: "var(--g-text-secondary)" }}>
-                Test interval during burst mode (when anomalies detected)
+                {t("settings.burstIntervalDesc")}
               </p>
 
               <GlassInput
-                label="Daily Data Budget (MB)"
+                label={t("settings.dailyDataBudget")}
                 type="number"
                 min={100}
                 max={10240}
@@ -267,7 +270,7 @@ export function SmartSchedulerCard() {
                 onChange={(e) => setDailyBudget(e.target.value)}
               />
               <p className="text-xs -mt-2" style={{ color: "var(--g-text-secondary)" }}>
-                Maximum data usage per day (~150 MB per test typical)
+                {t("settings.dailyDataBudgetDesc")}
               </p>
 
               <GlassButton
@@ -275,7 +278,7 @@ export function SmartSchedulerCard() {
                 onClick={handleSaveConfig}
                 disabled={updateConfig.isPending}
               >
-                {updateConfig.isPending ? "Saving..." : "Save Settings"}
+                {updateConfig.isPending ? t("settings.saving") : t("settings.saveSettings")}
               </GlassButton>
             </div>
           )}
@@ -289,12 +292,12 @@ export function SmartSchedulerCard() {
         >
           <Brain className="w-8 h-8 mx-auto mb-2" style={{ color: "var(--g-text-secondary)" }} />
           <p className="text-sm" style={{ color: "var(--g-text-secondary)" }}>
-            Enable Smart Scheduling to automatically adjust test frequency based on network conditions.
+            {t("settings.enableSmartScheduling")}
           </p>
           <ul className="text-xs mt-3 space-y-1 text-left max-w-xs mx-auto" style={{ color: "var(--g-text-secondary)" }}>
-            <li>• More frequent tests when issues detected</li>
-            <li>• Gradual recovery when network stabilizes</li>
-            <li>• Built-in safety limits and data budget</li>
+            <li>• {t("settings.smartSchedulingBenefits1")}</li>
+            <li>• {t("settings.smartSchedulingBenefits2")}</li>
+            <li>• {t("settings.smartSchedulingBenefits3")}</li>
           </ul>
         </div>
       )}

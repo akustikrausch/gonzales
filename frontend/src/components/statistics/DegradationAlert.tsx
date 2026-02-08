@@ -1,4 +1,5 @@
 import { AlertTriangle, TrendingDown, Info } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { DegradationAlert as DegradationAlertType } from "../../api/types";
 import { GlassCard } from "../ui/GlassCard";
 
@@ -6,19 +7,21 @@ interface DegradationAlertBannerProps {
   alerts: DegradationAlertType[];
 }
 
-const severityConfig: Record<string, { icon: typeof AlertTriangle; color: string; label: string }> = {
-  critical: { icon: AlertTriangle, color: "var(--g-red)", label: "Critical" },
-  warning: { icon: TrendingDown, color: "var(--g-orange)", label: "Warning" },
-  info: { icon: Info, color: "var(--g-teal)", label: "Info" },
-};
-
-const metricLabels: Record<string, string> = {
-  download_mbps: "Download Speed",
-  upload_mbps: "Upload Speed",
-  ping_ms: "Ping Latency",
+const severityConfig: Record<string, { icon: typeof AlertTriangle; color: string; labelKey: string }> = {
+  critical: { icon: AlertTriangle, color: "var(--g-red)", labelKey: "rootCause.critical" },
+  warning: { icon: TrendingDown, color: "var(--g-orange)", labelKey: "rootCause.warning" },
+  info: { icon: Info, color: "var(--g-teal)", labelKey: "rootCause.info" },
 };
 
 export function DegradationAlertBanner({ alerts }: DegradationAlertBannerProps) {
+  const { t } = useTranslation();
+
+  const metricLabels: Record<string, string> = {
+    download_mbps: t("qos.downloadSpeed"),
+    upload_mbps: t("qos.uploadSpeed"),
+    ping_ms: t("qos.pingLatency"),
+  };
+
   if (alerts.length === 0) return null;
 
   return (
@@ -54,7 +57,7 @@ export function DegradationAlertBanner({ alerts }: DegradationAlertBannerProps) 
                       color: config.color,
                     }}
                   >
-                    {config.label}
+                    {t(config.labelKey)}
                   </span>
                 </div>
                 <p className="text-xs mt-0.5" style={{ color: "var(--g-text-secondary)" }}>
@@ -62,10 +65,10 @@ export function DegradationAlertBanner({ alerts }: DegradationAlertBannerProps) 
                 </p>
                 <div className="flex items-center gap-4 mt-1">
                   <span className="text-[10px] tabular-nums" style={{ color: "var(--g-text-tertiary)" }}>
-                    Current: {alert.current_avg.toFixed(1)}
+                    {t("docs.currentValue")}: {alert.current_avg.toFixed(1)}
                   </span>
                   <span className="text-[10px] tabular-nums" style={{ color: "var(--g-text-tertiary)" }}>
-                    Historical: {alert.historical_avg.toFixed(1)}
+                    {t("docs.historicalValue")}: {alert.historical_avg.toFixed(1)}
                   </span>
                   <span
                     className="text-[10px] font-semibold tabular-nums"

@@ -1,4 +1,5 @@
 import { Activity } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface NetworkHealthGaugeProps {
   score: number;
@@ -12,17 +13,18 @@ function getScoreColor(score: number): string {
   return "var(--g-red)";
 }
 
-function getScoreLabel(score: number): string {
-  if (score >= 90) return "Excellent";
-  if (score >= 80) return "Good";
-  if (score >= 60) return "Fair";
-  if (score >= 40) return "Poor";
-  return "Critical";
+function getScoreLabelKey(score: number): string {
+  if (score >= 90) return "rootCause.excellent";
+  if (score >= 80) return "rootCause.good";
+  if (score >= 60) return "rootCause.fair";
+  if (score >= 40) return "rootCause.poor";
+  return "rootCause.critical";
 }
 
 export function NetworkHealthGauge({ score, className = "" }: NetworkHealthGaugeProps) {
+  const { t } = useTranslation();
   const color = getScoreColor(score);
-  const label = getScoreLabel(score);
+  const labelKey = getScoreLabelKey(score);
   const circumference = 2 * Math.PI * 45; // radius = 45
   const strokeDashoffset = circumference - (score / 100) * circumference;
 
@@ -66,11 +68,11 @@ export function NetworkHealthGauge({ score, className = "" }: NetworkHealthGauge
       <div className="mt-2 flex items-center gap-1.5">
         <Activity className="w-4 h-4" style={{ color }} />
         <span className="text-sm font-medium" style={{ color }}>
-          {label}
+          {t(labelKey)}
         </span>
       </div>
       <p className="text-xs mt-1" style={{ color: "var(--g-text-secondary)" }}>
-        Network Health Score
+        {t("rootCause.networkHealthScore")}
       </p>
     </div>
   );

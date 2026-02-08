@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Activity, ChevronRight, Tv, Video, Gamepad2, Briefcase, Upload, Radio, Home, Youtube, Users, MonitorPlay } from "lucide-react";
 import { useCurrentQosStatus } from "../../hooks/useApi";
 
@@ -16,6 +17,7 @@ const profileIcons: Record<string, React.ComponentType<{ className?: string; sty
 };
 
 export function QuickQosStatus() {
+  const { t } = useTranslation();
   const { data: qosStatus, isLoading } = useCurrentQosStatus();
 
   if (isLoading || !qosStatus) {
@@ -32,7 +34,7 @@ export function QuickQosStatus() {
         <div className="flex items-center gap-2">
           <Activity className="w-4 h-4" style={{ color: "var(--g-accent)" }} />
           <h3 className="font-semibold text-sm" style={{ color: "var(--g-text)" }}>
-            Application Compatibility
+            {t("qos.applicationCompatibility")}
           </h3>
         </div>
         <Link
@@ -40,7 +42,7 @@ export function QuickQosStatus() {
           className="flex items-center gap-1 text-xs hover:underline"
           style={{ color: "var(--g-accent)" }}
         >
-          View all
+          {t("qos.viewAll")}
           <ChevronRight className="w-3 h-3" />
         </Link>
       </div>
@@ -48,7 +50,7 @@ export function QuickQosStatus() {
       {/* Mini progress bar */}
       <div className="mb-3">
         <div className="flex justify-between text-xs mb-1" style={{ color: "var(--g-text-secondary)" }}>
-          <span>{passedCount} of {totalCount} optimal</span>
+          <span>{passedCount} of {totalCount} {t("qos.optimal").toLowerCase()}</span>
           <span>{passRate}%</span>
         </div>
         <div className="h-1.5 rounded-full" style={{ backgroundColor: "var(--g-surface)" }}>
@@ -66,10 +68,11 @@ export function QuickQosStatus() {
       <div className="flex flex-wrap gap-2">
         {qosStatus.results.slice(0, 6).map((result) => {
           const IconComponent = profileIcons[result.profile_id] || Activity;
+          const statusLabel = result.passed ? t("qos.optimal") : t("qos.limited");
           return (
             <div
               key={result.profile_id}
-              title={`${result.profile_name}: ${result.passed ? "Optimal" : "Limited"}`}
+              title={`${result.profile_name}: ${statusLabel}`}
               className="w-8 h-8 rounded-lg flex items-center justify-center"
               style={{
                 backgroundColor: result.passed ? "rgba(34, 197, 94, 0.15)" : "rgba(239, 68, 68, 0.15)",

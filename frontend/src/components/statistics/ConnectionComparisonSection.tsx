@@ -1,4 +1,5 @@
 import { Wifi, Cable, Shield, HelpCircle, Trophy, ArrowDownCircle, ArrowUpCircle, Gauge } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import {
   Bar,
   BarChart,
@@ -23,13 +24,6 @@ const connectionIcons: Record<string, React.ReactNode> = {
   unknown: <HelpCircle className="w-5 h-5" />,
 };
 
-const connectionLabels: Record<string, string> = {
-  ethernet: "Ethernet",
-  wifi: "Wi-Fi",
-  vpn: "VPN",
-  unknown: "Unknown",
-};
-
 const connectionColors: Record<string, string> = {
   ethernet: "var(--g-blue)",
   wifi: "var(--g-green)",
@@ -38,6 +32,15 @@ const connectionColors: Record<string, string> = {
 };
 
 export function ConnectionComparisonSection({ comparison }: ConnectionComparisonSectionProps) {
+  const { t } = useTranslation();
+
+  const connectionLabels: Record<string, string> = {
+    ethernet: t("latestResult.ethernet"),
+    wifi: t("latestResult.wifi"),
+    vpn: t("latestResult.vpn"),
+    unknown: t("latestResult.unknown"),
+  };
+
   if (!comparison || comparison.types.length === 0) return null;
 
   const chartData = comparison.types.map((t) => ({
@@ -64,7 +67,7 @@ export function ConnectionComparisonSection({ comparison }: ConnectionComparison
   return (
     <GlassCard>
       <h4 className="text-sm font-semibold mb-4" style={{ color: "var(--g-text)" }}>
-        Connection Type Comparison
+        {t("docs.connectionTypeComparison")}
       </h4>
 
       {/* Chart */}
@@ -85,13 +88,13 @@ export function ConnectionComparisonSection({ comparison }: ConnectionComparison
             <Bar
               dataKey="download"
               fill="var(--g-blue)"
-              name="Download (Mbps)"
+              name={`${t("common.download")} (${t("common.mbps")})`}
               radius={[4, 4, 0, 0]}
             />
             <Bar
               dataKey="upload"
               fill="var(--g-green)"
-              name="Upload (Mbps)"
+              name={`${t("common.upload")} (${t("common.mbps")})`}
               radius={[4, 4, 0, 0]}
             />
           </BarChart>
@@ -117,20 +120,20 @@ export function ConnectionComparisonSection({ comparison }: ConnectionComparison
                 className="text-xs ml-auto"
                 style={{ color: "var(--g-text-tertiary)" }}
               >
-                {type.test_count} tests
+                {type.test_count} {t("docs.tests")}
               </span>
             </div>
             <div className="grid grid-cols-3 gap-2 text-xs">
               <div>
-                <div style={{ color: "var(--g-text-tertiary)" }}>Down</div>
+                <div style={{ color: "var(--g-text-tertiary)" }}>{t("docs.down")}</div>
                 <div className="font-medium">{type.avg_download_mbps.toFixed(1)}</div>
               </div>
               <div>
-                <div style={{ color: "var(--g-text-tertiary)" }}>Up</div>
+                <div style={{ color: "var(--g-text-tertiary)" }}>{t("docs.up")}</div>
                 <div className="font-medium">{type.avg_upload_mbps.toFixed(1)}</div>
               </div>
               <div>
-                <div style={{ color: "var(--g-text-tertiary)" }}>Ping</div>
+                <div style={{ color: "var(--g-text-tertiary)" }}>{t("common.ping")}</div>
                 <div className="font-medium">{type.avg_ping_ms.toFixed(1)}</div>
               </div>
             </div>
@@ -143,21 +146,21 @@ export function ConnectionComparisonSection({ comparison }: ConnectionComparison
         <div className="flex flex-wrap gap-4 text-sm mb-2">
           <div className="flex items-center gap-2">
             {getBestIcon("download")}
-            <span style={{ color: "var(--g-text-secondary)" }}>Best Download:</span>
+            <span style={{ color: "var(--g-text-secondary)" }}>{t("docs.bestDownload")}:</span>
             <span className="font-medium">
               {connectionLabels[comparison.best_for_download] || comparison.best_for_download}
             </span>
           </div>
           <div className="flex items-center gap-2">
             {getBestIcon("upload")}
-            <span style={{ color: "var(--g-text-secondary)" }}>Best Upload:</span>
+            <span style={{ color: "var(--g-text-secondary)" }}>{t("docs.bestUpload")}:</span>
             <span className="font-medium">
               {connectionLabels[comparison.best_for_upload] || comparison.best_for_upload}
             </span>
           </div>
           <div className="flex items-center gap-2">
             {getBestIcon("latency")}
-            <span style={{ color: "var(--g-text-secondary)" }}>Best Latency:</span>
+            <span style={{ color: "var(--g-text-secondary)" }}>{t("docs.bestLatency")}:</span>
             <span className="font-medium">
               {connectionLabels[comparison.best_for_latency] || comparison.best_for_latency}
             </span>
@@ -165,7 +168,7 @@ export function ConnectionComparisonSection({ comparison }: ConnectionComparison
         </div>
         {comparison.recommendation && (
           <p className="text-sm" style={{ color: "var(--g-text-secondary)" }}>
-            <strong>Recommendation:</strong> {comparison.recommendation}
+            <strong>{t("docs.recommendation")}:</strong> {comparison.recommendation}
           </p>
         )}
       </div>

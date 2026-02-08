@@ -101,9 +101,46 @@ cd backend && python -m gonzales
 - Frontend: React + TypeScript + Vite + TailwindCSS
 - Home Assistant: Add-on with Ingress support
 
+## Internationalization (i18n)
+
+### MUST-HAVE RULES (Non-Negotiable)
+
+1. **ALL user-facing strings MUST be bilingual** (English + German) - No hardcoded English text in components
+2. **Always use `useTranslation()` hook** in React components - Never hardcode display strings
+3. **Translation files MUST stay in sync** - Every key in `en.json` MUST exist in `de.json` and vice versa
+4. **New features MUST include translations** - Any new UI text requires both EN and DE entries before merging
+
+### Translation Files
+
+| File | Purpose |
+|------|---------|
+| `frontend/src/i18n/index.ts` | i18n configuration (language detection, localStorage persistence) |
+| `frontend/src/i18n/locales/en.json` | English translations (default/fallback language) |
+| `frontend/src/i18n/locales/de.json` | German translations |
+
+### How to Add New Translations
+
+1. Add the key to **both** `en.json` and `de.json` with proper translations
+2. Use nested namespaces: `"section.key"` (e.g., `"dashboard.title"`, `"settings.save"`)
+3. For interpolation: `t("key", { variable: value })` - e.g., `t("history.page", { current: 1, total: 5 })`
+4. Import and use: `const { t } = useTranslation();` then `{t("namespace.key")}`
+
+### Language Selector
+
+- Located in Settings > Preferences > Language
+- Persists to `localStorage` key `gonzales_language`
+- Supported languages defined in `frontend/src/i18n/index.ts` (`supportedLanguages` array)
+- Default: auto-detect from browser, fallback to English
+
+### Navigation Config
+
+- Navigation items use `labelKey` and `shortLabelKey` (i18n keys, NOT display text)
+- Defined in `frontend/src/config/navigation.ts`
+- Components call `t(item.labelKey)` to get translated labels
+
 ## Agent System
 
-### Available Agents (15)
+### Available Agents (16)
 
 | Agent | Type | Tools | Purpose |
 |-------|------|-------|---------|
@@ -114,6 +151,7 @@ cd backend && python -m gonzales
 | tui-ux-expert | Audit | Read, Grep, Glob | Terminal UI design, demoscene aesthetic |
 | mcp-expert | Audit | Read, Grep, Glob | MCP protocol compliance, tool coverage |
 | docs-expert | Audit | Read, Grep, Glob | Documentation accuracy and completeness |
+| i18n-auditor | Audit | Read, Grep, Glob | Translation completeness, bilingual consistency |
 | backend-engineer | Impl | Read, Grep, Glob, Edit, Write, Bash | Python/FastAPI implementation |
 | frontend-engineer | Impl | Read, Grep, Glob, Edit, Write, Bash | React/TypeScript implementation |
 | tui-engineer | Impl | Read, Grep, Glob, Edit, Write, Bash | Textual TUI implementation |

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Activity, ArrowDown, ArrowUp, Wifi, Zap, AlertCircle, CheckCircle2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { SSEProgress } from "../../hooks/useSSE";
 import { useAnimatedNumber } from "../../hooks/useAnimatedNumber";
 import { useSpeedHistory } from "../../hooks/useSpeedHistory";
@@ -14,16 +15,6 @@ import { GlassBadge } from "../ui/GlassBadge";
 interface LiveTestViewProps {
   progress: SSEProgress;
 }
-
-const phaseLabels: Record<string, string> = {
-  idle: "Ready",
-  started: "Initializing",
-  ping: "Measuring Latency",
-  download: "Download",
-  upload: "Upload",
-  complete: "Complete",
-  error: "Failed",
-};
 
 const phaseColors: Record<string, string> = {
   idle: "var(--g-text-secondary)",
@@ -127,11 +118,22 @@ function MiniStat({
 }
 
 export function LiveTestView({ progress }: LiveTestViewProps) {
+  const { t } = useTranslation();
   const phase = progress.phase;
   const color = phaseColors[phase] || "var(--g-blue)";
   const Icon = phaseIcons[phase] || Activity;
   const isActive = phase !== "idle" && phase !== "complete" && phase !== "error";
   const isTransferring = phase === "download" || phase === "upload";
+
+  const phaseLabels: Record<string, string> = {
+    idle: t("speedtest.idle"),
+    started: t("speedtest.started"),
+    ping: t("speedtest.ping"),
+    download: t("speedtest.download"),
+    upload: t("speedtest.upload"),
+    complete: t("speedtest.complete"),
+    error: t("speedtest.error"),
+  };
 
   const speedHistory = useSpeedHistory();
   const prevPhaseRef = useRef(phase);
@@ -237,7 +239,7 @@ export function LiveTestView({ progress }: LiveTestViewProps) {
                 />
               </ProgressRing>
               <p className="text-sm font-medium" style={{ color: "var(--g-text-secondary)" }}>
-                Connecting to server...
+                {t("speedtest.started")}...
               </p>
             </div>
           )}
@@ -274,7 +276,7 @@ export function LiveTestView({ progress }: LiveTestViewProps) {
             <div className="w-full flex flex-col items-center gap-3">
               <SpeedNeedle
                 value={progress.bandwidth_mbps || 0}
-                label="Download"
+                label={t("speedtest.downloadResult")}
                 color="var(--g-blue)"
                 glowColor="#007AFF"
               />
@@ -299,7 +301,7 @@ export function LiveTestView({ progress }: LiveTestViewProps) {
             <div className="w-full flex flex-col items-center gap-3">
               <SpeedNeedle
                 value={progress.bandwidth_mbps || 0}
-                label="Upload"
+                label={t("speedtest.uploadResult")}
                 color="var(--g-green)"
                 glowColor="#34C759"
               />
@@ -324,25 +326,25 @@ export function LiveTestView({ progress }: LiveTestViewProps) {
             <div className="w-full max-w-md py-2">
               <div className="grid grid-cols-3 gap-3">
                 <ResultCard
-                  label="Download"
+                  label={t("speedtest.downloadResult")}
                   value={progress.download_mbps || 0}
-                  unit="Mbps"
+                  unit={t("common.mbps")}
                   color="var(--g-blue)"
                   icon={ArrowDown}
                   delay={0}
                 />
                 <ResultCard
-                  label="Upload"
+                  label={t("speedtest.uploadResult")}
                   value={progress.upload_mbps || 0}
-                  unit="Mbps"
+                  unit={t("common.mbps")}
                   color="var(--g-green)"
                   icon={ArrowUp}
                   delay={120}
                 />
                 <ResultCard
-                  label="Ping"
+                  label={t("speedtest.pingResult")}
                   value={progress.ping_ms || 0}
-                  unit="ms"
+                  unit={t("common.ms")}
                   color="var(--g-orange)"
                   icon={Activity}
                   delay={240}

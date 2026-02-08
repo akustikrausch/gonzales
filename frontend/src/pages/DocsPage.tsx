@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   BookOpen,
   ChevronDown,
@@ -137,24 +138,25 @@ function CodeBlock({ children }: { children: string }) {
 }
 
 export function DocsPage() {
+  const { t } = useTranslation();
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 g-animate-in mb-6">
         <BookOpen className="w-5 h-5" style={{ color: "var(--g-accent)" }} />
         <h2 className="text-xl font-bold" style={{ color: "var(--g-text)" }}>
-          Documentation
+          {t("docs.title")}
         </h2>
       </div>
 
       <div className="grid gap-4">
         <DocSection
-          title="Getting Started"
+          title={t("docs.gettingStarted")}
           icon={<Zap className="w-4 h-4" style={{ color: "var(--g-accent)" }} />}
           defaultOpen={true}
         >
           <DocParagraph>
-            Gonzales monitors your internet speed automatically. It runs tests at regular intervals
-            and tracks your ISP's performance over time. No technical knowledge required.
+            {t("docs.gettingStartedText")}
           </DocParagraph>
           <DocHeading>First Steps</DocHeading>
           <DocList
@@ -190,11 +192,11 @@ export function DocsPage() {
         </DocSection>
 
         <DocSection
-          title="Dashboard"
+          title={t("docs.dashboard")}
           icon={<Gauge className="w-4 h-4" style={{ color: "var(--g-accent)" }} />}
         >
           <DocParagraph>
-            The dashboard shows your latest speed test results and allows you to run manual tests.
+            {t("docs.dashboardText")}
           </DocParagraph>
           <DocHeading>Speed Metrics Explained</DocHeading>
           <DocTable

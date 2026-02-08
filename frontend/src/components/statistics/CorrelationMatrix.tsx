@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { CorrelationMatrix as CorrelationMatrixType } from "../../api/types";
 import { GlassCard } from "../ui/GlassCard";
 
@@ -22,15 +23,16 @@ function getCellOpacity(coefficient: number): number {
   return 0.15 + Math.abs(coefficient) * 0.6;
 }
 
-const metricLabels: Record<string, string> = {
-  download: "Download",
-  upload: "Upload",
-  ping: "Ping",
-  jitter: "Jitter",
-};
-
 export function CorrelationMatrixView({ data }: CorrelationMatrixProps) {
+  const { t } = useTranslation();
   const { metrics, pairs } = data;
+
+  const metricLabels: Record<string, string> = {
+    download: t("common.download"),
+    upload: t("common.upload"),
+    ping: t("common.ping"),
+    jitter: t("history.jitter"),
+  };
 
   // Build a lookup map for coefficient values
   const coeffMap = new Map<string, number>();
@@ -45,7 +47,7 @@ export function CorrelationMatrixView({ data }: CorrelationMatrixProps) {
         className="text-sm font-semibold mb-4"
         style={{ color: "var(--g-text)" }}
       >
-        Metric Correlations
+        {t("docs.metricCorrelations")}
       </h3>
 
       <div className="overflow-x-auto">
@@ -125,15 +127,15 @@ export function CorrelationMatrixView({ data }: CorrelationMatrixProps) {
       <div className="flex items-center justify-center gap-4 mt-3 pt-2" style={{ borderTop: "1px solid var(--g-border)" }}>
         <div className="flex items-center gap-1">
           <div className="w-3 h-3 rounded-sm" style={{ background: "var(--g-blue)", opacity: 0.6 }} />
-          <span className="text-[10px]" style={{ color: "var(--g-text-tertiary)" }}>Strong +</span>
+          <span className="text-[10px]" style={{ color: "var(--g-text-tertiary)" }}>{t("docs.strongPositive")}</span>
         </div>
         <div className="flex items-center gap-1">
           <div className="w-3 h-3 rounded-sm" style={{ background: "var(--g-text-tertiary)", opacity: 0.3 }} />
-          <span className="text-[10px]" style={{ color: "var(--g-text-tertiary)" }}>Weak</span>
+          <span className="text-[10px]" style={{ color: "var(--g-text-tertiary)" }}>{t("docs.weak")}</span>
         </div>
         <div className="flex items-center gap-1">
           <div className="w-3 h-3 rounded-sm" style={{ background: "var(--g-red)", opacity: 0.6 }} />
-          <span className="text-[10px]" style={{ color: "var(--g-text-tertiary)" }}>Strong -</span>
+          <span className="text-[10px]" style={{ color: "var(--g-text-tertiary)" }}>{t("docs.strongNegative")}</span>
         </div>
       </div>
     </GlassCard>

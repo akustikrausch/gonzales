@@ -1,4 +1,5 @@
 import { Shield } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { IspScore } from "../../api/types";
 import { useAnimatedNumber } from "../../hooks/useAnimatedNumber";
 import { GlassCard } from "../ui/GlassCard";
@@ -45,6 +46,7 @@ function ScoreBar({ label, value, color }: { label: string; value: number; color
 }
 
 export function IspScoreCard({ score }: IspScoreCardProps) {
+  const { t } = useTranslation();
   const color = gradeColors[score.grade] || "var(--g-blue)";
   const animated = useAnimatedNumber(score.composite, 1000);
 
@@ -53,7 +55,7 @@ export function IspScoreCard({ score }: IspScoreCardProps) {
       <div className="flex items-center gap-2 mb-4">
         <Shield className="w-4 h-4" style={{ color }} />
         <h3 className="text-sm font-semibold" style={{ color: "var(--g-text)" }}>
-          ISP Performance Score
+          {t("statistics.ispScore")}
         </h3>
       </div>
 
@@ -81,13 +83,13 @@ export function IspScoreCard({ score }: IspScoreCardProps) {
               {score.grade}
             </span>
             <span className="text-xs" style={{ color: "var(--g-text-tertiary)" }}>
-              Grade
+              {t("statistics.ispGrade")}
             </span>
           </div>
-          <ScoreBar label="Speed" value={score.breakdown.speed_score} color="var(--g-blue)" />
-          <ScoreBar label="Latency" value={score.breakdown.latency_score} color="var(--g-orange)" />
-          <ScoreBar label="Reliability" value={score.breakdown.reliability_score} color="var(--g-green)" />
-          <ScoreBar label="Consistency" value={score.breakdown.consistency_score} color="var(--g-teal)" />
+          <ScoreBar label={t("connectionHealth.speed")} value={score.breakdown.speed_score} color="var(--g-blue)" />
+          <ScoreBar label={t("connectionHealth.latency")} value={score.breakdown.latency_score} color="var(--g-orange)" />
+          <ScoreBar label={t("connectionHealth.reliability")} value={score.breakdown.reliability_score} color="var(--g-green)" />
+          <ScoreBar label={t("connectionHealth.consistency")} value={score.breakdown.consistency_score} color="var(--g-teal)" />
         </div>
       </div>
     </GlassCard>

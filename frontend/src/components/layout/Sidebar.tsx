@@ -1,5 +1,6 @@
 import { memo } from "react";
 import { NavLink } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Logo } from "../ui/Logo";
 import { useStatus } from "../../hooks/useApi";
 import {
@@ -20,31 +21,35 @@ const NavGroup = memo(function NavGroup({
   collapsed: boolean;
   groupLabel?: string;
 }) {
+  const { t } = useTranslation();
   return (
     <ul role="list" aria-label={groupLabel} className="list-none p-0 m-0">
-      {items.map((item) => (
-        <li key={item.to}>
-          <NavLink
-            to={item.to}
-            end={item.to === "/"}
-            title={collapsed ? item.label : undefined}
-            aria-label={collapsed ? item.label : undefined}
-            className={({ isActive }) =>
-              `glass-nav-item mb-0.5 ${
-                collapsed ? "justify-center !px-2.5 !gap-0" : ""
-              } ${isActive ? "glass-nav-item-active" : ""}`
-            }
-          >
-            {({ isActive }) => (
-              <>
-                <item.icon className="glass-nav-icon w-4 h-4 shrink-0" aria-hidden="true" />
-                {!collapsed && <span>{item.label}</span>}
-                {isActive && <span className="sr-only">(current page)</span>}
-              </>
-            )}
-          </NavLink>
-        </li>
-      ))}
+      {items.map((item) => {
+        const label = t(item.labelKey);
+        return (
+          <li key={item.to}>
+            <NavLink
+              to={item.to}
+              end={item.to === "/"}
+              title={collapsed ? label : undefined}
+              aria-label={collapsed ? label : undefined}
+              className={({ isActive }) =>
+                `glass-nav-item mb-0.5 ${
+                  collapsed ? "justify-center !px-2.5 !gap-0" : ""
+                } ${isActive ? "glass-nav-item-active" : ""}`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <item.icon className="glass-nav-icon w-4 h-4 shrink-0" aria-hidden="true" />
+                  {!collapsed && <span>{label}</span>}
+                  {isActive && <span className="sr-only">{t("nav.currentPage")}</span>}
+                </>
+              )}
+            </NavLink>
+          </li>
+        );
+      })}
     </ul>
   );
 });
@@ -63,6 +68,7 @@ function GroupDivider({ label }: { label: string }) {
 }
 
 export function Sidebar({ collapsed = false }: SidebarProps) {
+  const { t } = useTranslation();
   const { data: status } = useStatus();
 
   const mainItems = getNavItemsByGroup("main");
@@ -98,7 +104,7 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
               Gonzales
             </h1>
             <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>
-              Speed Monitor
+              {t("sidebar.speedMonitor")}
             </p>
           </div>
         )}
@@ -108,20 +114,20 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
       <nav
         className="flex-1 overflow-y-auto"
         style={{ padding: "var(--g-space-3)" }}
-        aria-label="Primary navigation"
+        aria-label={t("nav.primaryNavigation")}
       >
         {/* Main group */}
-        <NavGroup items={mainItems} collapsed={collapsed} groupLabel="Main navigation" />
+        <NavGroup items={mainItems} collapsed={collapsed} groupLabel={t("nav.mainNavigation")} />
 
         {/* Tools group */}
-        {!collapsed && <GroupDivider label="Tools" />}
+        {!collapsed && <GroupDivider label={t("nav.groupTools")} />}
         {collapsed && <div className="my-2" aria-hidden="true" />}
-        <NavGroup items={toolsItems} collapsed={collapsed} groupLabel="Tools" />
+        <NavGroup items={toolsItems} collapsed={collapsed} groupLabel={t("nav.groupTools")} />
 
         {/* System group */}
-        {!collapsed && <GroupDivider label="System" />}
+        {!collapsed && <GroupDivider label={t("nav.groupSystem")} />}
         {collapsed && <div className="my-2" aria-hidden="true" />}
-        <NavGroup items={systemItems} collapsed={collapsed} groupLabel="System settings" />
+        <NavGroup items={systemItems} collapsed={collapsed} groupLabel={t("nav.systemSettings")} />
       </nav>
 
       {/* Footer */}
@@ -139,7 +145,7 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
             rel="noopener noreferrer"
             className="text-[10px] hover:underline transition-colors"
             style={{ color: "var(--g-text-secondary)" }}
-            title="View releases on GitHub"
+            title={t("sidebar.viewReleases")}
           >
             Gonzales v{status?.version ?? "..."}
           </a>

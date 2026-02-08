@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { useTranslation } from "react-i18next";
 import { ArrowUp, ArrowDown, ArrowUpDown, Trash2 } from "lucide-react";
 import type { Measurement, SortField, SortOrder } from "../../api/types";
 import { formatDate } from "../../utils/format";
@@ -58,25 +59,27 @@ interface MeasurementTableProps {
 }
 
 export const MeasurementTable = memo(function MeasurementTable({ measurements, onDelete, sortBy, sortOrder, onSort }: MeasurementTableProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="overflow-x-auto">
       <table className="glass-table">
         <thead>
           <tr>
-            <SortableHeader label="Time" field="timestamp" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort} align="left" />
-            <SortableHeader label="Download" field="download_mbps" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort} />
-            <SortableHeader label="Upload" field="upload_mbps" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort} />
-            <SortableHeader label="Ping" field="ping_latency_ms" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort} />
-            <SortableHeader label="Jitter" field="ping_jitter_ms" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort} />
+            <SortableHeader label={t("history.timestamp")} field="timestamp" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort} align="left" />
+            <SortableHeader label={t("history.downloadSpeed")} field="download_mbps" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort} />
+            <SortableHeader label={t("history.uploadSpeed")} field="upload_mbps" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort} />
+            <SortableHeader label={t("history.pingLatency")} field="ping_latency_ms" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort} />
+            <SortableHeader label={t("history.jitter")} field="ping_jitter_ms" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort} />
             <th className="text-left py-3 px-3 font-medium" style={{ color: "var(--g-text-secondary)", fontSize: "var(--g-text-xs)" }}>
-              Server
+              {t("history.serverName")}
             </th>
             <th
               className="text-center py-3 px-3 font-medium"
               style={{ color: "var(--g-text-secondary)", fontSize: "var(--g-text-xs)" }}
-              title="Threshold violations: DL = Download below minimum, UL = Upload below minimum"
+              title={t("history.issuesTitle")}
             >
-              Issues
+              {t("history.issues")}
             </th>
             <th className="py-3 px-3"></th>
           </tr>
@@ -116,7 +119,7 @@ export const MeasurementTable = memo(function MeasurementTable({ measurements, o
                     <span
                       className="text-xs font-medium cursor-help"
                       style={{ color: "var(--g-red)" }}
-                      title={`${m.below_download_threshold ? "Download below threshold" : ""}${m.below_download_threshold && m.below_upload_threshold ? ", " : ""}${m.below_upload_threshold ? "Upload below threshold" : ""}`}
+                      title={`${m.below_download_threshold ? t("history.belowDownloadThreshold") : ""}${m.below_download_threshold && m.below_upload_threshold ? ", " : ""}${m.below_upload_threshold ? t("history.belowUploadThreshold") : ""}`}
                     >
                       {m.below_download_threshold && "DL"}
                       {m.below_download_threshold && m.below_upload_threshold && " / "}
@@ -130,8 +133,8 @@ export const MeasurementTable = memo(function MeasurementTable({ measurements, o
                       onClick={() => onDelete(m.id)}
                       className="glass-focus-ring rounded transition-colors"
                       style={{ color: "var(--g-text-secondary)" }}
-                      title="Delete measurement"
-                      aria-label={`Delete measurement from ${formatDate(m.timestamp)}`}
+                      title={t("history.deleteMeasurement")}
+                      aria-label={t("history.deleteMeasurementFrom", { time: formatDate(m.timestamp) })}
                       onMouseEnter={(e) => (e.currentTarget.style.color = "var(--g-red)")}
                       onMouseLeave={(e) => (e.currentTarget.style.color = "var(--g-text-secondary)")}
                     >

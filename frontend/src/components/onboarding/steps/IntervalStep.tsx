@@ -1,4 +1,5 @@
 import { Clock } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { GlassButton } from "../../ui/GlassButton";
 import { GlassSelect } from "../../ui/GlassSelect";
 
@@ -21,20 +22,21 @@ const intervalOptions = [
 ];
 
 export function IntervalStep({ testInterval, onChange, onNext, onBack }: IntervalStepProps) {
+  const { t } = useTranslation();
   return (
     <div>
       <div className="text-center mb-8">
         <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--g-orange)] bg-opacity-10 flex items-center justify-center">
           <Clock className="w-8 h-8 text-[var(--g-orange)]" />
         </div>
-        <h2 className="text-xl font-bold mb-2">Test Frequency</h2>
+        <h2 className="text-xl font-bold mb-2">{t("onboarding.step2Title")}</h2>
         <p className="text-[var(--g-text-secondary)] text-sm">
-          How often should Gonzales automatically run speed tests?
+          {t("onboarding.step2Text")}
         </p>
       </div>
 
       <div className="max-w-sm mx-auto mb-8">
-        <label className="block text-sm font-medium mb-2">Test Interval</label>
+        <label className="block text-sm font-medium mb-2">{t("settings.testInterval")}</label>
         <GlassSelect
           value={testInterval}
           onChange={(e) => onChange(Number(e.target.value))}
@@ -46,16 +48,16 @@ export function IntervalStep({ testInterval, onChange, onNext, onBack }: Interva
           ))}
         </GlassSelect>
         <p className="text-xs text-[var(--g-text-tertiary)] mt-2">
-          More frequent tests give better data but use more bandwidth
+          {t("settings.testIntervalDesc")}
         </p>
       </div>
 
       <div className="flex gap-3 justify-center">
         <GlassButton variant="default" onClick={onBack}>
-          Back
+          {t("onboarding.back")}
         </GlassButton>
         <GlassButton variant="primary" onClick={onNext}>
-          Continue
+          {t("onboarding.next")}
         </GlassButton>
       </div>
     </div>

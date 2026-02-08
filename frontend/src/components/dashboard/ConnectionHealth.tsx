@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { IspScore } from "../../api/types";
 import { GlassCard } from "../ui/GlassCard";
 
@@ -12,28 +13,28 @@ function getScoreColor(score: number): string {
   return "var(--g-red)";
 }
 
-function getScoreLabel(grade: string): string {
+function getScoreLabel(grade: string, t: (key: string) => string): string {
   switch (grade) {
     case "A+":
     case "A":
-      return "Excellent";
+      return t("connectionHealth.excellent");
     case "B":
-      return "Good";
+      return t("connectionHealth.good");
     case "C":
-      return "Fair";
+      return t("connectionHealth.fair");
     case "D":
-      return "Poor";
+      return t("connectionHealth.poor");
     default:
-      return "Critical";
+      return t("connectionHealth.bad");
   }
 }
 
-function getSummary(score: number): string {
-  if (score >= 85) return "Great for 4K streaming, gaming, and video calls";
-  if (score >= 70) return "Suitable for HD streaming and most online activities";
-  if (score >= 50) return "May experience issues with HD streaming or gaming";
-  if (score >= 30) return "Limited to basic browsing and SD streaming";
-  return "Significant connectivity issues detected";
+function getSummary(score: number, t: (key: string) => string): string {
+  if (score >= 85) return t("connectionHealth.excellent");
+  if (score >= 70) return t("connectionHealth.good");
+  if (score >= 50) return t("connectionHealth.fair");
+  if (score >= 30) return t("connectionHealth.poor");
+  return t("connectionHealth.bad");
 }
 
 function BreakdownBar({ label, value, color }: { label: string; value: number; color: string }) {
@@ -58,11 +59,12 @@ function BreakdownBar({ label, value, color }: { label: string; value: number; c
 }
 
 export function ConnectionHealth({ score }: ConnectionHealthProps) {
+  const { t } = useTranslation();
   if (!score) return null;
 
   const color = getScoreColor(score.composite);
-  const label = getScoreLabel(score.grade);
-  const summary = getSummary(score.composite);
+  const label = getScoreLabel(score.grade, t);
+  const summary = getSummary(score.composite, t);
 
   // SVG gauge parameters
   const size = 80;
@@ -110,7 +112,7 @@ export function ConnectionHealth({ score }: ConnectionHealthProps) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <h3 className="text-sm font-semibold" style={{ color: "var(--g-text)" }}>
-              Connection Health
+              {t("connectionHealth.title")}
             </h3>
             <span
               className="text-xs font-medium px-2 py-0.5 rounded-full"
@@ -123,10 +125,10 @@ export function ConnectionHealth({ score }: ConnectionHealthProps) {
             {summary}
           </p>
           <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
-            <BreakdownBar label="Speed" value={score.breakdown.speed_score} color="var(--g-blue)" />
-            <BreakdownBar label="Reliability" value={score.breakdown.reliability_score} color="var(--g-green)" />
-            <BreakdownBar label="Latency" value={score.breakdown.latency_score} color="var(--g-orange)" />
-            <BreakdownBar label="Consistency" value={score.breakdown.consistency_score} color="var(--g-teal)" />
+            <BreakdownBar label={t("connectionHealth.speed")} value={score.breakdown.speed_score} color="var(--g-blue)" />
+            <BreakdownBar label={t("connectionHealth.reliability")} value={score.breakdown.reliability_score} color="var(--g-green)" />
+            <BreakdownBar label={t("connectionHealth.latency")} value={score.breakdown.latency_score} color="var(--g-orange)" />
+            <BreakdownBar label={t("connectionHealth.consistency")} value={score.breakdown.consistency_score} color="var(--g-teal)" />
           </div>
         </div>
       </div>

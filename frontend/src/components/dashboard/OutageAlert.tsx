@@ -1,4 +1,5 @@
 import { AlertTriangle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { OutageStatus } from "../../api/types";
 import { formatDate } from "../../utils/format";
 
@@ -7,6 +8,7 @@ interface OutageAlertProps {
 }
 
 export function OutageAlert({ outage }: OutageAlertProps) {
+  const { t } = useTranslation();
   if (!outage.outage_active) return null;
 
   return (
@@ -21,11 +23,11 @@ export function OutageAlert({ outage }: OutageAlertProps) {
       <AlertTriangle className="w-5 h-5 shrink-0" style={{ color: "var(--g-red)" }} />
       <div className="min-w-0">
         <p className="text-sm font-semibold" style={{ color: "var(--g-red)" }}>
-          Outage Detected
+          {t("outageAlert.outageDetected")}
         </p>
         <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>
-          {outage.consecutive_failures} consecutive failure{outage.consecutive_failures !== 1 ? "s" : ""}
-          {outage.outage_started_at && ` since ${formatDate(outage.outage_started_at)}`}
+          {t("outageAlert.failures", { count: outage.consecutive_failures })}
+          {outage.outage_started_at && ` ${t("outageAlert.since", { time: formatDate(outage.outage_started_at) })}`}
         </p>
       </div>
     </div>

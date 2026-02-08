@@ -1,4 +1,5 @@
 import { Server, Router, Globe, Home, AlertTriangle, Clock } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { NetworkHop } from "../../api/types";
 
 interface HopVisualizationProps {
@@ -13,35 +14,37 @@ function getLatencyColor(latency: number | null, isTimeout: boolean): string {
   return "var(--g-red)";
 }
 
-function getStatusBadge(status: string): { color: string; label: string } {
+function getStatusBadge(status: string, t: (key: string) => string): { color: string; label: string } {
   switch (status) {
     case "ok":
-      return { color: "var(--g-green)", label: "OK" };
+      return { color: "var(--g-green)", label: t("topology.ok") };
     case "high_latency":
-      return { color: "var(--g-amber)", label: "High Latency" };
+      return { color: "var(--g-amber)", label: t("topology.highLatency") };
     case "packet_loss":
-      return { color: "var(--g-red)", label: "Packet Loss" };
+      return { color: "var(--g-red)", label: t("topology.packetLossStatus") };
     case "timeout":
-      return { color: "var(--g-text-secondary)", label: "Timeout" };
+      return { color: "var(--g-text-secondary)", label: t("topology.timeoutStatus") };
     default:
       return { color: "var(--g-text-secondary)", label: status };
   }
 }
 
-function HopIcon({ hop }: { hop: NetworkHop }) {
+function HopIcon({ hop, t }: { hop: NetworkHop; t: (key: string) => string }) {
   if (hop.hop_number === 1) {
-    return <span title="Local gateway (your router)"><Home className="w-5 h-5" style={{ color: "var(--g-blue)" }} /></span>;
+    return <span title={t("topology.localGateway")}><Home className="w-5 h-5" style={{ color: "var(--g-blue)" }} /></span>;
   }
   if (hop.is_local) {
-    return <span title="Local network device"><Router className="w-5 h-5" style={{ color: "var(--g-purple)" }} /></span>;
+    return <span title={t("topology.localDevice")}><Router className="w-5 h-5" style={{ color: "var(--g-purple)" }} /></span>;
   }
   if (hop.is_timeout) {
-    return <span title="No response (may be blocked)"><Clock className="w-5 h-5" style={{ color: "var(--g-text-secondary)" }} /></span>;
+    return <span title={t("topology.noResponseBlocked")}><Clock className="w-5 h-5" style={{ color: "var(--g-text-secondary)" }} /></span>;
   }
-  return <span title="Internet server/router"><Server className="w-5 h-5" style={{ color: "var(--g-cyan)" }} /></span>;
+  return <span title={t("topology.internetRouter")}><Server className="w-5 h-5" style={{ color: "var(--g-cyan)" }} /></span>;
 }
 
 export function HopVisualization({ hops, bottleneckHop }: HopVisualizationProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="space-y-2">
       {/* Start point */}
@@ -53,8 +56,8 @@ export function HopVisualization({ hops, bottleneckHop }: HopVisualizationProps)
           <Home className="w-5 h-5" style={{ color: "var(--g-blue)" }} />
         </div>
         <div>
-          <p className="font-medium" style={{ color: "var(--g-text)" }}>Your Device</p>
-          <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>Starting point</p>
+          <p className="font-medium" style={{ color: "var(--g-text)" }}>{t("topology.yourDevice")}</p>
+          <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>{t("topology.startingPoint")}</p>
         </div>
       </div>
 
@@ -62,7 +65,7 @@ export function HopVisualization({ hops, bottleneckHop }: HopVisualizationProps)
       {hops.map((hop, index) => {
         const isBottleneck = hop.hop_number === bottleneckHop;
         const latencyColor = getLatencyColor(hop.latency_ms, hop.is_timeout);
-        const status = getStatusBadge(hop.status);
+        const status = getStatusBadge(hop.status, t);
 
         return (
           <div key={hop.hop_number} className="relative">
@@ -92,7 +95,7 @@ export function HopVisualization({ hops, bottleneckHop }: HopVisualizationProps)
                 >
                   {hop.hop_number}
                 </span>
-                <HopIcon hop={hop} />
+                <HopIcon hop={hop} t={t} />
               </div>
 
               {/* Hop info */}
@@ -107,7 +110,7 @@ export function HopVisualization({ hops, bottleneckHop }: HopVisualizationProps)
                   {isBottleneck && (
                     <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: "rgba(234, 179, 8, 0.2)", color: "var(--g-amber)" }}>
                       <AlertTriangle className="w-3 h-3" />
-                      Bottleneck
+                      {t("topology.bottleneck")}
                     </span>
                   )}
                 </div>
@@ -117,7 +120,7 @@ export function HopVisualization({ hops, bottleneckHop }: HopVisualizationProps)
                   )}
                   {hop.is_local && (
                     <span className="px-1.5 py-0.5 rounded" style={{ backgroundColor: "rgba(139, 92, 246, 0.2)", color: "var(--g-purple)" }}>
-                      Local
+                      {t("topology.local")}
                     </span>
                   )}
                 </div>
@@ -133,7 +136,7 @@ export function HopVisualization({ hops, bottleneckHop }: HopVisualizationProps)
                   >
                     {hop.is_timeout ? "---" : hop.latency_ms !== null ? `${hop.latency_ms.toFixed(1)}` : "---"}
                   </p>
-                  <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>ms</p>
+                  <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>{t("common.ms")}</p>
                 </div>
 
                 {/* Packet loss */}
@@ -145,7 +148,7 @@ export function HopVisualization({ hops, bottleneckHop }: HopVisualizationProps)
                     >
                       {hop.packet_loss_pct.toFixed(0)}%
                     </p>
-                    <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>loss</p>
+                    <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>{t("history.packetLoss").toLowerCase()}</p>
                   </div>
                 )}
 
@@ -157,10 +160,10 @@ export function HopVisualization({ hops, bottleneckHop }: HopVisualizationProps)
                     color: status.color,
                   }}
                   title={
-                    hop.status === "ok" ? "Response time within normal range" :
-                    hop.status === "high_latency" ? "Response time above 50ms - may indicate congestion" :
-                    hop.status === "packet_loss" ? "Some packets lost - network instability" :
-                    hop.status === "timeout" ? "No response - node may block ICMP or be unreachable" : ""
+                    hop.status === "ok" ? t("topology.responseNormal") :
+                    hop.status === "high_latency" ? t("topology.responseLow") :
+                    hop.status === "packet_loss" ? t("topology.packetLossDetected") :
+                    hop.status === "timeout" ? t("topology.noResponse") : ""
                   }
                 >
                   {status.label}
@@ -193,8 +196,8 @@ export function HopVisualization({ hops, bottleneckHop }: HopVisualizationProps)
             <Globe className="w-5 h-5" style={{ color: "var(--g-green)" }} />
           </div>
           <div>
-            <p className="font-medium" style={{ color: "var(--g-text)" }}>Destination</p>
-            <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>Target reached</p>
+            <p className="font-medium" style={{ color: "var(--g-text)" }}>{t("topology.destination")}</p>
+            <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>{t("topology.targetReached")}</p>
           </div>
         </div>
       </div>

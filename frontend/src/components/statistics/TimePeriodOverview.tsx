@@ -1,4 +1,5 @@
 import { Sun, Sunrise, Cloud, Moon, Star } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { GlassCard } from "../ui/GlassCard";
 import type { TimePeriodAnalysis } from "../../api/types";
 
@@ -29,13 +30,15 @@ function getComplianceColor(pct: number): string {
 }
 
 export function TimePeriodOverview({ data }: TimePeriodOverviewProps) {
+  const { t } = useTranslation();
+
   return (
     <GlassCard>
       <h3
         className="text-sm font-semibold mb-4"
         style={{ color: "var(--g-text)" }}
       >
-        Time of Day Analysis
+        {t("docs.timeOfDayAnalysis")}
       </h3>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         {data.periods.map((period) => {
@@ -66,7 +69,7 @@ export function TimePeriodOverview({ data }: TimePeriodOverviewProps) {
                   className="absolute -top-2 -right-2 text-[10px] px-1.5 py-0.5 rounded-full"
                   style={{ background: "var(--g-green)", color: "white" }}
                 >
-                  Best
+                  {t("docs.best")}
                 </span>
               )}
               {isWorst && (
@@ -74,7 +77,7 @@ export function TimePeriodOverview({ data }: TimePeriodOverviewProps) {
                   className="absolute -top-2 -right-2 text-[10px] px-1.5 py-0.5 rounded-full"
                   style={{ background: "var(--g-red)", color: "white" }}
                 >
-                  Worst
+                  {t("docs.worst")}
                 </span>
               )}
 
@@ -102,21 +105,21 @@ export function TimePeriodOverview({ data }: TimePeriodOverviewProps) {
                 <>
                   <div className="space-y-1 mb-2">
                     <div className="flex justify-between text-xs">
-                      <span style={{ color: "var(--g-text-secondary)" }}>DL</span>
+                      <span style={{ color: "var(--g-text-secondary)" }}>{t("docs.down")}</span>
                       <span className="font-medium" style={{ color: "var(--g-blue)" }}>
-                        {period.avg_download_mbps.toFixed(0)} Mbps
+                        {period.avg_download_mbps.toFixed(0)} {t("common.mbps")}
                       </span>
                     </div>
                     <div className="flex justify-between text-xs">
-                      <span style={{ color: "var(--g-text-secondary)" }}>UL</span>
+                      <span style={{ color: "var(--g-text-secondary)" }}>{t("docs.up")}</span>
                       <span className="font-medium" style={{ color: "var(--g-green)" }}>
-                        {period.avg_upload_mbps.toFixed(0)} Mbps
+                        {period.avg_upload_mbps.toFixed(0)} {t("common.mbps")}
                       </span>
                     </div>
                     <div className="flex justify-between text-xs">
-                      <span style={{ color: "var(--g-text-secondary)" }}>Ping</span>
+                      <span style={{ color: "var(--g-text-secondary)" }}>{t("common.ping")}</span>
                       <span className="font-medium" style={{ color: "var(--g-orange)" }}>
-                        {period.avg_ping_ms.toFixed(1)} ms
+                        {period.avg_ping_ms.toFixed(1)} {t("common.ms")}
                       </span>
                     </div>
                   </div>
@@ -135,7 +138,7 @@ export function TimePeriodOverview({ data }: TimePeriodOverviewProps) {
                     className="text-center text-[10px] mt-1"
                     style={{ color: "var(--g-text-tertiary)" }}
                   >
-                    {period.test_count} tests
+                    {period.test_count} {t("docs.tests")}
                   </div>
                 </>
               ) : (
@@ -143,7 +146,7 @@ export function TimePeriodOverview({ data }: TimePeriodOverviewProps) {
                   className="text-center text-xs py-4"
                   style={{ color: "var(--g-text-tertiary)" }}
                 >
-                  No data
+                  {t("common.noData")}
                 </div>
               )}
             </div>

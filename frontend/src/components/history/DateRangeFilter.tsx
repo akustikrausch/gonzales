@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Calendar, X } from "lucide-react";
 
 interface DateRangeFilterProps {
@@ -32,20 +33,21 @@ function startOfYear(date: Date): Date {
   return new Date(date.getFullYear(), 0, 1);
 }
 
-const presets = [
-  { label: "Today", getStart: () => startOfDay(new Date()) },
-  { label: "This Week", getStart: () => startOfWeek(new Date()) },
-  { label: "This Month", getStart: () => startOfMonth(new Date()) },
-  { label: "This Year", getStart: () => startOfYear(new Date()) },
-];
-
 export function DateRangeFilter({
   startDate,
   endDate,
   onStartDateChange,
   onEndDateChange,
 }: DateRangeFilterProps) {
+  const { t } = useTranslation();
   const hasFilter = startDate || endDate;
+
+  const presets = [
+    { label: t("history.today"), getStart: () => startOfDay(new Date()) },
+    { label: t("history.thisWeek"), getStart: () => startOfWeek(new Date()) },
+    { label: t("history.thisMonth"), getStart: () => startOfMonth(new Date()) },
+    { label: t("history.thisYear"), getStart: () => startOfYear(new Date()) },
+  ];
 
   const applyPreset = (getStart: () => Date) => {
     onStartDateChange(toLocalISOString(getStart()));
@@ -80,7 +82,7 @@ export function DateRangeFilter({
       </div>
       <div className="h-4 w-px" style={{ background: "var(--g-border)" }} />
       <Calendar className="w-4 h-4" style={{ color: "var(--g-text-secondary)" }} />
-      <label className="text-sm" style={{ color: "var(--g-text-secondary)" }}>From</label>
+      <label className="text-sm" style={{ color: "var(--g-text-secondary)" }}>{t("history.startDate")}</label>
       <input
         type="datetime-local"
         value={startDate}
@@ -88,7 +90,7 @@ export function DateRangeFilter({
         className="glass-input"
         style={{ width: "auto" }}
       />
-      <label className="text-sm" style={{ color: "var(--g-text-secondary)" }}>To</label>
+      <label className="text-sm" style={{ color: "var(--g-text-secondary)" }}>{t("history.endDate")}</label>
       <input
         type="datetime-local"
         value={endDate}
@@ -101,7 +103,7 @@ export function DateRangeFilter({
           onClick={() => { onStartDateChange(""); onEndDateChange(""); }}
           className="transition-colors"
           style={{ color: "var(--g-text-secondary)" }}
-          title="Clear filter"
+          title={t("history.clearFilter")}
           onMouseEnter={(e) => (e.currentTarget.style.color = "var(--g-red)")}
           onMouseLeave={(e) => (e.currentTarget.style.color = "var(--g-text-secondary)")}
         >

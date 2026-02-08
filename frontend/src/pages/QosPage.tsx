@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Activity, CheckCircle, XCircle, Info } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useCurrentQosStatus } from "../hooks/useApi";
 import { Spinner } from "../components/ui/Spinner";
 import { QosProfileCard } from "../components/qos/QosProfileCard";
@@ -7,6 +8,7 @@ import { QosDetailModal } from "../components/qos/QosDetailModal";
 import type { QosTestResult } from "../api/types";
 
 export function QosPage() {
+  const { t } = useTranslation();
   const { data: qosStatus, isLoading } = useCurrentQosStatus();
   const [selectedResult, setSelectedResult] = useState<QosTestResult | null>(null);
 
@@ -24,14 +26,14 @@ export function QosPage() {
         <div className="flex items-center gap-2 g-animate-in">
           <Activity className="w-5 h-5" style={{ color: "var(--g-accent)" }} />
           <h2 className="text-xl font-bold" style={{ color: "var(--g-text)" }}>
-            QoS Tests
+            {t("qos.title")}
           </h2>
         </div>
 
         <div className="glass-card p-8 text-center g-animate-in g-stagger-1">
           <Info className="w-12 h-12 mx-auto mb-4" style={{ color: "var(--g-text-secondary)" }} />
           <p style={{ color: "var(--g-text-secondary)" }}>
-            No measurement data available yet. Run a speed test to see QoS analysis.
+            {t("qos.noData")}
           </p>
         </div>
       </div>
@@ -48,11 +50,11 @@ export function QosPage() {
         <div className="flex items-center gap-2">
           <Activity className="w-5 h-5" style={{ color: "var(--g-accent)" }} />
           <h2 className="text-xl font-bold" style={{ color: "var(--g-text)" }}>
-            QoS Tests
+            {t("qos.title")}
           </h2>
         </div>
         <p className="text-sm" style={{ color: "var(--g-text-secondary)" }}>
-          Based on latest measurement
+          {t("qos.subtitle")}
         </p>
       </div>
 
@@ -61,7 +63,7 @@ export function QosPage() {
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-lg font-semibold mb-1" style={{ color: "var(--g-text)" }}>
-              Application Compatibility
+              {t("qos.applicationCompatibility")}
             </h3>
             <p className="text-sm" style={{ color: "var(--g-text-secondary)" }}>
               {qosStatus.summary}
@@ -75,7 +77,7 @@ export function QosPage() {
                   {passedCount}
                 </span>
               </div>
-              <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>Optimal</p>
+              <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>{t("qos.optimal")}</p>
             </div>
             <div className="text-center">
               <div className="flex items-center gap-1">
@@ -84,7 +86,7 @@ export function QosPage() {
                   {totalCount - passedCount}
                 </span>
               </div>
-              <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>Limited</p>
+              <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>{t("qos.limited")}</p>
             </div>
           </div>
         </div>
@@ -92,7 +94,7 @@ export function QosPage() {
         {/* Progress bar */}
         <div className="mt-4">
           <div className="flex justify-between text-xs mb-1" style={{ color: "var(--g-text-secondary)" }}>
-            <span>Compatibility Score</span>
+            <span>{t("qos.compatibilityScore")}</span>
             <span>{passRate}%</span>
           </div>
           <div className="h-2 rounded-full" style={{ backgroundColor: "var(--g-surface)" }}>
@@ -122,11 +124,11 @@ export function QosPage() {
       <div className="flex items-center gap-6 text-sm g-animate-in g-stagger-3" style={{ color: "var(--g-text-secondary)" }}>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "var(--g-green)" }} />
-          <span>All requirements met</span>
+          <span>{t("qos.allRequirementsMet")}</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "var(--g-red)" }} />
-          <span>Some requirements not met</span>
+          <span>{t("qos.someRequirementsNotMet")}</span>
         </div>
       </div>
 

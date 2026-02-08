@@ -1,4 +1,5 @@
 import { Play, Loader2, Sun, Moon, Monitor, Clock, Pause } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useStatus, useSetSchedulerEnabled } from "../../hooks/useApi";
 import { useTheme } from "../../hooks/useTheme";
 import { useSpeedTest } from "../../context/SpeedTestContext";
@@ -32,6 +33,7 @@ function formatNextRun(nextRunTime: string | null): string | null {
 const themeOrder: Array<"auto" | "light" | "dark"> = ["auto", "light", "dark"];
 
 export function Header() {
+  const { t } = useTranslation();
   const { data: status } = useStatus();
   const { runTest, isStreaming, progress } = useSpeedTest();
   const { theme, setTheme } = useTheme();
@@ -53,17 +55,18 @@ export function Header() {
   };
 
   const getSchedulerStatus = () => {
-    if (!status) return { color: "var(--g-text-secondary)", text: "Loading...", enabled: false };
+    if (!status) return { color: "var(--g-text-secondary)", text: t("header.loading"), enabled: false };
     if (status.scheduler.paused) {
-      return { color: "var(--g-yellow)", text: "Scheduler Paused", enabled: false };
+      return { color: "var(--g-yellow)", text: t("header.schedulerPaused"), enabled: false };
     }
     if (status.scheduler.running) {
-      return { color: "var(--g-green)", text: "Scheduler Active", enabled: true };
+      return { color: "var(--g-green)", text: t("header.schedulerActive"), enabled: true };
     }
-    return { color: "var(--g-red)", text: "Scheduler Stopped", enabled: false };
+    return { color: "var(--g-red)", text: t("header.schedulerStopped"), enabled: false };
   };
 
   const schedulerStatus = getSchedulerStatus();
+  const nextRunFormatted = status ? formatNextRun(status.scheduler.next_run_time) : null;
 
   return (
     <header
@@ -81,8 +84,8 @@ export function Header() {
               onClick={toggleScheduler}
               disabled={isTogglingScheduler}
               className="glass-badge-button"
-              title={schedulerStatus.enabled ? "Click to pause scheduler" : "Click to resume scheduler"}
-              aria-label={schedulerStatus.enabled ? "Pause automatic speed tests" : "Resume automatic speed tests"}
+              title={schedulerStatus.enabled ? t("header.pauseScheduler") : t("header.resumeScheduler")}
+              aria-label={schedulerStatus.enabled ? t("header.pauseAutoTests") : t("header.resumeAutoTests")}
             >
               <GlassBadge color={schedulerStatus.color}>
                 {status.scheduler.paused ? (
@@ -94,17 +97,17 @@ export function Header() {
                     style={{ background: schedulerStatus.color }}
                   />
                 )}
-                {isTogglingScheduler ? "Updating..." : schedulerStatus.text}
+                {isTogglingScheduler ? t("header.updating") : schedulerStatus.text}
               </GlassBadge>
             </button>
-            {schedulerStatus.enabled && !status.scheduler.test_in_progress && formatNextRun(status.scheduler.next_run_time) && (
+            {schedulerStatus.enabled && !status.scheduler.test_in_progress && nextRunFormatted && (
               <span
                 className="flex items-center gap-1 text-xs"
                 style={{ color: "var(--g-text-secondary)" }}
-                title={`Next test in ${formatNextRun(status.scheduler.next_run_time)}`}
+                title={t("header.nextTest", { time: nextRunFormatted })}
               >
                 <Clock className="w-3 h-3" aria-hidden="true" />
-                {formatNextRun(status.scheduler.next_run_time)}
+                {nextRunFormatted}
               </span>
             )}
             {status.scheduler.test_in_progress && (
@@ -114,18 +117,18 @@ export function Header() {
                 role="status"
                 aria-live="assertive"
               >
-                Test running...
+                {t("header.testRunning")}
               </span>
             )}
           </>
         )}
       </div>
-      <div className="flex items-center gap-2" role="toolbar" aria-label="Quick actions">
+      <div className="flex items-center gap-2" role="toolbar" aria-label={t("header.quickActions")}>
         <GlassButton
           onClick={cycleTheme}
           size="sm"
-          title={`Theme: ${theme}`}
-          aria-label={`Change theme, current: ${theme}`}
+          title={t("header.theme", { theme })}
+          aria-label={t("header.changeTheme", { theme })}
         >
           <ThemeIcon className="w-4 h-4" aria-hidden="true" />
         </GlassButton>
@@ -133,14 +136,14 @@ export function Header() {
           variant="primary"
           onClick={runTest}
           disabled={!!isRunning}
-          aria-label={isRunning ? "Speed test in progress" : "Run speed test now"}
+          aria-label={isRunning ? t("header.testInProgress") : t("header.runTestNow")}
         >
           {isRunning ? (
             <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
           ) : (
             <Play className="w-4 h-4" aria-hidden="true" />
           )}
-          {isRunning ? "Testing..." : "Run Test"}
+          {isRunning ? t("header.testing") : t("header.runTest")}
         </GlassButton>
       </div>
     </header>

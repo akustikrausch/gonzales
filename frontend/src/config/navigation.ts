@@ -15,27 +15,27 @@ export type NavGroup = "main" | "tools" | "system";
 
 export interface NavItem {
   to: string;
-  label: string;
-  shortLabel?: string; // For mobile nav
+  labelKey: string; // i18n key for label
+  shortLabelKey?: string; // i18n key for mobile nav
   icon: LucideIcon;
   group: NavGroup;
 }
 
 export const navigationItems: NavItem[] = [
   // Main navigation
-  { to: "/", label: "Dashboard", shortLabel: "Dashboard", icon: Zap, group: "main" },
-  { to: "/history", label: "History", shortLabel: "History", icon: ClipboardList, group: "main" },
-  { to: "/statistics", label: "Statistics", shortLabel: "Stats", icon: BarChart3, group: "main" },
+  { to: "/", labelKey: "nav.dashboard", shortLabelKey: "nav.dashboard", icon: Zap, group: "main" },
+  { to: "/history", labelKey: "nav.history", shortLabelKey: "nav.history", icon: ClipboardList, group: "main" },
+  { to: "/statistics", labelKey: "nav.statistics", shortLabelKey: "nav.shortStats", icon: BarChart3, group: "main" },
 
   // Tools
-  { to: "/qos", label: "QoS Tests", shortLabel: "QoS", icon: Activity, group: "tools" },
-  { to: "/topology", label: "Network", shortLabel: "Network", icon: Network, group: "tools" },
-  { to: "/root-cause", label: "Root-Cause", shortLabel: "Diagnosis", icon: Search, group: "tools" },
-  { to: "/export", label: "Export", shortLabel: "Export", icon: Download, group: "tools" },
+  { to: "/qos", labelKey: "nav.qos", shortLabelKey: "nav.shortQos", icon: Activity, group: "tools" },
+  { to: "/topology", labelKey: "nav.network", shortLabelKey: "nav.shortNetwork", icon: Network, group: "tools" },
+  { to: "/root-cause", labelKey: "nav.rootCause", shortLabelKey: "nav.shortDiagnosis", icon: Search, group: "tools" },
+  { to: "/export", labelKey: "nav.export", shortLabelKey: "nav.export", icon: Download, group: "tools" },
 
   // System
-  { to: "/settings", label: "Settings", shortLabel: "Settings", icon: Settings, group: "system" },
-  { to: "/docs", label: "Documentation", shortLabel: "Docs", icon: BookOpen, group: "system" },
+  { to: "/settings", labelKey: "nav.settings", shortLabelKey: "nav.settings", icon: Settings, group: "system" },
+  { to: "/docs", labelKey: "nav.docs", shortLabelKey: "nav.shortDocs", icon: BookOpen, group: "system" },
 ];
 
 export function getNavItemsByGroup(group: NavGroup): NavItem[] {
@@ -50,8 +50,8 @@ export function getMoreNavItems(): NavItem[] {
   return navigationItems.filter((item) => item.group !== "main");
 }
 
-export const navGroups: { key: NavGroup; label: string }[] = [
-  { key: "main", label: "Main" },
-  { key: "tools", label: "Tools" },
-  { key: "system", label: "System" },
+export const navGroupKeys: { key: NavGroup; labelKey: string }[] = [
+  { key: "main", labelKey: "nav.groupMain" },
+  { key: "tools", labelKey: "nav.groupTools" },
+  { key: "system", labelKey: "nav.groupSystem" },
 ];

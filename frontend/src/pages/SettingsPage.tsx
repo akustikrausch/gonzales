@@ -9,7 +9,10 @@ import {
   Play,
   Pause,
   Gauge,
+  Languages,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { supportedLanguages } from "../i18n";
 import {
   useConfig,
   useStatus,
@@ -27,6 +30,7 @@ import { ThemeSelector } from "../components/settings/ThemeSelector";
 import { formatBytes, formatDuration } from "../utils/format";
 
 export function SettingsPage() {
+  const { t, i18n } = useTranslation();
   const { data: config, isLoading } = useConfig();
   const { data: status } = useStatus();
   const { data: stats } = useStatistics();
@@ -139,13 +143,13 @@ export function SettingsPage() {
           style={{ color: "var(--g-text)" }}
         >
           <Timer className="w-5 h-5" />
-          Settings
+          {t("settings.title")}
         </h2>
         <p
           className="text-sm mt-1"
           style={{ color: "var(--g-text-secondary)" }}
         >
-          Configure speed tests, scheduling, and preferences
+          {t("settings.subtitle")}
         </p>
       </div>
 
@@ -158,7 +162,7 @@ export function SettingsPage() {
           style={{ color: "var(--g-text-secondary)" }}
         >
           <Timer className="w-4 h-4" />
-          Scheduling
+          {t("settings.scheduler")}
         </h3>
 
         {/* Scheduler Control */}
@@ -191,15 +195,15 @@ export function SettingsPage() {
                     className="text-sm font-medium"
                     style={{ color: "var(--g-text)" }}
                   >
-                    Automatic Speed Tests
+                    {t("settings.automaticSpeedTests")}
                   </p>
                   <p
                     className="text-xs"
                     style={{ color: "var(--g-text-secondary)" }}
                   >
                     {status.scheduler.enabled
-                      ? `Running every ${status.scheduler.interval_minutes} minutes`
-                      : "Paused - only manual tests will run"}
+                      ? t("settings.runningEvery", { minutes: status.scheduler.interval_minutes })
+                      : t("settings.pausedOnlyManual")}
                   </p>
                 </div>
               </div>
@@ -208,7 +212,7 @@ export function SettingsPage() {
                 onClick={() => setSchedulerEnabled(!status.scheduler.enabled)}
                 disabled={isTogglingScheduler}
                 aria-label={
-                  status.scheduler.enabled ? "Pause scheduler" : "Resume scheduler"
+                  status.scheduler.enabled ? t("header.pauseScheduler") : t("header.resumeScheduler")
                 }
               >
                 {isTogglingScheduler ? (
@@ -221,8 +225,8 @@ export function SettingsPage() {
                 {isTogglingScheduler
                   ? "..."
                   : status.scheduler.enabled
-                    ? "Pause"
-                    : "Resume"}
+                    ? t("settings.pause")
+                    : t("settings.resume")}
               </GlassButton>
             </div>
           </GlassCard>
@@ -243,7 +247,7 @@ export function SettingsPage() {
           style={{ color: "var(--g-text-secondary)" }}
         >
           <Gauge className="w-4 h-4" />
-          Speed Test Configuration
+          {t("settings.speedTestConfiguration")}
         </h3>
 
         <GlassCard className="g-animate-in g-stagger-5">
@@ -254,12 +258,12 @@ export function SettingsPage() {
                 className="text-sm font-medium"
                 style={{ color: "var(--g-text)" }}
               >
-                Test Parameters
+                {t("settings.testParameters")}
               </h4>
 
               <div>
                 <GlassInput
-                  label="Test Interval (minutes)"
+                  label={t("settings.testInterval")}
                   type="number"
                   min={1}
                   max={1440}
@@ -272,17 +276,18 @@ export function SettingsPage() {
                   className="text-xs mt-2"
                   style={{ color: "var(--g-text-secondary)" }}
                 >
-                  {testsPerDay} tests/day ·{" "}
-                  {estimatedDataPerDayGB >= 1
-                    ? `${estimatedDataPerDayGB.toFixed(1)} GB`
-                    : `${Math.round(estimatedDataPerDayMB)} MB`}
-                  /day data usage
+                  {t("settings.testsPerDay", { count: testsPerDay })} ·{" "}
+                  {t("settings.dataUsagePerDay", {
+                    usage: estimatedDataPerDayGB >= 1
+                      ? `${estimatedDataPerDayGB.toFixed(1)} GB/day`
+                      : `${Math.round(estimatedDataPerDayMB)} MB/day`
+                  })}
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <GlassInput
-                  label="Download Target (Mbps)"
+                  label={t("settings.downloadTarget")}
                   type="number"
                   min={0}
                   step={0.1}
@@ -292,7 +297,7 @@ export function SettingsPage() {
                   }
                 />
                 <GlassInput
-                  label="Upload Target (Mbps)"
+                  label={t("settings.uploadTarget")}
                   type="number"
                   min={0}
                   step={0.1}
@@ -308,7 +313,7 @@ export function SettingsPage() {
                   className="block text-sm font-medium mb-2"
                   style={{ color: "var(--g-text)" }}
                 >
-                  Tolerance: {tolerance}%
+                  {t("settings.toleranceLabel", { percent: tolerance })}
                 </label>
                 <input
                   type="range"
@@ -328,13 +333,15 @@ export function SettingsPage() {
                   className="text-xs mt-2"
                   style={{ color: "var(--g-text-secondary)" }}
                 >
-                  Min. acceptable: {effectiveMinDownload.toFixed(0)} ↓ /{" "}
-                  {effectiveMinUpload.toFixed(0)} ↑ Mbps
+                  {t("settings.minAcceptable", {
+                    download: effectiveMinDownload.toFixed(0),
+                    upload: effectiveMinUpload.toFixed(0)
+                  })}
                 </p>
               </div>
 
               <GlassInput
-                label="ISP / Provider Name"
+                label={t("settings.ispProviderName")}
                 type="text"
                 placeholder="e.g., Deutsche Telekom"
                 value={ispName}
@@ -351,7 +358,7 @@ export function SettingsPage() {
                 style={{ color: "var(--g-text)" }}
               >
                 <Server className="w-4 h-4" />
-                Server Selection
+                {t("settings.serverSelection")}
               </h4>
               <ServerPicker value={serverId} onChange={handleServerChange} />
             </div>
@@ -368,10 +375,10 @@ export function SettingsPage() {
             >
               {testSettingsChanged ? (
                 <span style={{ color: "var(--g-yellow)" }}>
-                  Unsaved changes
+                  {t("settings.unsavedChanges")}
                 </span>
               ) : (
-                "All changes saved"
+                t("settings.allChangesSaved")
               )}
             </p>
             <GlassButton
@@ -380,7 +387,7 @@ export function SettingsPage() {
               disabled={updateConfig.isPending || !testSettingsChanged}
             >
               <Save className="w-4 h-4" />
-              {updateConfig.isPending ? "Saving..." : "Save Test Settings"}
+              {updateConfig.isPending ? t("settings.saving") : t("settings.saveTestSettings")}
             </GlassButton>
           </div>
         </GlassCard>
@@ -395,10 +402,10 @@ export function SettingsPage() {
           style={{ color: "var(--g-text-secondary)" }}
         >
           <Palette className="w-4 h-4" />
-          Preferences
+          {t("settings.preferences")}
         </h3>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Appearance */}
           <GlassCard className="g-animate-in g-stagger-7">
             <h4
@@ -406,9 +413,39 @@ export function SettingsPage() {
               style={{ color: "var(--g-text)" }}
             >
               <Palette className="w-4 h-4" />
-              Appearance
+              {t("settings.appearance")}
             </h4>
             <ThemeSelector />
+          </GlassCard>
+
+          {/* Language */}
+          <GlassCard className="g-animate-in g-stagger-7">
+            <h4
+              className="text-sm font-medium mb-4 flex items-center gap-2"
+              style={{ color: "var(--g-text)" }}
+            >
+              <Languages className="w-4 h-4" />
+              {t("settings.language")}
+            </h4>
+            <div className="space-y-2">
+              {supportedLanguages.map((lang) => (
+                <button
+                  key={lang.code}
+                  onClick={() => i18n.changeLanguage(lang.code)}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
+                  style={{
+                    backgroundColor: i18n.language === lang.code ? "var(--g-accent-dim)" : "transparent",
+                    color: i18n.language === lang.code ? "var(--g-accent)" : "var(--g-text)",
+                    border: i18n.language === lang.code ? "1px solid var(--g-accent)" : "1px solid var(--g-border)",
+                  }}
+                >
+                  <span className="text-sm font-medium">{lang.label}</span>
+                  {i18n.language === lang.code && (
+                    <span className="ml-auto text-xs">✓</span>
+                  )}
+                </button>
+              ))}
+            </div>
           </GlassCard>
 
           {/* Notifications & Data */}
@@ -418,12 +455,12 @@ export function SettingsPage() {
               style={{ color: "var(--g-text)" }}
             >
               <Bell className="w-4 h-4" />
-              Notifications & Data
+              {t("settings.notificationsData")}
             </h4>
             <div className="space-y-4">
               <div>
                 <GlassInput
-                  label="Webhook URL"
+                  label={t("settings.webhookUrl")}
                   type="url"
                   placeholder="https://webhook.example.com"
                   value={webhookUrl}
@@ -435,12 +472,12 @@ export function SettingsPage() {
                   className="text-xs mt-1"
                   style={{ color: "var(--g-text-secondary)" }}
                 >
-                  Leave empty to disable
+                  {t("settings.leaveEmptyToDisable")}
                 </p>
               </div>
               <div>
                 <GlassInput
-                  label="Data Retention (days)"
+                  label={t("settings.dataRetention")}
                   type="number"
                   min={0}
                   max={3650}
@@ -455,8 +492,8 @@ export function SettingsPage() {
                   style={{ color: "var(--g-text-secondary)" }}
                 >
                   {Number(retentionDays) === 0
-                    ? "0 = keep forever"
-                    : `Auto-delete after ${retentionDays} days`}
+                    ? t("settings.keepForever")
+                    : t("settings.autoDeleteAfter", { days: retentionDays })}
                 </p>
               </div>
               <div className="pt-2">
@@ -467,7 +504,7 @@ export function SettingsPage() {
                   disabled={updateConfig.isPending || !advancedSettingsChanged}
                 >
                   <Save className="w-3 h-3" />
-                  Save
+                  {t("settings.save")}
                 </GlassButton>
               </div>
             </div>
@@ -484,7 +521,7 @@ export function SettingsPage() {
           style={{ color: "var(--g-text-secondary)" }}
         >
           <Activity className="w-4 h-4" />
-          System Information
+          {t("settings.systemInformation")}
         </h3>
 
         <GlassCard className="g-animate-in g-stagger-10">
@@ -496,7 +533,7 @@ export function SettingsPage() {
                     className="text-xs uppercase tracking-wide mb-1"
                     style={{ color: "var(--g-text-secondary)" }}
                   >
-                    Version
+                    {t("settings.version")}
                   </p>
                   <a
                     href="https://github.com/akustikrausch/gonzales/releases"
@@ -513,7 +550,7 @@ export function SettingsPage() {
                     className="text-xs uppercase tracking-wide mb-1"
                     style={{ color: "var(--g-text-secondary)" }}
                   >
-                    Uptime
+                    {t("settings.uptime")}
                   </p>
                   <p
                     className="text-sm font-medium"
@@ -527,7 +564,7 @@ export function SettingsPage() {
                     className="text-xs uppercase tracking-wide mb-1"
                     style={{ color: "var(--g-text-secondary)" }}
                   >
-                    Measurements
+                    {t("settings.measurements")}
                   </p>
                   <p
                     className="text-sm font-medium"
@@ -541,7 +578,7 @@ export function SettingsPage() {
                     className="text-xs uppercase tracking-wide mb-1"
                     style={{ color: "var(--g-text-secondary)" }}
                   >
-                    Failures
+                    {t("settings.failures")}
                   </p>
                   <p
                     className="text-sm font-medium"
@@ -555,7 +592,7 @@ export function SettingsPage() {
                     className="text-xs uppercase tracking-wide mb-1"
                     style={{ color: "var(--g-text-secondary)" }}
                   >
-                    Database
+                    {t("settings.database")}
                   </p>
                   <p
                     className="text-sm font-medium"
@@ -569,7 +606,7 @@ export function SettingsPage() {
                     className="text-xs uppercase tracking-wide mb-1"
                     style={{ color: "var(--g-text-secondary)" }}
                   >
-                    Data Used
+                    {t("settings.dataUsed")}
                   </p>
                   <p
                     className="text-sm font-medium"
@@ -592,7 +629,7 @@ export function SettingsPage() {
                   className="text-xs uppercase tracking-wide mb-1"
                   style={{ color: "var(--g-text-secondary)" }}
                 >
-                  Host
+                  {t("settings.host")}
                 </p>
                 <p
                   className="text-sm font-mono"
@@ -606,7 +643,7 @@ export function SettingsPage() {
                   className="text-xs uppercase tracking-wide mb-1"
                   style={{ color: "var(--g-text-secondary)" }}
                 >
-                  Port
+                  {t("settings.port")}
                 </p>
                 <p
                   className="text-sm font-mono"
@@ -620,7 +657,7 @@ export function SettingsPage() {
                   className="text-xs uppercase tracking-wide mb-1"
                   style={{ color: "var(--g-text-secondary)" }}
                 >
-                  Log Level
+                  {t("settings.logLevel")}
                 </p>
                 <p
                   className="text-sm font-mono"

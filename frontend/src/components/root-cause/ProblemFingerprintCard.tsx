@@ -1,4 +1,5 @@
 import { AlertCircle, AlertTriangle, Info } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { ProblemFingerprint } from "../../api/types";
 
 interface ProblemFingerprintCardProps {
@@ -7,14 +8,14 @@ interface ProblemFingerprintCardProps {
 }
 
 const categoryLabels: Record<string, string> = {
-  dns: "DNS",
-  local_network: "Local Network",
-  isp_backbone: "ISP Backbone",
-  isp_lastmile: "ISP Last-Mile",
-  server: "Server",
-  time_based: "Time-Based",
-  outages: "Outages",
-  connection: "Connection",
+  dns: "rootCause.dns",
+  local_network: "rootCause.localNetwork",
+  isp_backbone: "rootCause.ispBackbone",
+  isp_lastmile: "rootCause.ispLastMile",
+  server: "rootCause.server",
+  time_based: "rootCause.timeBasedPatterns",
+  outages: "statistics.outages",
+  connection: "latestResult.connectionType",
 };
 
 const severityConfig = {
@@ -22,23 +23,24 @@ const severityConfig = {
     icon: AlertCircle,
     color: "var(--g-red)",
     bgColor: "var(--g-red-tint)",
-    label: "Critical",
+    label: "rootCause.critical",
   },
   warning: {
     icon: AlertTriangle,
     color: "var(--g-orange)",
     bgColor: "var(--g-orange-tint)",
-    label: "Warning",
+    label: "rootCause.warning",
   },
   info: {
     icon: Info,
     color: "var(--g-blue)",
     bgColor: "var(--g-blue-tint)",
-    label: "Info",
+    label: "rootCause.info",
   },
 };
 
 export function ProblemFingerprintCard({ fingerprint, isPrimary = false }: ProblemFingerprintCardProps) {
+  const { t } = useTranslation();
   const config = severityConfig[fingerprint.severity];
   const Icon = config.icon;
 
@@ -64,20 +66,20 @@ export function ProblemFingerprintCard({ fingerprint, isPrimary = false }: Probl
                 className="text-xs px-2 py-0.5 rounded-full font-medium"
                 style={{ background: config.color, color: "white" }}
               >
-                Primary Cause
+                {t("rootCause.primaryCause")}
               </span>
             )}
             <span
               className="text-xs px-2 py-0.5 rounded"
               style={{ background: "var(--g-card-bg)", color: "var(--g-text-secondary)" }}
             >
-              {categoryLabels[fingerprint.category] || fingerprint.category}
+              {t(categoryLabels[fingerprint.category] || fingerprint.category)}
             </span>
             <span
               className="text-xs px-2 py-0.5 rounded"
               style={{ background: config.color + "30", color: config.color }}
             >
-              {config.label}
+              {t(config.label)}
             </span>
           </div>
           <p className="text-sm font-medium mt-2" style={{ color: "var(--g-text)" }}>
@@ -85,18 +87,18 @@ export function ProblemFingerprintCard({ fingerprint, isPrimary = false }: Probl
           </p>
           <div className="mt-2 flex items-center gap-3 text-xs" style={{ color: "var(--g-text-secondary)" }}>
             <span>
-              Confidence: <strong style={{ color: config.color }}>{Math.round(fingerprint.confidence * 100)}%</strong>
+              {t("rootCause.confidence")}: <strong style={{ color: config.color }}>{Math.round(fingerprint.confidence * 100)}%</strong>
             </span>
             {fingerprint.occurrence_count > 1 && (
               <span>
-                Occurrences: <strong>{fingerprint.occurrence_count}</strong>
+                {t("rootCause.occurrences")}: <strong>{fingerprint.occurrence_count}</strong>
               </span>
             )}
           </div>
           {fingerprint.evidence.length > 0 && (
             <div className="mt-3 space-y-1">
               <p className="text-xs font-medium" style={{ color: "var(--g-text-secondary)" }}>
-                Evidence:
+                {t("rootCause.evidence")}:
               </p>
               <ul className="text-xs space-y-0.5" style={{ color: "var(--g-text)" }}>
                 {fingerprint.evidence.map((item, idx) => (

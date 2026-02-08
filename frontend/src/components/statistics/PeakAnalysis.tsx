@@ -1,4 +1,5 @@
 import { Sun, Moon, Sunset, ArrowUp, ArrowDown, Clock } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { PeakOffPeakAnalysis, BestWorstTimes } from "../../api/types";
 import { GlassCard } from "../ui/GlassCard";
 import { GlassBadge } from "../ui/GlassBadge";
@@ -29,6 +30,7 @@ function PeriodCard({
   isBest: boolean;
   isWorst: boolean;
 }) {
+  const { t } = useTranslation();
   const borderColor = isBest ? "var(--g-green)" : isWorst ? "var(--g-red)" : "var(--g-border)";
 
   return (
@@ -52,26 +54,26 @@ function PeriodCard({
       <div className="space-y-2">
         <div className="flex justify-between items-center">
           <span className="text-xs flex items-center gap-1" style={{ color: "var(--g-text-secondary)" }}>
-            <ArrowDown className="w-3 h-3" style={{ color: "var(--g-blue)" }} /> Download
+            <ArrowDown className="w-3 h-3" style={{ color: "var(--g-blue)" }} /> {t("common.download")}
           </span>
           <span className="text-sm font-semibold tabular-nums" style={{ color: "var(--g-blue)" }}>
-            {download.toFixed(1)} Mbps
+            {download.toFixed(1)} {t("common.mbps")}
           </span>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-xs flex items-center gap-1" style={{ color: "var(--g-text-secondary)" }}>
-            <ArrowUp className="w-3 h-3" style={{ color: "var(--g-green)" }} /> Upload
+            <ArrowUp className="w-3 h-3" style={{ color: "var(--g-green)" }} /> {t("common.upload")}
           </span>
           <span className="text-sm font-semibold tabular-nums" style={{ color: "var(--g-green)" }}>
-            {upload.toFixed(1)} Mbps
+            {upload.toFixed(1)} {t("common.mbps")}
           </span>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-xs flex items-center gap-1" style={{ color: "var(--g-text-secondary)" }}>
-            <Clock className="w-3 h-3" style={{ color: "var(--g-orange)" }} /> Ping
+            <Clock className="w-3 h-3" style={{ color: "var(--g-orange)" }} /> {t("common.ping")}
           </span>
           <span className="text-sm font-semibold tabular-nums" style={{ color: "var(--g-orange)" }}>
-            {ping.toFixed(1)} ms
+            {ping.toFixed(1)} {t("common.ms")}
           </span>
         </div>
       </div>

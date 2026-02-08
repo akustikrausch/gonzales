@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { TrendingUp } from "lucide-react";
 import { useEnhancedStatistics, useMeasurements } from "../hooks/useApi";
 import { Spinner } from "../components/ui/Spinner";
@@ -24,19 +25,20 @@ import { OutageSection } from "../components/statistics/OutageSection";
 
 type Tab = "overview" | "time" | "trends" | "insights" | "servers" | "outages";
 
-const tabs: { key: Tab; label: string }[] = [
-  { key: "overview", label: "Overview" },
-  { key: "time", label: "Time Analysis" },
-  { key: "trends", label: "Trends" },
-  { key: "insights", label: "Insights" },
-  { key: "servers", label: "Servers" },
-  { key: "outages", label: "Outages" },
-];
-
 export function StatisticsPage() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<Tab>("overview");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+
+  const tabs: { key: Tab; label: string }[] = [
+    { key: "overview", label: t("statistics.overview") },
+    { key: "time", label: t("statistics.timeAnalysis") },
+    { key: "trends", label: t("statistics.trends") },
+    { key: "insights", label: t("statistics.insights") },
+    { key: "servers", label: t("statistics.servers") },
+    { key: "outages", label: t("statistics.outages") },
+  ];
 
   const dateParams = {
     start_date: startDate ? new Date(startDate).toISOString() : undefined,
@@ -89,7 +91,7 @@ export function StatisticsPage() {
           style={{ color: "var(--g-text)" }}
         >
           <TrendingUp className="w-5 h-5" />
-          Statistics
+          {t("statistics.title")}
         </h2>
         <DateRangeFilter
           startDate={startDate}
@@ -244,7 +246,7 @@ export function StatisticsPage() {
                   className="text-sm font-semibold"
                   style={{ color: "var(--g-text)" }}
                 >
-                  Anomalies Detected ({enhanced.anomalies.length})
+                  {t("statistics.anomaliesDetected", { count: enhanced.anomalies.length })}
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                   {enhanced.anomalies.slice(0, 12).map((a, i) => (

@@ -1,4 +1,5 @@
 import { AlertTriangle, Home, Server } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { HopCorrelation } from "../../api/types";
 
 interface HopCorrelationViewProps {
@@ -21,6 +22,8 @@ function getLatencyColor(latency: number): string {
 }
 
 export function HopCorrelationView({ hops }: HopCorrelationViewProps) {
+  const { t } = useTranslation();
+
   if (hops.length === 0) {
     return (
       <div
@@ -29,10 +32,10 @@ export function HopCorrelationView({ hops }: HopCorrelationViewProps) {
       >
         <Server className="w-8 h-8 mx-auto mb-2" style={{ color: "var(--g-text-secondary)" }} />
         <p className="text-sm" style={{ color: "var(--g-text-secondary)" }}>
-          No topology data available for correlation analysis.
+          {t("rootCause.noTopologyData")}
         </p>
         <p className="text-xs mt-1" style={{ color: "var(--g-text-secondary)" }}>
-          Run network topology scans to enable hop-speed correlation.
+          {t("rootCause.runTopologyScans")}
         </p>
       </div>
     );
@@ -50,7 +53,7 @@ export function HopCorrelationView({ hops }: HopCorrelationViewProps) {
         >
           <AlertTriangle className="w-4 h-4 flex-shrink-0" style={{ color: "var(--g-orange)" }} />
           <p className="text-sm" style={{ color: "var(--g-text)" }}>
-            <strong>{bottlenecks.length}</strong> potential bottleneck{bottlenecks.length > 1 ? "s" : ""} detected at hop{bottlenecks.length > 1 ? "s" : ""}{" "}
+            <strong>{bottlenecks.length}</strong> {t(bottlenecks.length > 1 ? "rootCause.potentialBottlenecksPlural" : "rootCause.potentialBottlenecks")} {t(bottlenecks.length > 1 ? "rootCause.detectedAtPlural" : "rootCause.detectedAt")}{" "}
             {bottlenecks.map(h => h.hop_number).join(", ")}
           </p>
         </div>
@@ -112,7 +115,7 @@ export function HopCorrelationView({ hops }: HopCorrelationViewProps) {
                         className="text-xs px-1.5 py-0.5 rounded"
                         style={{ background: "var(--g-blue-tint)", color: "var(--g-blue)" }}
                       >
-                        Local
+                        {t("topology.local")}
                       </span>
                     )}
                     {hop.is_bottleneck && (
@@ -120,7 +123,7 @@ export function HopCorrelationView({ hops }: HopCorrelationViewProps) {
                         className="text-xs px-1.5 py-0.5 rounded"
                         style={{ background: "var(--g-red)", color: "white" }}
                       >
-                        Bottleneck
+                        {t("rootCause.bottleneck")}
                       </span>
                     )}
                   </div>
@@ -135,15 +138,15 @@ export function HopCorrelationView({ hops }: HopCorrelationViewProps) {
                 <div className="flex items-center gap-4 text-right">
                   <div>
                     <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>
-                      Latency
+                      {t("connectionHealth.latency")}
                     </p>
                     <p className="text-sm font-medium" style={{ color: latencyColor }}>
-                      {hop.avg_latency_ms.toFixed(1)}ms
+                      {hop.avg_latency_ms.toFixed(1)}{t("common.ms")}
                     </p>
                   </div>
                   <div>
                     <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>
-                      Correlation
+                      {t("rootCause.correlation")}
                     </p>
                     <p className="text-sm font-medium" style={{ color: corrColor }}>
                       {hop.latency_correlation.toFixed(2)}
@@ -152,7 +155,7 @@ export function HopCorrelationView({ hops }: HopCorrelationViewProps) {
                   {hop.packet_loss_pct > 0 && (
                     <div>
                       <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>
-                        Loss
+                        {t("history.packetLoss")}
                       </p>
                       <p className="text-sm font-medium" style={{ color: "var(--g-red)" }}>
                         {hop.packet_loss_pct.toFixed(1)}%
@@ -169,8 +172,7 @@ export function HopCorrelationView({ hops }: HopCorrelationViewProps) {
       {/* Legend */}
       <div className="text-xs p-3 rounded-lg" style={{ background: "var(--g-card-bg)" }}>
         <p style={{ color: "var(--g-text-secondary)" }}>
-          <strong>Correlation</strong>: Relationship between hop latency and download speed.
-          Negative values (red/orange) indicate higher latency at this hop correlates with slower speeds.
+          {t("rootCause.correlationExplanation")}
         </p>
       </div>
     </div>

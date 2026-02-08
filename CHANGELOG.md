@@ -2,6 +2,17 @@
 
 All notable changes to Gonzales will be documented in this file.
 
+## [3.9.9] - 2026-02-08
+
+### Features
+
+- **Full i18n support (English + German)**: All UI strings now translatable via react-i18next. 568 translation keys across all pages, components, navigation, onboarding, and settings. Users can switch language in Settings > Preferences > Language. Language preference persists in localStorage.
+- **Language selector**: New language picker in Settings page allows switching between English and Deutsch.
+- **i18n-auditor agent**: New agent for checking translation completeness and consistency.
+- **CLAUDE.md i18n rules**: Enforces bilingual requirement for all future development.
+
+---
+
 ## [3.9.8] - 2026-02-07
 
 ### Bug Fixes

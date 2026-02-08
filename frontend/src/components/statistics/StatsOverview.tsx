@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { Statistics } from "../../api/types";
 import { GlassCard } from "../ui/GlassCard";
 import { AnimatedNumber } from "../common/AnimatedNumber";
@@ -49,6 +50,7 @@ function StatRow({
 }
 
 export function StatsOverview({ stats }: StatsOverviewProps) {
+  const { t } = useTranslation();
   const avgDataPerTest = stats.total_tests > 0
     ? stats.total_data_used_bytes / stats.total_tests
     : 0;
@@ -58,7 +60,7 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
       <GlassCard>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div>
-            <p className="text-sm" style={{ color: "var(--g-text-secondary)" }}>Total Tests</p>
+            <p className="text-sm" style={{ color: "var(--g-text-secondary)" }}>{t("statistics.totalTests")}</p>
             <AnimatedNumber
               value={stats.total_tests}
               decimals={0}
@@ -88,22 +90,22 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
             </div>
           </div>
           <div>
-            <p className="text-sm" style={{ color: "var(--g-text-secondary)" }}>Total Data Used</p>
+            <p className="text-sm" style={{ color: "var(--g-text-secondary)" }}>{t("statistics.totalDataUsed")}</p>
             <p className="text-2xl font-bold" style={{ color: "var(--g-text)" }}>
               {formatBytes(stats.total_data_used_bytes)}
             </p>
           </div>
           <div>
-            <p className="text-sm" style={{ color: "var(--g-text-secondary)" }}>Avg per Test</p>
+            <p className="text-sm" style={{ color: "var(--g-text-secondary)" }}>{t("statistics.avgDataPerTest")}</p>
             <p className="text-2xl font-bold" style={{ color: "var(--g-text)" }}>
               {formatBytes(avgDataPerTest)}
             </p>
           </div>
         </div>
       </GlassCard>
-      <StatRow label="Download" stat={stats.download} unit="Mbps" color="var(--g-blue)" />
-      <StatRow label="Upload" stat={stats.upload} unit="Mbps" color="var(--g-green)" />
-      <StatRow label="Ping" stat={stats.ping} unit="ms" color="var(--g-orange)" />
+      <StatRow label={t("common.download")} stat={stats.download} unit={t("common.mbps")} color="var(--g-blue)" />
+      <StatRow label={t("common.upload")} stat={stats.upload} unit={t("common.mbps")} color="var(--g-green)" />
+      <StatRow label={t("common.ping")} stat={stats.ping} unit={t("common.ms")} color="var(--g-orange)" />
     </div>
   );
 }

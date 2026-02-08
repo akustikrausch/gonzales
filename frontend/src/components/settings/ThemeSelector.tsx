@@ -1,14 +1,16 @@
 import { Sun, Moon, Monitor } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useTheme } from "../../hooks/useTheme";
 
-const options = [
-  { value: "auto" as const, label: "Auto", Icon: Monitor },
-  { value: "light" as const, label: "Light", Icon: Sun },
-  { value: "dark" as const, label: "Dark", Icon: Moon },
-];
-
 export function ThemeSelector() {
+  const { t } = useTranslation();
   const { theme, setTheme } = useTheme();
+
+  const options = [
+    { value: "auto" as const, label: t("settings.themeAuto"), Icon: Monitor },
+    { value: "light" as const, label: t("settings.themeLight"), Icon: Sun },
+    { value: "dark" as const, label: t("settings.themeDark"), Icon: Moon },
+  ];
 
   return (
     <div className="flex gap-2">

@@ -1,4 +1,5 @@
 import { CheckCircle, AlertTriangle, Clock } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { TopologyHistoryEntry } from "../../api/types";
 
 interface TopologyHistoryListProps {
@@ -8,6 +9,7 @@ interface TopologyHistoryListProps {
 }
 
 export function TopologyHistoryList({ entries, selectedId, onSelect }: TopologyHistoryListProps) {
+  const { t } = useTranslation();
   return (
     <div className="space-y-2">
       {entries.map((entry) => {
@@ -47,10 +49,10 @@ export function TopologyHistoryList({ entries, selectedId, onSelect }: TopologyH
 
               <div className="text-right">
                 <p className="text-sm font-bold" style={{ color: "var(--g-text)" }}>
-                  {entry.total_hops} hops
+                  {entry.total_hops} {t("topology.hops").toLowerCase()}
                 </p>
                 <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>
-                  {entry.total_latency_ms.toFixed(0)} ms
+                  {entry.total_latency_ms.toFixed(0)} {t("common.ms")}
                 </p>
               </div>
             </div>

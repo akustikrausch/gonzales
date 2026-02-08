@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Clock, Trash2 } from "lucide-react";
 import { useDeleteAllMeasurements, useDeleteMeasurement, useMeasurements } from "../hooks/useApi";
 import { GlassCard } from "../components/ui/GlassCard";
@@ -10,6 +11,7 @@ import { MeasurementTable } from "../components/history/MeasurementTable";
 import type { SortField, SortOrder } from "../api/types";
 
 export function HistoryPage() {
+  const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -57,7 +59,7 @@ export function HistoryPage() {
           style={{ color: "var(--g-text)" }}
         >
           <Clock className="w-5 h-5" />
-          History
+          {t("history.title")}
         </h2>
         <DateRangeFilter
           startDate={startDate}
@@ -88,7 +90,7 @@ export function HistoryPage() {
               >
                 <div className="flex items-center gap-4">
                   <p className="text-xs" style={{ color: "var(--g-text-secondary)" }}>
-                    {data.total} measurements total
+                    {t("history.totalMeasurements", { count: data.total })}
                   </p>
                   <GlassButton
                     size="sm"
@@ -96,7 +98,7 @@ export function HistoryPage() {
                     style={{ color: "var(--g-red)" }}
                   >
                     <Trash2 className="w-3 h-3" />
-                    Delete All
+                    {t("history.deleteAll")}
                   </GlassButton>
                 </div>
                 <div className="flex gap-2">
@@ -105,20 +107,20 @@ export function HistoryPage() {
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page <= 1}
                   >
-                    Previous
+                    {t("history.previous")}
                   </GlassButton>
                   <span
                     className="text-xs px-2 py-1"
                     style={{ color: "var(--g-text-secondary)" }}
                   >
-                    Page {data.page} of {data.pages}
+                    {t("history.page", { current: data.page, total: data.pages })}
                   </span>
                   <GlassButton
                     size="sm"
                     onClick={() => setPage((p) => Math.min(data.pages, p + 1))}
                     disabled={page >= data.pages}
                   >
-                    Next
+                    {t("history.next")}
                   </GlassButton>
                 </div>
               </div>
@@ -128,7 +130,7 @@ export function HistoryPage() {
               className="text-center py-12"
               style={{ color: "var(--g-text-secondary)" }}
             >
-              No measurements found.
+              {t("history.noHistory")}
             </p>
           )}
         </div>

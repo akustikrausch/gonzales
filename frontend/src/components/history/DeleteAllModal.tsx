@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { AlertTriangle, Trash2, X } from "lucide-react";
 import { GlassButton } from "../ui/GlassButton";
 
@@ -17,6 +18,7 @@ export function DeleteAllModal({
   isPending,
   totalCount,
 }: DeleteAllModalProps) {
+  const { t } = useTranslation();
   const [confirmText, setConfirmText] = useState("");
   const CONFIRM_WORD = "DELETE";
   const modalRef = useRef<HTMLDivElement>(null);
@@ -108,7 +110,7 @@ export function DeleteAllModal({
               <AlertTriangle className="w-5 h-5" style={{ color: "var(--g-red)" }} />
             </div>
             <h3 id="delete-modal-title" className="text-lg font-semibold" style={{ color: "var(--g-text)" }}>
-              Delete All Measurements
+              {t("history.deleteAllTitle")}
             </h3>
           </div>
           <button
@@ -117,24 +119,27 @@ export function DeleteAllModal({
             style={{ color: "var(--g-text-secondary)" }}
             onMouseEnter={(e) => (e.currentTarget.style.background = "var(--g-border)")}
             onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-            aria-label="Close dialog"
+            aria-label={t("history.closeDialog")}
           >
             <X className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
 
         <div className="space-y-4">
-          <p id="delete-modal-description" style={{ color: "var(--g-text-secondary)" }}>
-            You are about to permanently delete <strong style={{ color: "var(--g-text)" }}>{totalCount}</strong> measurements.
-            This action cannot be undone.
-          </p>
+          <p
+            id="delete-modal-description"
+            style={{ color: "var(--g-text-secondary)" }}
+            dangerouslySetInnerHTML={{
+              __html: t("history.deleteAllWarning", { count: totalCount })
+            }}
+          />
 
           <div
             className="p-3 rounded-lg"
             style={{ background: "var(--g-red)08", border: "1px solid var(--g-red)30" }}
           >
             <p className="text-sm" style={{ color: "var(--g-red)" }}>
-              All historical data, statistics, and trends will be lost permanently.
+              {t("history.deleteAllWarningLong")}
             </p>
           </div>
 
@@ -142,9 +147,12 @@ export function DeleteAllModal({
             <label
               className="block text-sm mb-2"
               style={{ color: "var(--g-text-secondary)" }}
-            >
-              Type <strong style={{ color: "var(--g-text)" }}>{CONFIRM_WORD}</strong> to confirm:
-            </label>
+              dangerouslySetInnerHTML={{
+                __html: t("history.typeToConfirm", { word: CONFIRM_WORD })
+              }}
+            />
+          </div>
+          <div>
             <input
               type="text"
               value={confirmText}
@@ -162,7 +170,7 @@ export function DeleteAllModal({
 
           <div className="flex gap-3 pt-2">
             <GlassButton onClick={handleClose} className="flex-1">
-              Cancel
+              {t("history.cancel")}
             </GlassButton>
             <GlassButton
               onClick={handleConfirm}
@@ -175,7 +183,7 @@ export function DeleteAllModal({
               }}
             >
               <Trash2 className="w-4 h-4" />
-              {isPending ? "Deleting..." : "Delete All"}
+              {isPending ? t("history.deleting") : t("history.deleteAll")}
             </GlassButton>
           </div>
         </div>
