@@ -22,7 +22,10 @@ class NoCacheIndexMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next):
         response: Response = await call_next(request)
+        # Normalize double slashes from HA Ingress proxy
         path = request.url.path
+        while "//" in path:
+            path = path.replace("//", "/")
         # No cache for index.html (root or explicit)
         if path in ("/", "/index.html") or (
             not path.startswith("/api/") and not path.startswith("/assets/")
@@ -88,7 +91,7 @@ def create_app() -> FastAPI:
     app.add_middleware(
         RateLimitMiddleware,
         requests_per_minute=120,  # 2 requests/second sustained
-        burst_size=20,  # Allow bursts of 20 requests
+        burst_size=30,  # Allow bursts of 30 requests (page load ~8 API calls)
         strict_requests_per_minute=6,  # Resource-intensive endpoints: 1 per 10 seconds
         strict_burst_size=2,
         enabled=enable_rate_limit,

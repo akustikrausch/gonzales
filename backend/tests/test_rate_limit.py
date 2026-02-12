@@ -4,6 +4,7 @@ import pytest
 from httpx import AsyncClient
 
 from gonzales.core.rate_limit import RATE_LIMITS
+from gonzales.middleware.rate_limit import RateLimitMiddleware
 
 
 class TestRateLimits:
@@ -30,6 +31,56 @@ class TestRateLimits:
         limit = RATE_LIMITS["read"]
         count = int(limit.split("/")[0])
         assert count >= 100  # Should allow many reads
+
+
+class TestRateLimitMiddleware:
+    """Test the RateLimitMiddleware path handling."""
+
+    def setup_method(self):
+        self.mw = RateLimitMiddleware.__new__(RateLimitMiddleware)
+
+    def test_normalize_single_slash(self):
+        assert self.mw._normalize_path("/assets/foo.js") == "/assets/foo.js"
+
+    def test_normalize_double_slash(self):
+        """HA Ingress proxy sends //assets/ paths."""
+        assert self.mw._normalize_path("//assets/foo.js") == "/assets/foo.js"
+
+    def test_normalize_triple_slash(self):
+        assert self.mw._normalize_path("///assets/foo.js") == "/assets/foo.js"
+
+    def test_normalize_api_path(self):
+        assert self.mw._normalize_path("/api/v1/config") == "/api/v1/config"
+
+    def test_exempt_single_slash_assets(self):
+        assert self.mw._is_exempt("/assets/index.js") is True
+
+    def test_exempt_double_slash_assets(self):
+        """Critical: HA Ingress double-slash assets must be exempt."""
+        assert self.mw._is_exempt("//assets/SettingsPage-BJAb8jvK.js") is True
+
+    def test_exempt_static_files(self):
+        assert self.mw._is_exempt("/static/favicon.ico") is True
+
+    def test_exempt_status_endpoint(self):
+        assert self.mw._is_exempt("/api/v1/status") is True
+
+    def test_exempt_spa_routes(self):
+        """SPA routes (non-API) should be exempt."""
+        assert self.mw._is_exempt("/settings") is True
+        assert self.mw._is_exempt("/") is True
+
+    def test_not_exempt_api_config(self):
+        assert self.mw._is_exempt("/api/v1/config") is False
+
+    def test_strict_speedtest_trigger(self):
+        assert self.mw._is_strict("/api/v1/speedtest/trigger") is True
+
+    def test_strict_double_slash(self):
+        assert self.mw._is_strict("//api/v1/speedtest/trigger") is True
+
+    def test_not_strict_config(self):
+        assert self.mw._is_strict("/api/v1/config") is False
 
 
 class TestRateLimitHeaders:

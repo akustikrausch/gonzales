@@ -2,6 +2,17 @@
 
 All notable changes to Gonzales will be documented in this file.
 
+## [3.10.2] - 2026-02-12
+
+### Bug Fixes
+
+- **Fix rate limiter blocking static assets in HA Ingress**: HA Ingress proxy sends double-slash paths (`//assets/foo.js`). The rate limiter only checked for `/assets/` prefix, causing static JS chunks to be rate-limited and triggering `Failed to fetch dynamically imported module` errors that crashed the web UI. Fixed by normalizing all paths before checking exemptions.
+- **Fix NoCacheIndexMiddleware double-slash handling**: Same HA Ingress path issue prevented `Cache-Control: immutable` header from being set on static assets.
+- **Increase rate limit burst size**: Increased from 20 to 30 to accommodate page loads that make multiple parallel API calls.
+- **Added rate limit middleware tests**: 14 new tests covering path normalization, exemption, and strict path detection.
+
+---
+
 ## [3.10.1] - 2026-02-12
 
 ### Bug Fixes

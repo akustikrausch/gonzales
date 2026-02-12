@@ -179,24 +179,38 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         for ip in stale_ips:
             del self._strict_buckets[ip]
 
+    @staticmethod
+    def _normalize_path(path: str) -> str:
+        """Normalize path for matching (HA Ingress sends //assets/ double-slash)."""
+        while "//" in path:
+            path = path.replace("//", "/")
+        return path
+
     def _is_exempt(self, path: str) -> bool:
         """Check if path is exempt from rate limiting."""
-        # Static files
-        if path.startswith("/static/") or path.startswith("/assets/"):
+        normalized = self._normalize_path(path)
+
+        # Static files (assets, favicon, etc.)
+        if normalized.startswith("/assets/") or normalized.startswith("/static/"):
             return True
 
         # Exact match exempt paths
-        if path in self.EXEMPT_PATHS:
+        if normalized in self.EXEMPT_PATHS:
+            return True
+
+        # Non-API paths are static resources (SPA fallback)
+        if not normalized.startswith("/api/"):
             return True
 
         return False
 
     def _is_strict(self, path: str) -> bool:
         """Check if path needs stricter rate limits."""
-        if path in self.STRICT_PATHS:
+        normalized = self._normalize_path(path)
+        if normalized in self.STRICT_PATHS:
             return True
         for prefix in self.STRICT_PREFIXES:
-            if path.startswith(prefix):
+            if normalized.startswith(prefix):
                 return True
         return False
 
@@ -207,7 +221,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         if not self.enabled:
             return await call_next(request)
 
-        path = request.url.path
+        path = self._normalize_path(request.url.path)
 
         # Skip rate limiting for exempt paths
         if self._is_exempt(path):
