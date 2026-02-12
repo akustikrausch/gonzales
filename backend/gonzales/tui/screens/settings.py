@@ -1,7 +1,7 @@
 from textual.app import ComposeResult
 from textual.containers import Container, Horizontal, Vertical
 from textual.screen import Screen
-from textual.widgets import Button, Footer, Header, Input, Label, Static
+from textual.widgets import Button, Footer, Header, Input, Label, Static, Switch
 
 
 class SettingsScreen(Screen):
@@ -40,6 +40,10 @@ class SettingsScreen(Screen):
                     type="number",
                 )
                 yield Static("")
+                with Horizontal(id="randomize-row"):
+                    yield Label("Randomize Schedule:")
+                    yield Switch(id="randomize-switch", value=False)
+                yield Static("")
                 with Horizontal(id="settings-buttons"):
                     yield Button("Save [Ctrl+S]", id="save-btn", variant="primary")
             yield Static("", id="settings-status")
@@ -55,6 +59,9 @@ class SettingsScreen(Screen):
         self.query_one("#ul-threshold-input", Input).value = str(
             config.get("upload_threshold_mbps", 500.0)
         )
+        self.query_one("#randomize-switch", Switch).value = config.get(
+            "scheduler_randomize", False
+        )
 
     def get_settings(self) -> dict:
         return {
@@ -67,6 +74,9 @@ class SettingsScreen(Screen):
             "upload_threshold_mbps": float(
                 self.query_one("#ul-threshold-input", Input).value or "500.0"
             ),
+            "scheduler_randomize": self.query_one(
+                "#randomize-switch", Switch
+            ).value,
         }
 
     def show_status(self, msg: str) -> None:
@@ -82,13 +92,23 @@ class SettingsScreen(Screen):
     def action_save_settings(self) -> None:
         """Save current settings."""
         from gonzales.config import settings
+        from gonzales.services.scheduler_service import scheduler_service
 
         try:
             new_settings = self.get_settings()
+            interval_changed = (
+                settings.test_interval_minutes != new_settings["test_interval_minutes"]
+            )
+            randomize_changed = (
+                settings.scheduler_randomize != new_settings["scheduler_randomize"]
+            )
             settings.test_interval_minutes = new_settings["test_interval_minutes"]
             settings.download_threshold_mbps = new_settings["download_threshold_mbps"]
             settings.upload_threshold_mbps = new_settings["upload_threshold_mbps"]
+            settings.scheduler_randomize = new_settings["scheduler_randomize"]
             settings.save_config()
+            if interval_changed or randomize_changed:
+                scheduler_service.reschedule(settings.test_interval_minutes)
             self.show_status("[green]Settings saved successfully![/]")
         except Exception as e:
             self.show_status(f"[red]Error saving settings: {e}[/]")

@@ -10,6 +10,7 @@ import {
   Pause,
   Gauge,
   Languages,
+  Shuffle,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { supportedLanguages } from "../i18n";
@@ -46,6 +47,7 @@ export function SettingsPage() {
   const [ispName, setIspName] = useState("");
   const [webhookUrl, setWebhookUrl] = useState("");
   const [retentionDays, setRetentionDays] = useState("0");
+  const [randomize, setRandomize] = useState(false);
 
   // Track if test settings have changed
   const [testSettingsChanged, setTestSettingsChanged] = useState(false);
@@ -61,6 +63,7 @@ export function SettingsPage() {
       setIspName(config.isp_name || "");
       setWebhookUrl(config.webhook_url || "");
       setRetentionDays(String(config.data_retention_days || 0));
+      setRandomize(config.scheduler_randomize);
       setTestSettingsChanged(false);
       setAdvancedSettingsChanged(false);
     }
@@ -101,6 +104,10 @@ export function SettingsPage() {
       }
     );
   };
+
+  // Calculate jitter for the current interval (mirrors backend _calculate_jitter: int())
+  const currentIntervalMin = Number(interval || 60);
+  const jitterMinutes = Math.floor(Math.min(Math.max(currentIntervalMin * 0.25, 1), 30));
 
   // Calculate effective minimum speeds based on tolerance
   const effectiveMinDownload = Number(dlThreshold) * (1 - tolerance / 100);
@@ -232,8 +239,65 @@ export function SettingsPage() {
           </GlassCard>
         )}
 
+        {/* Randomize Schedule */}
+        <GlassCard className="g-animate-in g-stagger-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center"
+                style={{
+                  background: randomize
+                    ? "var(--g-green-tint)"
+                    : "var(--g-border-subtle, var(--g-border))",
+                }}
+              >
+                <Shuffle
+                  className="w-5 h-5"
+                  style={{ color: randomize ? "var(--g-green)" : "var(--g-text-secondary)" }}
+                />
+              </div>
+              <div>
+                <p
+                  className="text-sm font-medium"
+                  style={{ color: "var(--g-text)" }}
+                >
+                  {t("settings.randomizeSchedule")}
+                </p>
+                <p
+                  className="text-xs"
+                  style={{ color: "var(--g-text-secondary)" }}
+                >
+                  {randomize
+                    ? t("settings.randomizeScheduleActive", {
+                        jitter: String(jitterMinutes),
+                        min: String(currentIntervalMin),
+                        max: String(currentIntervalMin + jitterMinutes),
+                      })
+                    : t("settings.randomizeScheduleDesc")}
+                </p>
+              </div>
+            </div>
+            <GlassButton
+              variant={randomize ? "default" : "primary"}
+              onClick={() => {
+                const newValue = !randomize;
+                setRandomize(newValue);
+                updateConfig.mutate({ scheduler_randomize: newValue });
+              }}
+              disabled={updateConfig.isPending}
+              aria-label={
+                randomize
+                  ? t("settings.disableRandomization")
+                  : t("settings.enableRandomization")
+              }
+            >
+              {randomize ? t("settings.disable") : t("settings.enable")}
+            </GlassButton>
+          </div>
+        </GlassCard>
+
         {/* Smart Scheduler */}
-        <div className="g-animate-in g-stagger-3">
+        <div className="g-animate-in g-stagger-4">
           <SmartSchedulerCard />
         </div>
       </section>

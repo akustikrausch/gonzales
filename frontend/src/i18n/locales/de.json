@@ -335,7 +335,12 @@
     "loadingServers": "Lade Server...",
     "failedToLoadServers": "Serverliste konnte nicht geladen werden. Speedtest CLI ist möglicherweise nicht verfügbar.",
     "searchServers": "Server suchen...",
-    "autoNearestServer": "Automatisch (nächster Server)"
+    "autoNearestServer": "Automatisch (nächster Server)",
+    "randomizeSchedule": "Zeitplan randomisieren",
+    "randomizeScheduleDesc": "Zufällige Verschiebung zu Testintervallen hinzufügen, damit verschiedene Tageszeiten abgedeckt werden",
+    "randomizeScheduleActive": "Aktiv: ±{{jitter}} Min. Jitter — Tests variieren zwischen {{min}}–{{max}} Min. Abstand",
+    "enableRandomization": "Zeitplan-Randomisierung aktivieren",
+    "disableRandomization": "Zeitplan-Randomisierung deaktivieren"
   },
   "qos": {
     "title": "QoS-Tests",
@@ -508,7 +513,7 @@
     "dashboard": "Dashboard",
     "dashboardText": "Zeigt deine neuesten Geschwindigkeitstestergebnisse mit Download-, Upload- und Ping-Anzeigen. Der Verbindungsqualitätswert gibt einen schnellen Überblick über deine Internetqualität.",
     "scheduledTests": "Geplante Tests",
-    "scheduledTestsText": "Tests werden automatisch im konfigurierten Intervall ausgeführt. Verwende den Planer-Schalter in der Kopfzeile zum Pausieren/Fortsetzen. Der Smart Scheduler kann Intervalle basierend auf Netzwerkbedingungen anpassen.",
+    "scheduledTestsText": "Tests werden automatisch im konfigurierten Intervall ausgeführt. Verwende den Planer-Schalter in der Kopfzeile zum Pausieren/Fortsetzen. Der Smart Scheduler kann Intervalle basierend auf Netzwerkbedingungen anpassen. Aktiviere 'Zeitplan randomisieren' für zufällige Verschiebungen, damit verschiedene Tageszeiten abgedeckt werden.",
     "api": "API",
     "apiText": "Alle Daten sind über die REST-API unter /api/v1/ verfügbar. Die vollständige Endpunktliste findest du in der Projekt-README.",
     "cli": "CLI",

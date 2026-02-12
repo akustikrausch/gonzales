@@ -16,7 +16,7 @@ Python FastAPI application with async SQLAlchemy and APScheduler.
 - **Services**:
   - `services/speedtest_runner.py` -- Ookla CLI subprocess. `run()` for simple execution, `run_with_progress()` for SSE streaming with progress events, `list_servers()` for server enumeration
   - `services/measurement_service.py` -- orchestrates tests, threshold checks, asyncio lock, publishes events to event_bus
-  - `services/scheduler_service.py` -- APScheduler recurring test execution
+  - `services/scheduler_service.py` -- APScheduler recurring test execution with optional jitter (`_calculate_jitter`: 25% of interval, capped at 30 min, min 1 min)
   - `services/statistics_service.py` -- basic stats (percentiles, aggregates) + enhanced stats (hourly, daily, trend regression, SLA compliance, reliability score, per-server breakdown) + innovative insights (anomaly detection, ISP score, peak/off-peak, correlations, degradation alerts, predictions)
   - `services/event_bus.py` -- async pub/sub for real-time SSE streaming. `EventBus` class with per-subscriber `asyncio.Queue` fan-out
   - `services/export_service.py` -- CSV + PDF + professional compliance report generation
@@ -121,7 +121,7 @@ All under `/api/v1`:
 | POST | `/speedtest/trigger` | Run test manually |
 | GET | `/speedtest/stream` | SSE stream for real-time test progress |
 | GET | `/config` | Current config |
-| PUT | `/config` | Update config (interval, thresholds, preferred_server_id, cooldown, theme, isp_name, data_retention_days, webhook_url) |
+| PUT | `/config` | Update config (interval, thresholds, preferred_server_id, cooldown, theme, isp_name, data_retention_days, webhook_url, scheduler_randomize) |
 | GET | `/servers` | List available speedtest servers |
 | GET | `/outages` | List detected outages |
 | GET | `/outages/statistics` | Aggregated outage statistics |

@@ -34,7 +34,7 @@
 | Category | Features |
 |----------|----------|
 | **Monitoring** | Scheduled tests (15-240 min), 10,000+ Ookla servers, preferred server pinning, real-time SSE streaming |
-| **Smart Scheduling** | Adaptive intervals, anomaly detection with burst mode, stability analysis, daily data budget (2 GB default) |
+| **Smart Scheduling** | Adaptive intervals, anomaly detection with burst mode, stability analysis, daily data budget (2 GB default), optional schedule randomization for full time-of-day coverage |
 | **Analytics** | Hourly/daily/weekly stats, per-server comparison, SLA compliance, reliability metrics, trend prediction |
 | **Root-Cause Analysis** | Network health scoring, multi-layer diagnostics (DNS/Local/ISP), hop-speed correlation, actionable recommendations |
 | **Quality Analysis** | ISP grading (A+ to F), QoS profiles (gaming/streaming/video calls), network topology, latency analysis |
@@ -198,6 +198,7 @@ cp .env.example .env
 | `GONZALES_ISP_NAME` | *(empty)* | Provider name for reports |
 | `GONZALES_DATA_RETENTION_DAYS` | `0` | Delete data older than N days (0 = unlimited) |
 | `GONZALES_WEBHOOK_URL` | *(empty)* | Webhook URL for notifications (empty = disabled) |
+| `GONZALES_SCHEDULER_RANDOMIZE` | `false` | Add random jitter to test intervals for full time-of-day coverage (25% of interval, capped at 30 min) |
 
 Settings can also be changed at runtime via the web UI (Settings page) or the API (`PUT /api/v1/config`). Runtime changes are persisted to `config.json`, which is auto-created and gitignored.
 

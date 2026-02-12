@@ -109,6 +109,7 @@ class GonzalesApp(App):
                 "test_interval_minutes": settings.test_interval_minutes,
                 "download_threshold_mbps": settings.download_threshold_mbps,
                 "upload_threshold_mbps": settings.upload_threshold_mbps,
+                "scheduler_randomize": settings.scheduler_randomize,
             })
 
         elif isinstance(screen, StatisticsScreen):

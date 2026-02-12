@@ -2,6 +2,17 @@
 
 All notable changes to Gonzales will be documented in this file.
 
+## [3.10.0] - 2026-02-12
+
+### Features
+
+- **Scheduler randomization**: Optional jitter for scheduled speed tests. When enabled, adds a random time offset to each test interval so that different times of day are covered over time instead of always testing at the same hours. Jitter is proportional to the interval (25%, capped at 30 minutes). Works with all interval settings and the smart scheduler.
+  - Toggle in Settings > Scheduler > "Randomize Schedule"
+  - Available in Web UI and TUI
+  - Examples: 15 min interval → ±3.75 min jitter, 2h interval → ±30 min jitter
+
+---
+
 ## [3.9.9] - 2026-02-08
 
 ### Features

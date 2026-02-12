@@ -23,6 +23,7 @@ async def get_config(request: Request):
         isp_name=settings.isp_name,
         data_retention_days=settings.data_retention_days,
         webhook_url=settings.webhook_url,
+        scheduler_randomize=settings.scheduler_randomize,
         host=settings.host,
         port=settings.port,
         log_level=settings.log_level,
@@ -33,9 +34,13 @@ async def get_config(request: Request):
 @router.put("", response_model=ConfigOut, dependencies=[Depends(require_api_key)])
 @limiter.limit(RATE_LIMITS["config_update"])
 async def update_config(request: Request, update: ConfigUpdate):
+    needs_reschedule = False
     if update.test_interval_minutes is not None:
         settings.test_interval_minutes = update.test_interval_minutes
-        scheduler_service.reschedule(update.test_interval_minutes)
+        needs_reschedule = True
+    if update.scheduler_randomize is not None:
+        settings.scheduler_randomize = update.scheduler_randomize
+        needs_reschedule = True
     if update.download_threshold_mbps is not None:
         settings.download_threshold_mbps = update.download_threshold_mbps
     if update.upload_threshold_mbps is not None:
@@ -57,6 +62,12 @@ async def update_config(request: Request, update: ConfigUpdate):
 
     settings.save_config()
 
+    if needs_reschedule:
+        scheduler_service.reschedule(
+            settings.test_interval_minutes,
+            randomize=settings.scheduler_randomize,
+        )
+
     return ConfigOut(
         test_interval_minutes=settings.test_interval_minutes,
         download_threshold_mbps=settings.download_threshold_mbps,
@@ -68,6 +79,7 @@ async def update_config(request: Request, update: ConfigUpdate):
         isp_name=settings.isp_name,
         data_retention_days=settings.data_retention_days,
         webhook_url=settings.webhook_url,
+        scheduler_randomize=settings.scheduler_randomize,
         host=settings.host,
         port=settings.port,
         log_level=settings.log_level,

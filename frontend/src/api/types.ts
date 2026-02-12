@@ -122,6 +122,7 @@ export interface Config {
   port: number;
   log_level: string;
   debug: boolean;
+  scheduler_randomize: boolean;
 }
 
 export interface ConfigUpdate {
@@ -135,6 +136,7 @@ export interface ConfigUpdate {
   isp_name?: string;
   data_retention_days?: number;
   webhook_url?: string;
+  scheduler_randomize?: boolean;
 }
 
 export type SortField = "timestamp" | "download_mbps" | "upload_mbps" | "ping_latency_ms" | "ping_jitter_ms";

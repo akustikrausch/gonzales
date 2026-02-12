@@ -14,6 +14,7 @@ MUTABLE_KEYS = {
     "isp_name",
     "data_retention_days",
     "webhook_url",
+    "scheduler_randomize",
     # Smart scheduler settings
     "smart_scheduler_enabled",
     "smart_scheduler_burst_interval",
@@ -46,6 +47,7 @@ class Settings(BaseSettings):
     isp_name: str = ""  # Provider name for reports
     data_retention_days: int = 0  # 0 = unlimited, otherwise delete data older than N days
     webhook_url: str = ""  # Webhook URL for notifications (empty = disabled)
+    scheduler_randomize: bool = False  # Add random jitter (±25%) to scheduled test times
 
     @property
     def database_url(self) -> str:

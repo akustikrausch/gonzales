@@ -335,7 +335,12 @@
     "loadingServers": "Loading servers...",
     "failedToLoadServers": "Failed to load servers. Speedtest CLI may not be available.",
     "searchServers": "Search servers...",
-    "autoNearestServer": "Auto (nearest server)"
+    "autoNearestServer": "Auto (nearest server)",
+    "randomizeSchedule": "Randomize Schedule",
+    "randomizeScheduleDesc": "Add random offset to test intervals so different times of day are covered over time",
+    "randomizeScheduleActive": "Active: ±{{jitter}} min jitter — tests vary between {{min}}–{{max}} min apart",
+    "enableRandomization": "Enable schedule randomization",
+    "disableRandomization": "Disable schedule randomization"
   },
   "qos": {
     "title": "QoS Tests",
@@ -509,7 +514,7 @@
     "dashboard": "Dashboard",
     "dashboardText": "Shows your latest speed test results with download, upload, and ping gauges. The connection health score gives a quick overview of your internet quality.",
     "scheduledTests": "Scheduled Tests",
-    "scheduledTestsText": "Tests run automatically at the configured interval. Use the scheduler toggle in the header to pause/resume. The smart scheduler can adapt intervals based on network conditions.",
+    "scheduledTestsText": "Tests run automatically at the configured interval. Use the scheduler toggle in the header to pause/resume. The smart scheduler can adapt intervals based on network conditions. Enable 'Randomize Schedule' to add jitter so different times of day are covered.",
     "api": "API",
     "apiText": "All data is available via REST API at /api/v1/. See the full endpoint list in the project README.",
     "cli": "CLI",

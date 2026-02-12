@@ -18,6 +18,24 @@ RETRY_DELAY_SECONDS = 60  # Wait 1 minute between retries
 MAX_CONSECUTIVE_FAILURES = 3  # 3 failures = outage confirmed
 
 
+def _calculate_jitter(interval_minutes: int) -> int:
+    """Calculate jitter in seconds, proportional to interval but capped.
+
+    Formula: 25% of interval, capped at 30 minutes, minimum 1 minute.
+    Examples:
+      5 min  → 75s    (1.25 min jitter)
+      15 min → 225s   (3.75 min jitter)
+      30 min → 450s   (7.5 min jitter)
+      60 min → 900s   (15 min jitter)
+      120 min → 1800s (30 min jitter, cap reached)
+      360 min → 1800s (30 min jitter, capped)
+    """
+    jitter_minutes = interval_minutes * 0.25
+    jitter_minutes = min(jitter_minutes, 30)  # Cap at 30 minutes
+    jitter_minutes = max(jitter_minutes, 1)   # At least 1 minute
+    return int(jitter_minutes * 60)
+
+
 class SchedulerService:
     def __init__(self) -> None:
         self._scheduler: AsyncIOScheduler | None = None
@@ -257,6 +275,7 @@ class SchedulerService:
 
     def start(self) -> None:
         self._scheduler = AsyncIOScheduler()
+        jitter = _calculate_jitter(settings.test_interval_minutes) if settings.scheduler_randomize else None
         self._scheduler.add_job(
             self._run_scheduled_test,
             "interval",
@@ -264,6 +283,7 @@ class SchedulerService:
             id="speedtest",
             max_instances=1,
             misfire_grace_time=120,
+            jitter=jitter,
         )
         # Add daily retention cleanup job (runs at 3 AM)
         self._scheduler.add_job(
@@ -277,8 +297,9 @@ class SchedulerService:
         )
         self._scheduler.start()
         logger.info(
-            "Scheduler started: running every %d minutes (retention: %s)",
+            "Scheduler started: running every %d minutes (jitter: %s, retention: %s)",
             settings.test_interval_minutes,
+            f"±{jitter}s" if jitter else "off",
             f"{settings.data_retention_days} days" if settings.data_retention_days > 0 else "disabled",
         )
 
@@ -287,14 +308,22 @@ class SchedulerService:
             self._scheduler.shutdown(wait=True)
             logger.info("Scheduler stopped")
 
-    def reschedule(self, interval_minutes: int) -> None:
+    def reschedule(self, interval_minutes: int, randomize: bool | None = None) -> None:
         if self._scheduler and self._scheduler.running:
+            if randomize is None:
+                randomize = settings.scheduler_randomize
+            jitter = _calculate_jitter(interval_minutes) if randomize else None
             self._scheduler.reschedule_job(
                 "speedtest",
                 trigger="interval",
                 minutes=interval_minutes,
+                jitter=jitter,
             )
-            logger.info("Scheduler rescheduled: every %d minutes", interval_minutes)
+            logger.info(
+                "Scheduler rescheduled: every %d minutes (jitter: %s)",
+                interval_minutes,
+                f"±{jitter}s" if jitter else "off",
+            )
 
     def pause(self) -> bool:
         """Pause the scheduler (tests will be skipped until resumed)."""

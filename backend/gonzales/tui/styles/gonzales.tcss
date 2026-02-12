@@ -173,6 +173,26 @@ Input:focus {
     border: solid #00ffff;
 }
 
+#randomize-row {
+    height: auto;
+    align: left middle;
+}
+
+#randomize-row Label {
+    margin-top: 0;
+    width: auto;
+    margin-right: 1;
+}
+
+Switch {
+    background: #1a1a2e;
+    border: solid #333366;
+}
+
+Switch.-on {
+    background: #1a1a2e;
+}
+
 #settings-status {
     color: #00ff00;
     margin-top: 1;
