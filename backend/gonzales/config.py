@@ -49,6 +49,11 @@ class Settings(BaseSettings):
     webhook_url: str = ""  # Webhook URL for notifications (empty = disabled)
     scheduler_randomize: bool = False  # Add random jitter (±25%) to scheduled test times
 
+    # Smart scheduler settings
+    smart_scheduler_enabled: bool = False
+    smart_scheduler_burst_interval: int = 10
+    smart_scheduler_daily_budget_mb: int = 2048
+
     @property
     def database_url(self) -> str:
         return f"sqlite+aiosqlite:///{self.db_path}"

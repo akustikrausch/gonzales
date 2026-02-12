@@ -2,6 +2,14 @@
 
 All notable changes to Gonzales will be documented in this file.
 
+## [3.10.1] - 2026-02-12
+
+### Bug Fixes
+
+- **Fix 500 error on config save**: `save_config()` crashed with `AttributeError` because smart scheduler keys (`smart_scheduler_enabled`, `smart_scheduler_burst_interval`, `smart_scheduler_daily_budget_mb`) were listed in `MUTABLE_KEYS` but had no corresponding fields in the `Settings` class. Added the missing fields with proper defaults.
+
+---
+
 ## [3.10.0] - 2026-02-12
 
 ### Features
