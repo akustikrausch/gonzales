@@ -7,7 +7,7 @@ name = "gonzales"
 version = "3.10.2"
 description = "Open-source internet speed monitor with automated testing, analytics dashboard, and Home Assistant integration"
 license = "MIT"
-authors = [{ name = "akustikrausch" }]
+authors = [{ name = "Andreas Wendorf" }]
 keywords = [
     "internet speed test",
     "bandwidth monitor",
