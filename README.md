@@ -364,6 +364,8 @@ Gonzales integrates with Home Assistant in two ways. Both live in the [gonzales-
 
 One-click installation that runs Gonzales entirely inside Home Assistant as a Docker container. The web dashboard is accessible via the HA sidebar (Ingress). Database and config are persisted across updates.
 
+[![Add Repository to Home Assistant](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fakustikrausch%2Fgonzales-ha)
+
 1. In HA go to **Settings > Add-ons > Add-on Store** (three-dot menu) > **Repositories**
 2. Add `https://github.com/akustikrausch/gonzales-ha`
 3. Install **Gonzales Speed Monitor** and start it
@@ -546,6 +548,8 @@ Gonzales laesst sich auf zwei Arten mit Home Assistant verbinden. Beides lebt im
 **Option A: Home Assistant Add-on (empfohlen)**
 
 Ein-Klick-Installation, die Gonzales komplett in Home Assistant als Docker-Container ausfuehrt. Das Web-Dashboard ist ueber die HA-Sidebar (Ingress) erreichbar. Datenbank und Config bleiben bei Updates erhalten.
+
+[![Repository zu Home Assistant hinzufuegen](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fakustikrausch%2Fgonzales-ha)
 
 1. In HA zu **Einstellungen > Add-ons > Add-on Store** (Drei-Punkte-Menue) > **Repositories**
 2. `https://github.com/akustikrausch/gonzales-ha` hinzufuegen
