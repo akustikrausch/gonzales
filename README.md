@@ -48,6 +48,20 @@
 
 ---
 
+## Gonzales Ecosystem
+
+Gonzales consists of three repositories. Which ones you need depends on your setup:
+
+| Repository | What it is | You need this if... |
+|-----------|------------|---------------------|
+| **[gonzales](https://github.com/akustikrausch/gonzales)** | Backend, Web Dashboard, TUI, CLI, API, MCP Server | You run Gonzales standalone (Docker, Raspberry Pi, bare metal) |
+| **[gonzales-ha](https://github.com/akustikrausch/gonzales-ha)** | Home Assistant Add-on (App) | You use HA OS/Supervised and want one-click installation |
+| **[gonzales-integration](https://github.com/akustikrausch/gonzales-integration)** | Home Assistant Integration (HACS) | You run Gonzales standalone AND want HA sensors |
+
+> **Add-on users** don't need the HACS integration -- the add-on bundles it automatically.
+
+---
+
 ## English
 
 ### Getting Started
@@ -402,6 +416,20 @@ Copy `custom_components/gonzales/` from the [gonzales-integration](https://githu
 ---
 
 ## Deutsch
+
+### Gonzales Ecosystem
+
+Gonzales besteht aus drei Repositories. Welche du brauchst, haengt von deinem Setup ab:
+
+| Repository | Was es ist | Du brauchst das wenn... |
+|-----------|------------|------------------------|
+| **[gonzales](https://github.com/akustikrausch/gonzales)** | Backend, Web Dashboard, TUI, CLI, API, MCP Server | Du Gonzales standalone betreibst (Docker, Raspberry Pi, Bare Metal) |
+| **[gonzales-ha](https://github.com/akustikrausch/gonzales-ha)** | Home Assistant Add-on (App) | Du HA OS/Supervised nutzt und Ein-Klick-Installation willst |
+| **[gonzales-integration](https://github.com/akustikrausch/gonzales-integration)** | Home Assistant Integration (HACS) | Du Gonzales standalone betreibst UND HA-Sensoren willst |
+
+> **Add-on Nutzer** brauchen die HACS-Integration nicht -- das Add-on bringt sie automatisch mit.
+
+---
 
 **Professionelle Internet-Überwachung für volle Transparenz.** Gonzales führt rund um die Uhr automatisierte Speedtests durch und baut eine umfassende Performance-Datenbank auf. Wisse genau, was deine Verbindung leistet — mit objektiven Daten, historischen Trends und detaillierten Analysen.
 
