@@ -358,27 +358,32 @@ curl http://localhost:8470/api/v1/root-cause/analysis
 
 #### Home Assistant
 
-Gonzales integrates with Home Assistant in two ways. Both live in the [gonzales-ha](https://github.com/akustikrausch/gonzales-ha) repository.
+Gonzales integrates with Home Assistant in three ways:
 
-**Option A: Home Assistant Add-on (recommended)**
+**Option A: Home Assistant Add-on (recommended for HA OS/Supervised)**
 
 One-click installation that runs Gonzales entirely inside Home Assistant as a Docker container. The web dashboard is accessible via the HA sidebar (Ingress). Database and config are persisted across updates.
 
 [![Add Repository to Home Assistant](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fakustikrausch%2Fgonzales-ha)
 
-1. In HA go to **Settings > Add-ons > Add-on Store** (three-dot menu) > **Repositories**
+1. In HA go to **Settings > Apps > App Store** (three-dot menu) > **Repositories**
 2. Add `https://github.com/akustikrausch/gonzales-ha`
 3. Install **Gonzales Speed Monitor** and start it
 4. The sensor integration is auto-discovered -- confirm setup when prompted
 
-**Option B: Standalone + HACS Integration**
+**Option B: HACS Integration (for standalone Gonzales)**
 
-Run Gonzales on a separate machine (e.g. Raspberry Pi) and install the HACS integration to pull sensor data into HA.
+Install the integration via HACS to connect Home Assistant to a Gonzales server running on a separate device (Docker, Raspberry Pi, bare metal).
 
-1. Install via HACS (custom repository) or copy `custom_components/gonzales/` to your HA config directory
-2. Add the integration and enter the host/port of your Gonzales instance
+1. Install [Gonzales Integration](https://github.com/akustikrausch/gonzales-integration) via HACS
+2. Go to **Settings > Devices & Services > Add Integration**
+3. Search for **Gonzales** and enter host, port, and API key
 
-**Sensors** (both options):
+**Option C: Manual Integration**
+
+Copy `custom_components/gonzales/` from the [gonzales-integration](https://github.com/akustikrausch/gonzales-integration) repository to your HA config directory.
+
+**Sensors** (all options):
 - `sensor.gonzales_download_speed` -- latest download speed (Mbit/s)
 - `sensor.gonzales_upload_speed` -- latest upload speed (Mbit/s)
 - `sensor.gonzales_ping_latency` -- latest ping latency (ms)
@@ -391,7 +396,7 @@ Run Gonzales on a separate machine (e.g. Raspberry Pi) and install the HACS inte
 - `sensor.gonzales_stability_score` -- network stability score (0-100%)
 - Diagnostic: scheduler status, test in progress, uptime, total measurements, DB size
 
-**Button** (both options):
+**Button** (all options):
 - `button.gonzales_run_speed_test` -- manually trigger a speed test from HA
 
 ---
@@ -543,29 +548,34 @@ Einstellungen koennen auch zur Laufzeit ueber die Web-Oberflaeche (Einstellungen
 
 #### Home Assistant
 
-Gonzales laesst sich auf zwei Arten mit Home Assistant verbinden. Beides lebt im [gonzales-ha](https://github.com/akustikrausch/gonzales-ha) Repository.
+Gonzales laesst sich auf drei Arten mit Home Assistant verbinden:
 
-**Option A: Home Assistant Add-on (empfohlen)**
+**Option A: Home Assistant Add-on (empfohlen fuer HA OS/Supervised)**
 
 Ein-Klick-Installation, die Gonzales komplett in Home Assistant als Docker-Container ausfuehrt. Das Web-Dashboard ist ueber die HA-Sidebar (Ingress) erreichbar. Datenbank und Config bleiben bei Updates erhalten.
 
 [![Repository zu Home Assistant hinzufuegen](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fakustikrausch%2Fgonzales-ha)
 
-1. In HA zu **Einstellungen > Add-ons > Add-on Store** (Drei-Punkte-Menue) > **Repositories**
+1. In HA zu **Einstellungen > Apps > App Store** (Drei-Punkte-Menue) > **Repositories**
 2. `https://github.com/akustikrausch/gonzales-ha` hinzufuegen
 3. **Gonzales Speed Monitor** installieren und starten
 4. Die Sensor-Integration wird automatisch erkannt -- Einrichtung bestaetigen
 
-**Option B: Standalone + HACS Integration**
+**Option B: HACS Integration (fuer Standalone-Gonzales)**
 
-Gonzales auf einem separaten Geraet laufen lassen (z.B. Raspberry Pi) und die HACS-Integration installieren, um Sensordaten in HA zu holen.
+Die Integration ueber HACS installieren, um Home Assistant mit einem Gonzales-Server zu verbinden, der auf einem separaten Geraet laeuft (Docker, Raspberry Pi, Bare Metal).
 
-1. Installation ueber HACS (Custom Repository) oder manuell `custom_components/gonzales/` ins HA Config-Verzeichnis kopieren
-2. Integration hinzufuegen und Host/Port der Gonzales-Instanz eingeben
+1. [Gonzales Integration](https://github.com/akustikrausch/gonzales-integration) ueber HACS installieren
+2. Zu **Einstellungen > Geraete & Dienste > Integration hinzufuegen**
+3. Nach **Gonzales** suchen und Host, Port und API-Key eingeben
 
-**Sensoren** (beide Optionen): Download-Geschwindigkeit, Upload-Geschwindigkeit, Ping-Latenz, Ping-Jitter, Paketverlust, Letzter Test, ISP-Score, Netzwerk-Gesundheit, Smart-Scheduler-Phase, Stabilitaets-Score. Zusaetzlich Diagnose-Sensoren fuer Scheduler-Status, laufende Tests, Uptime, Gesamtmessungen und Datenbankgroesse.
+**Option C: Manuelle Integration**
 
-**Button** (beide Optionen): `button.gonzales_run_speed_test` -- manuell einen Speedtest aus HA starten.
+`custom_components/gonzales/` aus dem [gonzales-integration](https://github.com/akustikrausch/gonzales-integration) Repository ins HA Config-Verzeichnis kopieren.
+
+**Sensoren** (alle Optionen): Download-Geschwindigkeit, Upload-Geschwindigkeit, Ping-Latenz, Ping-Jitter, Paketverlust, Letzter Test, ISP-Score, Netzwerk-Gesundheit, Smart-Scheduler-Phase, Stabilitaets-Score. Zusaetzlich Diagnose-Sensoren fuer Scheduler-Status, laufende Tests, Uptime, Gesamtmessungen und Datenbankgroesse.
+
+**Button** (alle Optionen): `button.gonzales_run_speed_test` -- manuell einen Speedtest aus HA starten.
 
 #### CLI-Befehle
 
@@ -655,7 +665,7 @@ cp config.json.example config.json  # Runtime settings (optional)
 | CLI | Typer + Rich |
 | AI Integration | MCP Server (Model Context Protocol) |
 | Export | CSV, PDF (ReportLab) |
-| Home Assistant | [gonzales-ha](https://github.com/akustikrausch/gonzales-ha) (Add-on + HACS Integration) |
+| Home Assistant | [gonzales-ha](https://github.com/akustikrausch/gonzales-ha) (Add-on) + [gonzales-integration](https://github.com/akustikrausch/gonzales-integration) (HACS) |
 
 ## Security
 

@@ -6,12 +6,12 @@
 
 1. **ALL version files MUST be in sync** - Never release with mismatched versions
 2. **CHANGELOG MUST be updated** before any release
-3. **GitHub releases MUST be created** for BOTH repos after every version bump - use `gh release create`
+3. **GitHub releases MUST be created** for ALL THREE repos after every version bump - use `gh release create`
 4. **Frontend version constant MUST match** backend version (prevents infinite reload loop)
 5. **Verify versions BEFORE pushing** - Always run the verification command below
 6. **ALWAYS create GitHub releases immediately after pushing** - Never leave releases out of sync with code
-7. **NEVER release gonzales without updating gonzales-ha** - Both repos MUST be released together as one atomic operation. The HA add-on runs the same backend, TUI, and web UI. Any code fix, feature, or change in gonzales MUST be reflected in gonzales-ha with matching version. A gonzales release without a gonzales-ha release is INCOMPLETE and FORBIDDEN.
-8. **gonzales-ha MUST be identical in functionality** - The HA add-on is the same app, just packaged for Home Assistant. TUI, Web UI, API, MCP, CLI must all be identical between standalone and HA versions.
+7. **NEVER release gonzales without updating gonzales-ha AND gonzales-integration** - All three repos MUST be released together as one atomic operation. The HA add-on runs the same backend, TUI, and web UI. The HACS integration connects to any Gonzales server. Any code fix, feature, or change in gonzales MUST be reflected in gonzales-ha and gonzales-integration with matching version. A gonzales release without gonzales-ha and gonzales-integration releases is INCOMPLETE and FORBIDDEN.
+8. **gonzales-ha and gonzales-integration MUST be identical in functionality** - The HA add-on is the same app, just packaged for Home Assistant. The HACS integration provides the same sensors and services. TUI, Web UI, API, MCP, CLI must all be identical between standalone and HA versions.
 
 ### Version Verification Command
 
@@ -26,7 +26,9 @@ grep "FRONTEND_VERSION" frontend/src/hooks/useVersionCheck.ts && \
 grep '"version"' frontend/package.json | head -1 && \
 echo "=== GONZALES-HA REPO ===" && \
 grep "^version:" ../gonzales-ha/gonzales-addon/config.yaml && \
-grep '"version"' ../gonzales-ha/custom_components/gonzales/manifest.json
+grep '"version"' ../gonzales-ha/custom_components/gonzales/manifest.json && \
+echo "=== GONZALES-INTEGRATION REPO ===" && \
+grep '"version"' ../gonzales-integration/custom_components/gonzales/manifest.json
 ```
 
 All outputs MUST show the same version number!
@@ -51,24 +53,36 @@ All outputs MUST show the same version number!
 | `custom_components/gonzales/manifest.json` | `"version": "X.Y.Z"` | `"version": "2.1.2"` |
 | `gonzales-addon/CHANGELOG.md` | New entry at top | `## 2.1.2` |
 
+### Files to Update (gonzales-integration repo)
+
+| File | Field | Example |
+|------|-------|---------|
+| `custom_components/gonzales/manifest.json` | `"version": "X.Y.Z"` | `"version": "3.10.2"` |
+
 ### Release Checklist
 
-1. [ ] Update ALL version files in both repos
+1. [ ] Update ALL version files in all three repos
 2. [ ] Update CHANGELOG.md with changes
 3. [ ] Run version verification command
 4. [ ] Rebuild frontend: `cd frontend && npm run build`
 5. [ ] Copy to static: `rm -rf backend/gonzales/static/* && cp -r frontend/dist/* backend/gonzales/static/`
 6. [ ] Commit and push gonzales repo
 7. [ ] Commit and push gonzales-ha repo
-8. [ ] **Create GitHub release for gonzales repo** (MANDATORY):
-   ```bash
-   gh release create vX.Y.Z --title "vX.Y.Z: Title" --notes "Release notes here"
-   ```
-9. [ ] **Create GitHub release for gonzales-ha repo** (MANDATORY):
-   ```bash
-   cd ../gonzales-ha && gh release create vX.Y.Z --title "vX.Y.Z: Title" --notes "Release notes here"
-   ```
-10. [ ] Verify releases show correct versions in GitHub UI
+8. [ ] Update version in gonzales-integration `custom_components/gonzales/manifest.json`
+9. [ ] Commit and push gonzales-integration repo
+10. [ ] **Create GitHub release for gonzales repo** (MANDATORY):
+    ```bash
+    gh release create vX.Y.Z --title "vX.Y.Z: Title" --notes "Release notes here"
+    ```
+11. [ ] **Create GitHub release for gonzales-ha repo** (MANDATORY):
+    ```bash
+    cd ../gonzales-ha && gh release create vX.Y.Z --title "vX.Y.Z: Title" --notes "Release notes here"
+    ```
+12. [ ] **Create GitHub release for gonzales-integration repo** (MANDATORY):
+    ```bash
+    cd ../gonzales-integration && gh release create vX.Y.Z --title "vX.Y.Z: Title" --notes "Release notes here"
+    ```
+13. [ ] Verify releases show correct versions in GitHub UI
 
 **IMPORTANT:** GitHub releases MUST be created immediately after pushing. The "Latest" release tag in GitHub must always match the current version in the code.
 
@@ -99,7 +113,7 @@ cd backend && python -m gonzales
 
 - Backend: FastAPI + SQLAlchemy + SQLite
 - Frontend: React + TypeScript + Vite + TailwindCSS
-- Home Assistant: Add-on with Ingress support
+- Home Assistant: Add-on with Ingress support + HACS Integration
 
 ## Internationalization (i18n)
 
