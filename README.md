@@ -1,5 +1,6 @@
 # Gonzales - Internet Speed Monitor
 
+[![GitHub Release](https://img.shields.io/github/release/akustikrausch/gonzales.svg)](https://github.com/akustikrausch/gonzales/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
