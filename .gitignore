@@ -68,6 +68,14 @@ audits/
 # Agent bootstrap prompt (meta-tooling, not project code)
 AGENT_BOOTSTRAP.md
 
+# AI tooling and internal dev docs (not for public consumption)
+CLAUDE.md
+.claude/
+REQUIREMENTS.md
+PLAN.md
+STATUS.md
+STYLEGUIDE.md
+
 # Competitive analysis (internal strategy, not to be committed)
 COMPETITORS.md
 tmp/
