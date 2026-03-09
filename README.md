@@ -57,7 +57,7 @@ Gonzales consists of three repositories. Which ones you need depends on your set
 |-----------|------------|---------------------|
 | **[gonzales](https://github.com/akustikrausch/gonzales)** | Backend, Web Dashboard, TUI, CLI, API, MCP Server | You run Gonzales standalone (Docker, Raspberry Pi, bare metal) |
 | **[gonzales-ha](https://github.com/akustikrausch/gonzales-ha)** | Home Assistant Add-on (App) | You use HA OS/Supervised and want one-click installation |
-| **[gonzales-integration](https://github.com/akustikrausch/gonzales-integration)** | Home Assistant Integration (HACS) | You run Gonzales standalone AND want HA sensors |
+| **[gonzales-integration](https://github.com/akustikrausch/gonzales-integration)** | Home Assistant Integration (HACS Default) | You run Gonzales standalone AND want HA sensors |
 
 > **Add-on users** don't need the HACS integration -- the add-on bundles it automatically.
 
@@ -388,9 +388,9 @@ One-click installation that runs Gonzales entirely inside Home Assistant as a Do
 
 **Option B: HACS Integration (for standalone Gonzales)**
 
-Install the integration via HACS to connect Home Assistant to a Gonzales server running on a separate device (Docker, Raspberry Pi, bare metal).
+Install the integration via HACS to connect Home Assistant to a Gonzales server running on a separate device (Docker, Raspberry Pi, bare metal). Gonzales is part of the HACS Default repository -- no custom repository URL needed.
 
-1. Install [Gonzales Integration](https://github.com/akustikrausch/gonzales-integration) via HACS
+1. Open **HACS > Integrations**, search for **Gonzales**, and install
 2. Go to **Settings > Devices & Services > Add Integration**
 3. Search for **Gonzales** and enter host, port, and API key
 
@@ -426,7 +426,7 @@ Gonzales besteht aus drei Repositories. Welche du brauchst, haengt von deinem Se
 |-----------|------------|------------------------|
 | **[gonzales](https://github.com/akustikrausch/gonzales)** | Backend, Web Dashboard, TUI, CLI, API, MCP Server | Du Gonzales standalone betreibst (Docker, Raspberry Pi, Bare Metal) |
 | **[gonzales-ha](https://github.com/akustikrausch/gonzales-ha)** | Home Assistant Add-on (App) | Du HA OS/Supervised nutzt und Ein-Klick-Installation willst |
-| **[gonzales-integration](https://github.com/akustikrausch/gonzales-integration)** | Home Assistant Integration (HACS) | Du Gonzales standalone betreibst UND HA-Sensoren willst |
+| **[gonzales-integration](https://github.com/akustikrausch/gonzales-integration)** | Home Assistant Integration (HACS Default) | Du Gonzales standalone betreibst UND HA-Sensoren willst |
 
 > **Add-on Nutzer** brauchen die HACS-Integration nicht -- das Add-on bringt sie automatisch mit.
 
@@ -592,9 +592,9 @@ Ein-Klick-Installation, die Gonzales komplett in Home Assistant als Docker-Conta
 
 **Option B: HACS Integration (fuer Standalone-Gonzales)**
 
-Die Integration ueber HACS installieren, um Home Assistant mit einem Gonzales-Server zu verbinden, der auf einem separaten Geraet laeuft (Docker, Raspberry Pi, Bare Metal).
+Die Integration ueber HACS installieren, um Home Assistant mit einem Gonzales-Server zu verbinden, der auf einem separaten Geraet laeuft (Docker, Raspberry Pi, Bare Metal). Gonzales ist im HACS Default Repository enthalten -- keine Custom Repository URL noetig.
 
-1. [Gonzales Integration](https://github.com/akustikrausch/gonzales-integration) ueber HACS installieren
+1. **HACS > Integrations** oeffnen, nach **Gonzales** suchen und installieren
 2. Zu **Einstellungen > Geraete & Dienste > Integration hinzufuegen**
 3. Nach **Gonzales** suchen und Host, Port und API-Key eingeben
 
@@ -694,7 +694,7 @@ cp config.json.example config.json  # Runtime settings (optional)
 | CLI | Typer + Rich |
 | AI Integration | MCP Server (Model Context Protocol) |
 | Export | CSV, PDF (ReportLab) |
-| Home Assistant | [gonzales-ha](https://github.com/akustikrausch/gonzales-ha) (Add-on) + [gonzales-integration](https://github.com/akustikrausch/gonzales-integration) (HACS) |
+| Home Assistant | [gonzales-ha](https://github.com/akustikrausch/gonzales-ha) (Add-on) + [gonzales-integration](https://github.com/akustikrausch/gonzales-integration) (HACS Default) |
 
 ## Security
 
