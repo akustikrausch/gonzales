@@ -163,3 +163,49 @@ class TestTestFailureRepository:
 
         recent = await repo.get_recent(limit=3)
         assert len(recent) == 3
+
+
+class TestOutageRepository:
+    async def test_resolve_with_naive_started_at(self, session):
+        """Outages re-read from SQLite carry naive datetimes; resolve must
+        normalize them instead of raising TypeError (#6)."""
+        from gonzales.db.models import Outage
+        from gonzales.db.repository import OutageRepository
+
+        repo = OutageRepository(session)
+        started = datetime(2026, 4, 8, 11, 0, tzinfo=timezone.utc)
+        await repo.create(
+            Outage(started_at=started, failure_count=3, trigger_error="exit 173")
+        )
+
+        # Force re-read from DB so started_at comes back naive (SQLite drops tz)
+        session.expire_all()
+        active = await repo.get_active()
+        assert active is not None
+
+        resolved = await repo.resolve(active.id, started + timedelta(hours=2))
+        assert resolved is not None
+        assert resolved.ended_at is not None
+        assert resolved.duration_seconds == 7200
+
+        session.expire_all()
+        assert await repo.get_active() is None
+
+    async def test_statistics_include_active_outage(self, session):
+        """An unresolved outage must count toward totals with ongoing duration (#6)."""
+        from gonzales.db.models import Outage
+        from gonzales.db.repository import OutageRepository
+
+        repo = OutageRepository(session)
+        await repo.create(
+            Outage(
+                started_at=datetime.now(timezone.utc) - timedelta(minutes=10),
+                failure_count=3,
+                trigger_error="exit 173",
+            )
+        )
+
+        session.expire_all()
+        stats = await repo.get_statistics()
+        assert stats["total_outages"] == 1
+        assert stats["total_duration_seconds"] > 0

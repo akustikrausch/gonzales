@@ -22,6 +22,7 @@ import { QualityTimeline } from "../components/statistics/QualityTimeline";
 import { CorrelationMatrixView } from "../components/statistics/CorrelationMatrix";
 import { DegradationAlertBanner } from "../components/statistics/DegradationAlert";
 import { OutageSection } from "../components/statistics/OutageSection";
+import { dateLocale, parseUtcDate } from "../utils/format";
 
 type Tab = "overview" | "time" | "trends" | "insights" | "servers" | "outages";
 
@@ -264,7 +265,7 @@ export function StatisticsPage() {
                           {a.metric}: {a.value} (z={a.z_score})
                         </span>
                         <span className="text-[10px]" style={{ color: "var(--g-text-tertiary)" }}>
-                          Mean: {a.mean} / {new Date(a.timestamp).toLocaleDateString()}
+                          Mean: {a.mean} / {parseUtcDate(a.timestamp).toLocaleDateString(dateLocale())}
                         </span>
                       </div>
                     </div>

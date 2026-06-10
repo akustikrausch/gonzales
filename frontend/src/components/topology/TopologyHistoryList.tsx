@@ -1,5 +1,6 @@
 import { CheckCircle, AlertTriangle, Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { dateLocale, parseUtcDate } from "../../utils/format";
 import type { TopologyHistoryEntry } from "../../api/types";
 
 interface TopologyHistoryListProps {
@@ -14,7 +15,7 @@ export function TopologyHistoryList({ entries, selectedId, onSelect }: TopologyH
     <div className="space-y-2">
       {entries.map((entry) => {
         const isSelected = selectedId === entry.id;
-        const timestamp = new Date(entry.timestamp);
+        const timestamp = parseUtcDate(entry.timestamp);
 
         return (
           <button
@@ -43,7 +44,7 @@ export function TopologyHistoryList({ entries, selectedId, onSelect }: TopologyH
                 </div>
                 <div className="flex items-center gap-1 mt-1 text-xs" style={{ color: "var(--g-text-secondary)" }}>
                   <Clock className="w-3 h-3" />
-                  {timestamp.toLocaleDateString()} {timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  {timestamp.toLocaleDateString(dateLocale())} {timestamp.toLocaleTimeString(dateLocale(), { hour: '2-digit', minute: '2-digit' })}
                 </div>
               </div>
 

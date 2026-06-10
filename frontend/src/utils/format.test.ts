@@ -33,12 +33,13 @@ describe("formatDate", () => {
 });
 
 describe("formatShortDate", () => {
-  it("formats date as M/D HH:MM", () => {
+  it("formats date with day, month and time", () => {
     // Use UTC date to ensure consistent test results
     const date = new Date(Date.UTC(2024, 0, 15, 10, 30, 0));
     const result = formatShortDate(date.toISOString());
-    // Check it contains the expected parts (locale-adjusted)
-    expect(result).toMatch(/\d{1,2}\/\d{1,2}\s\d{2}:\d{2}/);
+    // Locale-dependent ordering, but day number and time must be present
+    expect(result).toMatch(/\d{1,2}/);
+    expect(result).toMatch(/\d{2}:\d{2}/);
   });
 
   it("pads hours and minutes correctly", () => {
@@ -46,6 +47,13 @@ describe("formatShortDate", () => {
     const result = formatShortDate(date.toISOString());
     // Should have two-digit hours and minutes
     expect(result).toMatch(/\d{2}:\d{2}/);
+  });
+
+  it("treats timestamps without timezone suffix as UTC", () => {
+    // Same instant, with and without 'Z' - must render identically
+    const withZ = formatShortDate("2024-01-15T10:30:00Z");
+    const withoutZ = formatShortDate("2024-01-15T10:30:00");
+    expect(withoutZ).toBe(withZ);
   });
 });
 

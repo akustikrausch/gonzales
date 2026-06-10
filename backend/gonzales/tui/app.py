@@ -21,6 +21,13 @@ from gonzales.tui.screens.test import TestScreen
 CSS_PATH = Path(__file__).parent / "styles" / "gonzales.tcss"
 
 
+def _to_local(dt: datetime) -> datetime:
+    """Convert a stored UTC timestamp (naive from SQLite) to local time."""
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone()
+
+
 class GonzalesApp(App):
     TITLE = "GONZALES Speed Monitor"
     SUB_TITLE = ""
@@ -79,7 +86,7 @@ class GonzalesApp(App):
                     "ping_latency_ms": latest.ping_latency_ms,
                     "ping_jitter_ms": latest.ping_jitter_ms,
                     "packet_loss_pct": latest.packet_loss_pct,
-                    "timestamp": latest.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+                    "timestamp": _to_local(latest.timestamp).strftime("%Y-%m-%d %H:%M:%S"),
                     "server_name": latest.server_name,
                     "isp": latest.isp,
                 })
@@ -93,7 +100,7 @@ class GonzalesApp(App):
             screen.update_data([
                 {
                     "id": m.id,
-                    "timestamp": m.timestamp.isoformat(),
+                    "timestamp": _to_local(m.timestamp).isoformat(),
                     "download_mbps": m.download_mbps,
                     "upload_mbps": m.upload_mbps,
                     "ping_latency_ms": m.ping_latency_ms,

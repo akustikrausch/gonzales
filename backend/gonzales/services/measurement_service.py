@@ -9,7 +9,7 @@ This module provides the MeasurementService class which handles:
 import asyncio
 import json
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -18,7 +18,11 @@ from gonzales.core.exceptions import CooldownError, TestInProgressError
 from gonzales.domain.value_objects import ThresholdConfig
 from gonzales.core.logging import logger
 from gonzales.db.models import Measurement, TestFailure
-from gonzales.db.repository import MeasurementRepository, TestFailureRepository
+from gonzales.db.repository import (
+    MeasurementRepository,
+    OutageRepository,
+    TestFailureRepository,
+)
 from gonzales.schemas.speedtest_raw import SpeedtestRawResult
 from gonzales.services.event_bus import event_bus
 from gonzales.services.speedtest_runner import speedtest_runner
@@ -163,6 +167,27 @@ class MeasurementService:
                 measurement = self._create_measurement_from_result(raw_result, raw_json)
                 repo = MeasurementRepository(session)
                 saved = await repo.create(measurement)
+
+                # A successful test means connectivity is restored - close any
+                # active outage record. DB-based, so it also covers outages
+                # orphaned by restarts and manually triggered tests (#6).
+                try:
+                    outage_repo = OutageRepository(session)
+                    active_outage = await outage_repo.get_active()
+                    if active_outage:
+                        resolved = await outage_repo.resolve(
+                            active_outage.id,
+                            datetime.now(timezone.utc),
+                            measurement_id=saved.id,
+                        )
+                        logger.info(
+                            "Resolved outage #%d after successful test "
+                            "(duration: %.0f seconds)",
+                            active_outage.id,
+                            resolved.duration_seconds or 0 if resolved else 0,
+                        )
+                except Exception as outage_err:
+                    logger.error("Failed to resolve active outage: %s", outage_err)
 
                 if saved.below_download_threshold or saved.below_upload_threshold:
                     tolerance_factor = 1 - (settings.tolerance_percent / 100)

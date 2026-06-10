@@ -1,6 +1,7 @@
 import { AlertTriangle, Clock, TrendingUp, Wifi, WifiOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useOutages, useOutageStatistics } from "../../hooks/useApi";
+import { dateLocale, parseUtcDate } from "../../utils/format";
 import type { OutageRecord } from "../../api/types";
 
 interface OutageSectionProps {
@@ -18,9 +19,9 @@ function formatDuration(seconds: number | null): string {
 }
 
 function formatDate(isoString: string): string {
-  return new Date(isoString).toLocaleString(undefined, {
-    month: "short",
+  return parseUtcDate(isoString).toLocaleString(dateLocale(), {
     day: "numeric",
+    month: "short",
     hour: "2-digit",
     minute: "2-digit",
   });

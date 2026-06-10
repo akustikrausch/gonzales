@@ -160,18 +160,10 @@ class SchedulerService:
                         consecutive_failures=self._consecutive_failures,
                     )
                 )
-                # Persist outage resolution to DB
-                if self._current_outage_id:
-                    try:
-                        async with async_session() as db_session:
-                            outage_repo = OutageRepository(db_session)
-                            await outage_repo.resolve(
-                                self._current_outage_id,
-                                datetime.now(timezone.utc),
-                            )
-                    except Exception as db_err:
-                        logger.error("Failed to persist outage resolution: %s", db_err)
-                    self._current_outage_id = None
+                # DB resolution is handled inside measurement_service.run_test()
+                # (it closes any active outage with the resolving measurement id),
+                # so only the in-memory state needs clearing here.
+                self._current_outage_id = None
                 self._outage_active = False
                 self._outage_started_at = None
             elif self._consecutive_failures > 0:

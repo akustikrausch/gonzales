@@ -5,6 +5,7 @@ import { useTheme } from "../../hooks/useTheme";
 import { useSpeedTest } from "../../context/SpeedTestContext";
 import { GlassBadge } from "../ui/GlassBadge";
 import { GlassButton } from "../ui/GlassButton";
+import { parseUtcDate } from "../../utils/format";
 
 const themeIcons = {
   auto: Monitor,
@@ -14,7 +15,7 @@ const themeIcons = {
 
 function formatNextRun(nextRunTime: string | null): string | null {
   if (!nextRunTime) return null;
-  const next = new Date(nextRunTime);
+  const next = parseUtcDate(nextRunTime);
   const now = new Date();
   const diffMs = next.getTime() - now.getTime();
 

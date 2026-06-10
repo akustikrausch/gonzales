@@ -2,6 +2,18 @@
 
 All notable changes to Gonzales will be documented in this file.
 
+## [3.10.3] - 2026-06-11
+
+### Bug Fixes
+
+- **Fix stuck outages that never resolve** (#6): Outage resolution previously relied on the scheduler's in-memory state, so outages were never closed after an add-on/app restart or when the next successful test was triggered manually. A successful test now always closes any active outage record in the database (with the resolving measurement linked). Also fixed a latent `TypeError` when resolving outages re-read from SQLite (naive vs. aware datetimes).
+- **Fix outage statistics showing "0 total outages" during an active outage** (#6): The statistics query excluded unresolved outages entirely. Active outages now count toward the total, and their ongoing duration (up to now) is included in duration/uptime calculations.
+- **Fix timestamps displayed in UTC instead of local time** (#5): The backend serializes UTC timestamps without a timezone suffix (SQLite drops it), so browsers interpreted them as local time. All API timestamps are now parsed as UTC and converted to the viewer's local timezone in the web UI; the TUI converts stored UTC timestamps to system local time.
+- **Fix inconsistent date format on chart axes** (#4): Chart x-axis labels used a hardcoded `M/D` (month-day) pattern while the rest of the UI used locale-dependent day-month formatting. All dates now use a shared locale-aware formatter (German locale when the UI language is German, browser locale otherwise).
+- **Fix `last_test_time` sensor in the HA integration**: The timestamp sensor returned a raw naive string; it now provides a timezone-aware UTC datetime as required by Home Assistant.
+
+---
+
 ## [3.10.2] - 2026-02-12
 
 ### Bug Fixes

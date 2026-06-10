@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import Integer, asc, delete, desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -196,8 +196,14 @@ class OutageRepository:
         )
         outage = result.scalar_one_or_none()
         if outage:
+            # SQLite returns naive datetimes - normalize both sides to aware UTC
+            started_at = outage.started_at
+            if started_at.tzinfo is None:
+                started_at = started_at.replace(tzinfo=timezone.utc)
+            if ended_at.tzinfo is None:
+                ended_at = ended_at.replace(tzinfo=timezone.utc)
             outage.ended_at = ended_at
-            outage.duration_seconds = (ended_at - outage.started_at).total_seconds()
+            outage.duration_seconds = (ended_at - started_at).total_seconds()
             outage.resolution_measurement_id = measurement_id
             await self.session.commit()
             await self.session.refresh(outage)
@@ -233,8 +239,12 @@ class OutageRepository:
         start_date: datetime | None = None,
         end_date: datetime | None = None,
     ) -> dict:
-        """Get aggregated outage statistics."""
-        query = select(Outage).where(Outage.ended_at.isnot(None))
+        """Get aggregated outage statistics.
+
+        Includes active (unresolved) outages: they count toward the total and
+        their ongoing duration is measured up to now.
+        """
+        query = select(Outage)
         if start_date:
             query = query.where(Outage.started_at >= start_date)
         if end_date:
@@ -243,10 +253,23 @@ class OutageRepository:
         result = await self.session.execute(query)
         outages = list(result.scalars().all())
 
+        now = datetime.now(timezone.utc)
+        durations: list[float] = []
+        for o in outages:
+            if o.duration_seconds is not None:
+                durations.append(o.duration_seconds)
+            elif o.ended_at is None:
+                started = o.started_at
+                if started.tzinfo is None:
+                    started = started.replace(tzinfo=timezone.utc)
+                durations.append(max(0.0, (now - started).total_seconds()))
+            else:
+                durations.append(0.0)
+
         total_outages = len(outages)
-        total_duration = sum(o.duration_seconds or 0 for o in outages)
+        total_duration = sum(durations)
         avg_duration = total_duration / total_outages if total_outages > 0 else 0
-        longest = max((o.duration_seconds or 0 for o in outages), default=0)
+        longest = max(durations, default=0)
 
         # Calculate uptime percentage
         if start_date and end_date:

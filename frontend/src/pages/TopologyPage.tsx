@@ -5,6 +5,7 @@ import { useLatestTopology, useTopologyHistory, useNetworkDiagnosis, useAnalyzeT
 import { Spinner } from "../components/ui/Spinner";
 import { HopVisualization } from "../components/topology/HopVisualization";
 import { TopologyHistoryList } from "../components/topology/TopologyHistoryList";
+import { formatDate } from "../utils/format";
 import type { NetworkTopology } from "../api/types";
 
 export function TopologyPage() {
@@ -153,7 +154,7 @@ export function TopologyPage() {
                 </div>
                 <div className="flex items-center gap-2 text-sm" style={{ color: "var(--g-text-secondary)" }}>
                   <Clock className="w-4 h-4" />
-                  {new Date(displayedTopology.timestamp).toLocaleString()}
+                  {formatDate(displayedTopology.timestamp)}
                 </div>
               </div>
 

@@ -5,13 +5,39 @@ export function formatSpeed(mbps: number): string {
   return `${mbps.toFixed(1)} Mbps`;
 }
 
+import i18n from "../i18n";
+
+/** Locale for date formatting: explicit for German, browser default otherwise. */
+export function dateLocale(): string | undefined {
+  return i18n.language?.toLowerCase().startsWith("de") ? "de-DE" : undefined;
+}
+
+/**
+ * Parse an ISO timestamp from the API as UTC.
+ * The backend stores UTC, but SQLite drops the timezone info, so strings can
+ * arrive without a 'Z' suffix - new Date() would interpret them as local time.
+ */
+export function parseUtcDate(iso: string): Date {
+  const hasTimezone = /(?:Z|[+-]\d{2}:?\d{2})$/.test(iso);
+  return new Date(hasTimezone ? iso : `${iso}Z`);
+}
+
 export function formatDate(iso: string): string {
-  return new Date(iso).toLocaleString();
+  return parseUtcDate(iso).toLocaleString(dateLocale());
 }
 
 export function formatShortDate(iso: string): string {
-  const d = new Date(iso);
-  return `${d.getMonth() + 1}/${d.getDate()} ${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
+  const d = parseUtcDate(iso);
+  const date = d.toLocaleDateString(dateLocale(), {
+    day: "numeric",
+    month: "short",
+  });
+  const time = d.toLocaleTimeString(dateLocale(), {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+  return `${date} ${time}`;
 }
 
 export function formatBytes(bytes: number): string {
